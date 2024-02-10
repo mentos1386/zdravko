@@ -1,121 +1,117 @@
-{{define "title"}}Home{{end}}
+{{define "title"}}Status{{end}}
 
 {{define "main"}}
-  <div class="container max-w-screen-md mt-6 flex flex-col">
-    <nav class="justify-center flex space-x-2">
-      <a href="/" class="btn btn-active">Status</a>
-      <a href="/incidents" class="btn">Incidents</a>
-      <a href="/about" class="btn">About</a>
-    </nav>
-    <div class="flex flex-col items-center mt-20">
-      <svg class="feather h-20 w-20 rounded-full bg-green-300 p-4 overflow-visible"><use href="/static/icons/feather-sprite.svg#check" /></svg>
-      <h1 class="text-slate-500">All services are online</h1>
-      <p class="text-slate-500 text-sm">Last updated on Feb 10 at 10:55am UTC</p>
-    </div>
-    <div class="flex flex-col items-center mt-20">
-      <svg class="feather h-20 w-20 rounded-full bg-red-300 p-4 overflow-visible"><use href="/static/icons/feather-sprite.svg#alert-triangle" /></svg>
-      <h3 class="text-slate-500">Degraded performance</h3>
-      <p class="text-slate-500 text-sm">Last updated on Feb 10 at 10:55am UTC</p>
-    </div>
-    <div class="grid justify-items-stretch justify-stretch items-center mt-20 bg-gray-200 shadow-inner p-5 rounded-lg">
-      <div class="grid grid-cols-2 gap-2">
-        <div class="">foo.bar</div>
-        <div class="justify-self-end text-sm">69.420% uptime</div>
-        <div class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden">
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-red-500 hover:bg-red-700 flex-auto"></div>
-          <div class="bg-red-500 hover:bg-red-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-red-500 hover:bg-red-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-          <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
-        </div>
-        <div class="text-slate-500 justify-self-start text-sm">90 days ago</div>
-        <div class="text-slate-500 justify-self-end text-sm">Today</div>
+  <div class="flex flex-col items-center">
+    <svg class="feather h-20 w-20 rounded-full bg-green-300 p-4 overflow-visible"><use href="/static/icons/feather-sprite.svg#check" /></svg>
+    <h1 class="text-slate-500">All services are online</h1>
+    <p class="text-slate-500 text-sm">Last updated on Feb 10 at 10:55am UTC</p>
+  </div>
+  <div class="flex flex-col items-center mt-20">
+    <svg class="feather h-20 w-20 rounded-full bg-red-300 p-4 overflow-visible"><use href="/static/icons/feather-sprite.svg#alert-triangle" /></svg>
+    <h3 class="text-slate-500">Degraded performance</h3>
+    <p class="text-slate-500 text-sm">Last updated on Feb 10 at 10:55am UTC</p>
+  </div>
+  <div class="grid justify-items-stretch justify-stretch items-center mt-20 bg-gray-200 shadow-inner p-5 rounded-lg">
+    <div class="grid grid-cols-2 gap-2">
+      <div class="flex items-center">
+        <svg class="feather h-5 w-5 stroke-[3] rounded-full bg-green-400 p-1 mr-1"><use href="/static/icons/feather-sprite.svg#check" /></svg>
+        <p>foo.bar</p>
       </div>
+      <div class="justify-self-end text-sm">69.420% uptime</div>
+      <div class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden">
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-red-500 hover:bg-red-700 flex-auto"></div>
+        <div class="bg-red-500 hover:bg-red-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-red-500 hover:bg-red-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+      </div>
+      <div class="text-slate-500 justify-self-start text-sm">90 days ago</div>
+      <div class="text-slate-500 justify-self-end text-sm">Today</div>
     </div>
   </div>
 {{end}}
