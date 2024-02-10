@@ -1,0 +1,19 @@
+version: "0.5"
+
+processes:
+  tailwind:
+    command: watchexec -r -e go,tmpl,css just tailwindcss-build
+    availability:
+      restart: "always"
+  server:
+    command: watchexec -r -e go,tmpl,css just run-server
+    availability:
+      restart: "always"
+  worker:
+    command: watchexec -r -e go,tmpl,css just run-worker
+    availability:
+      restart: "always"
+  temporal:
+    command: just run-temporal
+    availability:
+      restart: "always"

@@ -1,0 +1,16 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Zdravko - {{template "title" .}}</title>
+    <link rel="stylesheet" href="/static/css/tailwind.css">
+  </head>
+  <body class="bg-gray-100">
+    {{template "main" .}}
+    <script src="/static/js/htmx.min.js"></script>
+  </body>
+</html>
+{{end}}

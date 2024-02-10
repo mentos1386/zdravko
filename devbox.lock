@@ -1,0 +1,85 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "go@1.21": {
+      "last_modified": "2024-01-27T14:55:31Z",
+      "resolved": "github:NixOS/nixpkgs/160b762eda6d139ac10ae081f8f78d640dd523eb#go",
+      "source": "devbox-search",
+      "version": "1.21.6",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/8m3wjb23sfbjpjsj4l82b4zh9xnw62hh-go-1.21.6"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/ia1z2slwgdgibad4z42rpd1dib7gk999-go-1.21.6"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/dm4s4dfrah5zhl6larnrbh07v76j4pgy-go-1.21.6"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/cw9dqybf9w6wp7827h23pb3ym8gs8h47-go-1.21.6"
+        }
+      }
+    },
+    "tailwindcss@latest": {
+      "last_modified": "2024-01-27T14:55:31Z",
+      "resolved": "github:NixOS/nixpkgs/160b762eda6d139ac10ae081f8f78d640dd523eb#tailwindcss",
+      "source": "devbox-search",
+      "version": "3.4.1",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/dii6r8cwfav7r8kd779f3ma5bs71ny54-tailwindcss-3.4.1"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/b83zqgln5z5wpxiiccrlcmzgvgqj24wq-tailwindcss-3.4.1"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/lpgbpk0lpiqp8my34l0agcz26qcdlshq-tailwindcss-3.4.1"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/xag8bx7ld2k2ixg52yw5c9knbqw5a3bs-tailwindcss-3.4.1"
+        }
+      }
+    },
+    "temporal-cli@latest": {
+      "last_modified": "2024-02-05T02:15:44Z",
+      "resolved": "github:NixOS/nixpkgs/0a254180b4cad6be45aa46dce896bdb8db5d2930#temporal-cli",
+      "source": "devbox-search",
+      "version": "1.18.0",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/6897s8ww6fhkiqvqdwfiji7497gvcxj6-temporal-cli-1.18.0"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/d0lvc4fq5y9cql0fshy32285ldzyvhjz-temporal-cli-1.18.0"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/dxwlx019wah1pj0hr3j50skrbdlb3x9g-temporal-cli-1.18.0"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/v6z5knwsyxymnsk1gfmlnm51j22gf1df-temporal-cli-1.18.0"
+        }
+      }
+    },
+    "watchexec@latest": {
+      "last_modified": "2024-01-27T14:55:31Z",
+      "resolved": "github:NixOS/nixpkgs/160b762eda6d139ac10ae081f8f78d640dd523eb#watchexec",
+      "source": "devbox-search",
+      "version": "1.25.1",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/lmi497mmsgnafrrk4lkas8n7smpsmaxl-watchexec-1.25.1"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/n9j2ri219dqp8hyj6km7n3rhcbnasxqp-watchexec-1.25.1"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/7ws8nlmazah2bqqhvsfyv6c3y8p5zaxb-watchexec-1.25.1"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/pmji9885k2p6k45c4a36zv4xccvq0m4x-watchexec-1.25.1"
+        }
+      }
+    }
+  }
+}

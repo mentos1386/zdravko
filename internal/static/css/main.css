@@ -1,0 +1,26 @@
+.feather {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn {
+  @apply font-bold py-2 px-4 rounded;
+}
+.btn:hover {
+  @apply bg-gray-200 shadow-inner;
+}
+.btn-active {
+  @apply bg-gray-300 text-black shadow;
+}
+.btn-active:hover {
+  @apply shadow;
+}
