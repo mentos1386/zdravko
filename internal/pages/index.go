@@ -10,7 +10,6 @@ import (
 func Index(w http.ResponseWriter, r *http.Request) {
 	ts, err := template.ParseFS(internal.Templates,
 		"ui/components/base.tmpl",
-		"ui/components/icon.tmpl",
 		"ui/pages/index.tmpl",
 	)
 	if err != nil {
