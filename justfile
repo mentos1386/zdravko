@@ -1,3 +1,6 @@
+# Always use devbox environment to run commands.
+set shell := ["devbox", "run"]
+
 STATIC_DIR := "./internal/static"
 
 # Start devbox shell

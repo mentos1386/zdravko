@@ -10,6 +10,8 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
    - Otherwise using a cronjob would do the job, no need for temporal.
  - [ ] Some nice UI to try out [htmx](https://htmx.org/).
 
+![Screenshot](docs/screenshot.png)
+
 # Development
 
 ### Dependencies
