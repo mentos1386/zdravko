@@ -16,14 +16,14 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"code.tjo.space/mentos1386/zdravko/internal/database"
+	"code.tjo.space/mentos1386/zdravko/internal/models"
 )
 
 func newHealthcheck(db *gorm.DB, opts ...gen.DOOption) healthcheck {
 	_healthcheck := healthcheck{}
 
 	_healthcheck.healthcheckDo.UseDB(db, opts...)
-	_healthcheck.healthcheckDo.UseModel(&database.Healthcheck{})
+	_healthcheck.healthcheckDo.UseModel(&models.Healthcheck{})
 
 	tableName := _healthcheck.healthcheckDo.TableName()
 	_healthcheck.ALL = field.NewAsterisk(tableName)
@@ -139,17 +139,17 @@ type IHealthcheckDo interface {
 	Count() (count int64, err error)
 	Scopes(funcs ...func(gen.Dao) gen.Dao) IHealthcheckDo
 	Unscoped() IHealthcheckDo
-	Create(values ...*database.Healthcheck) error
-	CreateInBatches(values []*database.Healthcheck, batchSize int) error
-	Save(values ...*database.Healthcheck) error
-	First() (*database.Healthcheck, error)
-	Take() (*database.Healthcheck, error)
-	Last() (*database.Healthcheck, error)
-	Find() ([]*database.Healthcheck, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*database.Healthcheck, err error)
-	FindInBatches(result *[]*database.Healthcheck, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Create(values ...*models.Healthcheck) error
+	CreateInBatches(values []*models.Healthcheck, batchSize int) error
+	Save(values ...*models.Healthcheck) error
+	First() (*models.Healthcheck, error)
+	Take() (*models.Healthcheck, error)
+	Last() (*models.Healthcheck, error)
+	Find() ([]*models.Healthcheck, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.Healthcheck, err error)
+	FindInBatches(result *[]*models.Healthcheck, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*database.Healthcheck) (info gen.ResultInfo, err error)
+	Delete(...*models.Healthcheck) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -161,9 +161,9 @@ type IHealthcheckDo interface {
 	Assign(attrs ...field.AssignExpr) IHealthcheckDo
 	Joins(fields ...field.RelationField) IHealthcheckDo
 	Preload(fields ...field.RelationField) IHealthcheckDo
-	FirstOrInit() (*database.Healthcheck, error)
-	FirstOrCreate() (*database.Healthcheck, error)
-	FindByPage(offset int, limit int) (result []*database.Healthcheck, count int64, err error)
+	FirstOrInit() (*models.Healthcheck, error)
+	FirstOrCreate() (*models.Healthcheck, error)
+	FindByPage(offset int, limit int) (result []*models.Healthcheck, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
 	Scan(result interface{}) (err error)
 	Returning(value interface{}, columns ...string) IHealthcheckDo
@@ -263,57 +263,57 @@ func (h healthcheckDo) Unscoped() IHealthcheckDo {
 	return h.withDO(h.DO.Unscoped())
 }
 
-func (h healthcheckDo) Create(values ...*database.Healthcheck) error {
+func (h healthcheckDo) Create(values ...*models.Healthcheck) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return h.DO.Create(values)
 }
 
-func (h healthcheckDo) CreateInBatches(values []*database.Healthcheck, batchSize int) error {
+func (h healthcheckDo) CreateInBatches(values []*models.Healthcheck, batchSize int) error {
 	return h.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (h healthcheckDo) Save(values ...*database.Healthcheck) error {
+func (h healthcheckDo) Save(values ...*models.Healthcheck) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return h.DO.Save(values)
 }
 
-func (h healthcheckDo) First() (*database.Healthcheck, error) {
+func (h healthcheckDo) First() (*models.Healthcheck, error) {
 	if result, err := h.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*database.Healthcheck), nil
+		return result.(*models.Healthcheck), nil
 	}
 }
 
-func (h healthcheckDo) Take() (*database.Healthcheck, error) {
+func (h healthcheckDo) Take() (*models.Healthcheck, error) {
 	if result, err := h.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*database.Healthcheck), nil
+		return result.(*models.Healthcheck), nil
 	}
 }
 
-func (h healthcheckDo) Last() (*database.Healthcheck, error) {
+func (h healthcheckDo) Last() (*models.Healthcheck, error) {
 	if result, err := h.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*database.Healthcheck), nil
+		return result.(*models.Healthcheck), nil
 	}
 }
 
-func (h healthcheckDo) Find() ([]*database.Healthcheck, error) {
+func (h healthcheckDo) Find() ([]*models.Healthcheck, error) {
 	result, err := h.DO.Find()
-	return result.([]*database.Healthcheck), err
+	return result.([]*models.Healthcheck), err
 }
 
-func (h healthcheckDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*database.Healthcheck, err error) {
-	buf := make([]*database.Healthcheck, 0, batchSize)
+func (h healthcheckDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.Healthcheck, err error) {
+	buf := make([]*models.Healthcheck, 0, batchSize)
 	err = h.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -321,7 +321,7 @@ func (h healthcheckDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int)
 	return results, err
 }
 
-func (h healthcheckDo) FindInBatches(result *[]*database.Healthcheck, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (h healthcheckDo) FindInBatches(result *[]*models.Healthcheck, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return h.DO.FindInBatches(result, batchSize, fc)
 }
 
@@ -347,23 +347,23 @@ func (h healthcheckDo) Preload(fields ...field.RelationField) IHealthcheckDo {
 	return &h
 }
 
-func (h healthcheckDo) FirstOrInit() (*database.Healthcheck, error) {
+func (h healthcheckDo) FirstOrInit() (*models.Healthcheck, error) {
 	if result, err := h.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*database.Healthcheck), nil
+		return result.(*models.Healthcheck), nil
 	}
 }
 
-func (h healthcheckDo) FirstOrCreate() (*database.Healthcheck, error) {
+func (h healthcheckDo) FirstOrCreate() (*models.Healthcheck, error) {
 	if result, err := h.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*database.Healthcheck), nil
+		return result.(*models.Healthcheck), nil
 	}
 }
 
-func (h healthcheckDo) FindByPage(offset int, limit int) (result []*database.Healthcheck, count int64, err error) {
+func (h healthcheckDo) FindByPage(offset int, limit int) (result []*models.Healthcheck, count int64, err error) {
 	result, err = h.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -392,7 +392,7 @@ func (h healthcheckDo) Scan(result interface{}) (err error) {
 	return h.DO.Scan(result)
 }
 
-func (h healthcheckDo) Delete(models ...*database.Healthcheck) (result gen.ResultInfo, err error) {
+func (h healthcheckDo) Delete(models ...*models.Healthcheck) (result gen.ResultInfo, err error) {
 	return h.DO.Delete(models)
 }
 

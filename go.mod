@@ -3,8 +3,12 @@ module code.tjo.space/mentos1386/zdravko
 go 1.21.6
 
 require (
+	github.com/glebarez/sqlite v1.10.0
 	github.com/gorilla/mux v1.8.1
 	go.temporal.io/sdk v1.25.1
+	gorm.io/gen v0.3.25
+	gorm.io/gorm v1.25.7
+	gorm.io/plugin/dbresolver v1.5.0
 )
 
 require (
@@ -12,7 +16,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
-	github.com/glebarez/sqlite v1.10.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
@@ -48,10 +51,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/datatypes v1.2.0 // indirect
 	gorm.io/driver/mysql v1.5.4 // indirect
-	gorm.io/gen v0.3.25 // indirect
-	gorm.io/gorm v1.25.7 // indirect
 	gorm.io/hints v1.1.2 // indirect
-	gorm.io/plugin/dbresolver v1.5.0 // indirect
 	modernc.org/libc v1.41.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
 	modernc.org/memory v1.7.2 // indirect
