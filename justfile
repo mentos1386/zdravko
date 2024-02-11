@@ -1,5 +1,7 @@
 # Always use devbox environment to run commands.
 set shell := ["devbox", "run"]
+# Load dotenv
+set dotenv-load
 
 STATIC_DIR := "./internal/static"
 
@@ -45,4 +47,4 @@ _feather-icons-download:
   curl -sLo {{STATIC_DIR}}/icons/feather-sprite.svg https://unpkg.com/feather-icons/dist/feather-sprite.svg
 
 _generate-gorm:
-  go run cmd/generate/main.go
+  go run tools/generate/main.go

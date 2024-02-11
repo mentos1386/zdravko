@@ -1,4 +1,7 @@
 dist/
 
 # Database
-gorm.db
+zdravko.db
+
+# Config
+.env

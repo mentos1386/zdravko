@@ -1,14 +1,14 @@
-package pages
+package handlers
 
 import (
 	"net/http"
 	"text/template"
 
-	"code.tjo.space/mentos1386/zdravko/internal/ui"
+	"code.tjo.space/mentos1386/zdravko/web/templates"
 )
 
-func (p *PageHandler) Index(w http.ResponseWriter, r *http.Request) {
-	ts, err := template.ParseFS(ui.Templates,
+func (h *BaseHandler) Index(w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFS(templates.Templates,
 		"components/base.tmpl",
 		"pages/index.tmpl",
 	)

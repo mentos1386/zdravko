@@ -9,6 +9,13 @@ primary_region = 'waw'
 
 [env]
   PORT = '8080'
+  ROOT_URL = 'https://zdravko.fly.dev'
+  SQLITE_DB_PATH = 'zdravko.db'
+  # Other are defined in secrets
+  OAUTH2_SCOPES = 'openid,profile,email'
+  OAUTH2_ENDPOINT_TOKEN_URL = 'https://id.tjo.space/application/o/token/'
+  OAUTH2_ENDPOINT_AUTH_URL = 'https://id.tjo.space/application/o/authorize/'
+  OAUTH2_ENDPOINT_USER_INFO_URL = 'https://id.tjo.space/application/o/userinfo/'
 
 [processes]
   server = "server"

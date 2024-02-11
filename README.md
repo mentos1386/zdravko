@@ -20,6 +20,9 @@ Demo is available at https://zdravko.fly.dev.
  * [justfile](https://github.com/casey/just)
 
 ```sh
+# Configure
+cp example.env .env
+
 # Start development environment
 just run
 ```

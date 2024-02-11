@@ -1,16 +1,22 @@
 package internal
 
 import (
+	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"code.tjo.space/mentos1386/zdravko/internal/models/query"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 
 //go:generate just _generate-gorm
-func ConnectToDatabase() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
+func ConnectToDatabase(path string) (*gorm.DB, *query.Query, error) {
+	db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return db, nil
+	db.AutoMigrate(&models.Healthcheck{})
+
+	q := query.Use(db)
+
+	return db, q, nil
 }
