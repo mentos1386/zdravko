@@ -11,7 +11,7 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
  - [ ] Some nice UI to try out [htmx](https://htmx.org/).
 
 ![Screenshot](docs/screenshot.png)
-Demo is available at https://zdravko.fly.io.
+Demo is available at https://zdravko.fly.dev.
 
 # Development
 
