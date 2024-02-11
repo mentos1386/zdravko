@@ -1,1 +1,4 @@
 dist/
+
+# Database
+gorm.db

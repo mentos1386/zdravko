@@ -1,8 +1,8 @@
-package internal
+package ui
 
 import (
 	"embed"
 )
 
-//go:embed ui
+//go:embed *
 var Templates embed.FS

@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"text/template"
 
-	"code.tjo.space/mentos1386/zdravko/internal"
+	"code.tjo.space/mentos1386/zdravko/internal/ui"
 )
 
-func Settings(w http.ResponseWriter, r *http.Request) {
-	ts, err := template.ParseFS(internal.Templates,
-		"ui/components/base.tmpl",
-		"ui/pages/settings.tmpl",
+func (p *PageHandler) Settings(w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFS(ui.Templates,
+		"components/base.tmpl",
+		"pages/settings.tmpl",
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

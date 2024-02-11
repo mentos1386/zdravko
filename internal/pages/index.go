@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"text/template"
 
-	"code.tjo.space/mentos1386/zdravko/internal"
+	"code.tjo.space/mentos1386/zdravko/internal/ui"
 )
 
-func Index(w http.ResponseWriter, r *http.Request) {
-	ts, err := template.ParseFS(internal.Templates,
-		"ui/components/base.tmpl",
-		"ui/pages/index.tmpl",
+func (p *PageHandler) Index(w http.ResponseWriter, r *http.Request) {
+	ts, err := template.ParseFS(ui.Templates,
+		"components/base.tmpl",
+		"pages/index.tmpl",
 	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -2,7 +2,7 @@ version: "0.5"
 
 processes:
   tailwind:
-    command: watchexec -r -e go,tmpl,css just tailwindcss-build
+    command: watchexec -r -e go,tmpl,css just _tailwindcss-build
     availability:
       restart: "always"
   server:

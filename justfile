@@ -3,23 +3,9 @@ set shell := ["devbox", "run"]
 
 STATIC_DIR := "./internal/static"
 
-# Start devbox shell
-shell:
-  devbox shell
-
-tailwindcss-build:
-  tailwindcss build -i {{STATIC_DIR}}/css/main.css -o {{STATIC_DIR}}/css/tailwind.css
-
-htmx-download:
-  mkdir -p  {{STATIC_DIR}}/js
-  curl -sLo {{STATIC_DIR}}/js/htmx.min.js https://unpkg.com/htmx.org/dist/htmx.min.js
-
-feather-icons-download:
-  mkdir -p {{STATIC_DIR}}/icons
-  curl -sLo {{STATIC_DIR}}/icons/feather-sprite.svg https://unpkg.com/feather-icons/dist/feather-sprite.svg
-
-generate:
-  go generate ./...
+# Run full development environment
+run:
+  devbox services up
 
 # Start temporal which is accassible at http://localhost:8233/
 run-temporal:
@@ -35,10 +21,28 @@ run-worker:
   go build -o dist/worker cmd/worker/main.go
   ./dist/worker
 
-# Run full development environment
-run:
-  devbox services up
-
 # Deploy the application to fly.io
 deploy:
   fly deploy
+
+# Start devbox shell
+shell:
+  devbox shell
+
+# Generate and download all external dependencies.
+generate:
+  go generate ./...
+
+_tailwindcss-build:
+  tailwindcss build -i {{STATIC_DIR}}/css/main.css -o {{STATIC_DIR}}/css/tailwind.css
+
+_htmx-download:
+  mkdir -p  {{STATIC_DIR}}/js
+  curl -sLo {{STATIC_DIR}}/js/htmx.min.js https://unpkg.com/htmx.org/dist/htmx.min.js
+
+_feather-icons-download:
+  mkdir -p {{STATIC_DIR}}/icons
+  curl -sLo {{STATIC_DIR}}/icons/feather-sprite.svg https://unpkg.com/feather-icons/dist/feather-sprite.svg
+
+_generate-gorm:
+  go run cmd/generate/main.go

@@ -9,6 +9,7 @@ import (
 
 	"code.tjo.space/mentos1386/zdravko/internal"
 	"code.tjo.space/mentos1386/zdravko/internal/pages"
+	"code.tjo.space/mentos1386/zdravko/internal/static"
 )
 
 func main() {
@@ -19,11 +20,19 @@ func main() {
 
 	r := mux.NewRouter()
 
-	// Server static files
-	r.PathPrefix("/static/").Handler(http.FileServer(http.FS(internal.Static)))
+	db, err := internal.ConnectToDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Connected to database")
 
-	r.HandleFunc("/", pages.Index).Methods("GET")
-	r.HandleFunc("/settings", pages.Settings).Methods("GET")
+	page := pages.NewPageHandler(db)
+
+	// Server static files
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static.Static))))
+
+	r.HandleFunc("/", page.Index).Methods("GET")
+	r.HandleFunc("/settings", page.Settings).Methods("GET")
 
 	log.Println("Server started on", port)
 	log.Fatal(http.ListenAndServe(":"+port, r))
