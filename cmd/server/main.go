@@ -44,11 +44,14 @@ func main() {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static.Static))))
 
 	r.HandleFunc("/", h.Index).Methods("GET")
-	r.HandleFunc("/settings", h.Settings).Methods("GET")
+
+	// Authenticated routes
+	r.HandleFunc("/settings", h.Authenticated(h.Settings)).Methods("GET")
 
 	// OAuth2
 	r.HandleFunc("/oauth2/login", h.OAuth2LoginGET).Methods("GET")
 	r.HandleFunc("/oauth2/callback", h.OAuth2CallbackGET).Methods("GET")
+	r.HandleFunc("/oauth2/logout", h.Authenticated(h.OAuth2LogoutGET)).Methods("GET")
 
 	log.Println("Server started on", config.PORT)
 	log.Fatal(http.ListenAndServe(":"+config.PORT, r))

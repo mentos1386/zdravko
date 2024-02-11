@@ -19,6 +19,7 @@ type Config struct {
 	OAUTH2_ENDPOINT_TOKEN_URL     string
 	OAUTH2_ENDPOINT_AUTH_URL      string
 	OAUTH2_ENDPOINT_USER_INFO_URL string
+	OAUTH2_ENDPOINT_LOGOUT_URL    string
 }
 
 func getEnv(key, fallback string) string {
@@ -49,5 +50,6 @@ func NewConfig() *Config {
 		OAUTH2_ENDPOINT_TOKEN_URL:     getEnvRequired("OAUTH2_ENDPOINT_TOKEN_URL"),
 		OAUTH2_ENDPOINT_AUTH_URL:      getEnvRequired("OAUTH2_ENDPOINT_AUTH_URL"),
 		OAUTH2_ENDPOINT_USER_INFO_URL: getEnvRequired("OAUTH2_ENDPOINT_USER_INFO_URL"),
+		OAUTH2_ENDPOINT_LOGOUT_URL:    getEnvRequired("OAUTH2_ENDPOINT_LOGOUT_URL"),
 	}
 }

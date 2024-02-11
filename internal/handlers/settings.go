@@ -7,7 +7,7 @@ import (
 	"code.tjo.space/mentos1386/zdravko/web/templates"
 )
 
-func (h *BaseHandler) Settings(w http.ResponseWriter, r *http.Request) {
+func (h *BaseHandler) Settings(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
 	ts, err := template.ParseFS(templates.Templates,
 		"components/base.tmpl",
 		"pages/settings.tmpl",
@@ -17,7 +17,7 @@ func (h *BaseHandler) Settings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", nil)
+	err = ts.ExecuteTemplate(w, "base", user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

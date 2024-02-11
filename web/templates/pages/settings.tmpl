@@ -2,4 +2,8 @@
 
 {{define "main"}}
   <h1>The settings!</h1>
+  <p>You are logged in as {{.Email}}.</p>
+  <p>Your id is {{.ID}}.</p>
+  <p>Your access expieres at {{.OAuth2Expiry}}.</p>
+  <a href="/oauth2/logout">Logout</a>
 {{end}}

@@ -2,12 +2,18 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 
 	"code.tjo.space/mentos1386/zdravko/internal"
 	"golang.org/x/oauth2"
 )
+
+type UserInfo struct {
+	Sub   string `json:"sub"`
+	Email string `json:"email"`
+}
 
 func newOAuth2(config *internal.Config) *oauth2.Config {
 	return &oauth2.Config{
@@ -20,6 +26,40 @@ func newOAuth2(config *internal.Config) *oauth2.Config {
 			AuthURL:  config.OAUTH2_ENDPOINT_AUTH_URL,
 		},
 	}
+}
+
+func (h *BaseHandler) AuthenticatedUserToOAuth2Token(user *AuthenticatedUser) *oauth2.Token {
+	return &oauth2.Token{
+		AccessToken:  user.OAuth2AccessToken,
+		TokenType:    user.OAuth2TokenType,
+		RefreshToken: user.OAuth2RefreshToken,
+		Expiry:       user.OAuth2Expiry,
+	}
+}
+
+func (h *BaseHandler) RefreshToken(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) (*AuthenticatedUser, error) {
+	tok := h.AuthenticatedUserToOAuth2Token(user)
+	conf := newOAuth2(h.config)
+	refreshed, err := conf.TokenSource(context.Background(), tok).Token()
+	if err != nil {
+		return nil, err
+	}
+
+	refreshedUser := &AuthenticatedUser{
+		ID:                 user.ID,
+		Email:              user.Email,
+		OAuth2AccessToken:  refreshed.AccessToken,
+		OAuth2RefreshToken: refreshed.RefreshToken,
+		OAuth2TokenType:    refreshed.TokenType,
+		OAuth2Expiry:       refreshed.Expiry,
+	}
+
+	err = h.SetAuthenticatedUserForRequest(w, r, refreshedUser)
+	if err != nil {
+		return nil, err
+	}
+
+	return refreshedUser, nil
 }
 
 func (h *BaseHandler) OAuth2LoginGET(w http.ResponseWriter, r *http.Request) {
@@ -54,10 +94,41 @@ func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	_, err = w.Write(body)
+	var userInfo UserInfo
+	err = json.Unmarshal(body, &userInfo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	err = h.SetAuthenticatedUserForRequest(w, r, &AuthenticatedUser{
+		ID:                 userInfo.Sub,
+		Email:              userInfo.Email,
+		OAuth2AccessToken:  tok.AccessToken,
+		OAuth2RefreshToken: tok.RefreshToken,
+		OAuth2TokenType:    tok.TokenType,
+		OAuth2Expiry:       tok.Expiry,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/settings", http.StatusTemporaryRedirect)
+}
+
+func (h *BaseHandler) OAuth2LogoutGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+	tok := h.AuthenticatedUserToOAuth2Token(user)
+	client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(tok))
+	_, err := client.Get(h.config.OAUTH2_ENDPOINT_USER_INFO_URL)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = h.ClearAuthenticatedUserForRequest(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
