@@ -26,3 +26,6 @@ cp example.env .env
 # Start development environment
 just run
 ```
+
+### License
+Under AGPL, see [LICENSE](LICENSE) file.
