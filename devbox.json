@@ -3,6 +3,7 @@
     "go@1.21",
     "temporal-cli@latest",
     "watchexec@latest",
-    "tailwindcss@latest"
+    "tailwindcss@latest",
+    "flyctl@latest"
   ]
 }

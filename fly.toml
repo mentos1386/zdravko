@@ -1,0 +1,27 @@
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+
+app = 'zdravko'
+primary_region = 'waw'
+
+[build]
+  builder = 'paketobuildpacks/builder:base'
+  buildpacks = ['gcr.io/paketo-buildpacks/go']
+
+[env]
+  PORT = '8080'
+
+[processes]
+  server = "server"
+  #worker = "worker"
+
+[http_service]
+  processes = ["server"]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 256

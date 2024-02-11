@@ -38,3 +38,7 @@ run-worker:
 # Run full development environment
 run:
   devbox services up
+
+# Deploy the application to fly.io
+deploy:
+  fly deploy

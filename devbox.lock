@@ -1,6 +1,26 @@
 {
   "lockfile_version": "1",
   "packages": {
+    "flyctl@latest": {
+      "last_modified": "2024-02-05T02:15:44Z",
+      "resolved": "github:NixOS/nixpkgs/0a254180b4cad6be45aa46dce896bdb8db5d2930#flyctl",
+      "source": "devbox-search",
+      "version": "0.1.147",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/r2nqhmbcmijhcc1saz41hcxz8rr4b41x-flyctl-0.1.147"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/04xazp0avkk26zyf50prl1mskflfpb86-flyctl-0.1.147"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/4zbndlj7m4wy834qppl2rir9fcwrzji4-flyctl-0.1.147"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/8cfzmq9dka6vaah9j2lpdpbkpm4q0i4m-flyctl-0.1.147"
+        }
+      }
+    },
     "go@1.21": {
       "last_modified": "2024-01-27T14:55:31Z",
       "resolved": "github:NixOS/nixpkgs/160b762eda6d139ac10ae081f8f78d640dd523eb#go",

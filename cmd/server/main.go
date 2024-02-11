@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 
@@ -11,6 +12,11 @@ import (
 )
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
+	}
+
 	r := mux.NewRouter()
 
 	// Server static files
@@ -19,6 +25,6 @@ func main() {
 	r.HandleFunc("/", pages.Index).Methods("GET")
 	r.HandleFunc("/settings", pages.Settings).Methods("GET")
 
-	log.Println("Server started on :8000")
-	log.Fatal(http.ListenAndServe(":8000", r))
+	log.Println("Server started on", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
