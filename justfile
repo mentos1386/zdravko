@@ -3,7 +3,7 @@ set shell := ["devbox", "run"]
 # Load dotenv
 set dotenv-load
 
-STATIC_DIR := "./internal/static"
+STATIC_DIR := "./web/static"
 
 # Run full development environment
 run:

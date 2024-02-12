@@ -103,7 +103,8 @@ func (h *BaseHandler) Authenticated(next AuthenticatedHandler) func(http.Respons
 		if user.OAuth2Expiry.Before(time.Now()) {
 			user, err = h.RefreshToken(w, r, user)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				http.Redirect(w, r, "/oauth2/login", http.StatusTemporaryRedirect)
+				return
 			}
 		}
 		next(w, r, user)

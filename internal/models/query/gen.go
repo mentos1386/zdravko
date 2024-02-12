@@ -18,17 +18,20 @@ import (
 var (
 	Q           = new(Query)
 	Healthcheck *healthcheck
+	OAuth2State *oAuth2State
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	Healthcheck = &Q.Healthcheck
+	OAuth2State = &Q.OAuth2State
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:          db,
 		Healthcheck: newHealthcheck(db, opts...),
+		OAuth2State: newOAuth2State(db, opts...),
 	}
 }
 
@@ -36,6 +39,7 @@ type Query struct {
 	db *gorm.DB
 
 	Healthcheck healthcheck
+	OAuth2State oAuth2State
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -44,6 +48,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:          db,
 		Healthcheck: q.Healthcheck.clone(db),
+		OAuth2State: q.OAuth2State.clone(db),
 	}
 }
 
@@ -59,16 +64,19 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:          db,
 		Healthcheck: q.Healthcheck.replaceDB(db),
+		OAuth2State: q.OAuth2State.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
 	Healthcheck IHealthcheckDo
+	OAuth2State IOAuth2StateDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
 		Healthcheck: q.Healthcheck.WithContext(ctx),
+		OAuth2State: q.OAuth2State.WithContext(ctx),
 	}
 }
 

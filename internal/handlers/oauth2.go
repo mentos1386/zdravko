@@ -2,17 +2,31 @@ package handlers
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"code.tjo.space/mentos1386/zdravko/internal"
+	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"golang.org/x/oauth2"
 )
 
 type UserInfo struct {
 	Sub   string `json:"sub"`
 	Email string `json:"email"`
+}
+
+func newRandomState() string {
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
+	}
+	return hex.EncodeToString(b)
 }
 
 func newOAuth2(config *internal.Config) *oauth2.Config {
@@ -42,6 +56,7 @@ func (h *BaseHandler) RefreshToken(w http.ResponseWriter, r *http.Request, user 
 	conf := newOAuth2(h.config)
 	refreshed, err := conf.TokenSource(context.Background(), tok).Token()
 	if err != nil {
+		fmt.Println("Error: ", err)
 		return nil, err
 	}
 
@@ -65,7 +80,13 @@ func (h *BaseHandler) RefreshToken(w http.ResponseWriter, r *http.Request, user 
 func (h *BaseHandler) OAuth2LoginGET(w http.ResponseWriter, r *http.Request) {
 	conf := newOAuth2(h.config)
 
-	url := conf.AuthCodeURL("state", oauth2.AccessTypeOffline)
+	state := newRandomState()
+	result := h.db.Create(&models.OAuth2State{State: state, Expiry: time.Now().Add(5 * time.Minute)})
+	if result.Error != nil {
+		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+	}
+
+	url := conf.AuthCodeURL(state, oauth2.AccessTypeOffline)
 
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
@@ -73,6 +94,21 @@ func (h *BaseHandler) OAuth2LoginGET(w http.ResponseWriter, r *http.Request) {
 func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	conf := newOAuth2(h.config)
+
+	state := r.URL.Query().Get("state")
+
+	result, err := h.query.OAuth2State.WithContext(ctx).Where(
+		h.query.OAuth2State.State.Eq(state),
+		h.query.OAuth2State.Expiry.Gt(time.Now()),
+	).Delete()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if result.RowsAffected != 1 {
+		http.Error(w, "Invalid state", http.StatusUnauthorized)
+		return
+	}
 
 	// Exchange the code for a new token.
 	tok, err := conf.Exchange(r.Context(), r.URL.Query().Get("code"))
