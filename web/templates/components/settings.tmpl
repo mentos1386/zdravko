@@ -1,0 +1,28 @@
+{{define "main"}}
+{{ $title := "" }}
+{{ $path := "" }}
+{{ if ne nil .SettingsPage }}
+  {{ $title = .SettingsPage.Title }}
+  {{ $path = .SettingsPage.Path }}
+{{ end }}
+
+<div class="grid grid-cols-[1fr_100%] gap-8">
+  <ul class="sidebar">
+    {{range .SettingsPages}}
+    <li>
+      <a
+        {{$active := eq .Path $path }}
+        {{if $active}}aria-current="true"{{end}}
+        href="{{.Path}}"
+        class="{{if $active}}active{{end}}">
+          {{.Title}}
+      </a>
+    </li>
+    {{end}}
+  </ul>
+
+  <div>
+    {{template "settings" .}}
+  </div>
+</div>
+{{end}}

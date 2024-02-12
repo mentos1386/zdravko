@@ -46,7 +46,8 @@ func main() {
 	r.HandleFunc("/", h.Index).Methods("GET")
 
 	// Authenticated routes
-	r.HandleFunc("/settings", h.Authenticated(h.Settings)).Methods("GET")
+	r.HandleFunc("/settings", h.Authenticated(h.SettingsOverviewGET)).Methods("GET")
+	r.HandleFunc("/settings/healthchecks", h.Authenticated(h.SettingsHealthchecksGET)).Methods("GET")
 
 	// OAuth2
 	r.HandleFunc("/oauth2/login", h.OAuth2LoginGET).Methods("GET")

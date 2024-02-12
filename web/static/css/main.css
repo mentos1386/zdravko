@@ -44,3 +44,11 @@
 .sidebar a.active {
   @apply bg-blue-700 text-white;
 }
+
+.healthchecks {
+  @apply grid justify-items-stretch justify-stretch items-center mt-20 bg-gray-200 shadow-inner p-5 rounded-lg;
+}
+
+.healthchecks > div:not(:last-child) {
+  @apply mb-3;
+}

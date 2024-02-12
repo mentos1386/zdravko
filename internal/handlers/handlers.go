@@ -14,8 +14,8 @@ var Pages = []*components.Page{
 	{Path: "/settings", Title: "Settings"},
 }
 
-func GetPageByTitle(title string) *components.Page {
-	for _, p := range Pages {
+func GetPageByTitle(pages []*components.Page, title string) *components.Page {
+	for _, p := range pages {
 		if p.Title == title {
 			return p
 		}
