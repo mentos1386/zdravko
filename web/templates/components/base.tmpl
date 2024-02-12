@@ -1,18 +1,31 @@
 {{define "base"}}
+{{ $title := "" }}
+{{ $path := "" }}
+{{ if ne nil .Page }}
+  {{ $title = .Page.Title }}
+  {{ $path = .Page.Path }}
+{{ end }}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Zdravko - {{template "title" .}}</title>
+    <title>Zdravko - {{$title}}</title>
     <link rel="stylesheet" href="/static/css/tailwind.css">
   </head>
   <body class="bg-gray-100">
     <nav class="justify-center flex space-x-2 mt-10">
-      <a href="/" class="btn btn-active">Status</a>
-      <a href="/incidents" class="btn">Incidents</a>
-      <a href="/settings" class="btn">Settings</a>
+      {{range .Pages}}
+      <a
+        {{$active := eq .Path $path }}
+        {{if $active}}aria-current="true"{{end}}
+        href="{{.Path}}"
+        class="btn {{if $active}}btn-active{{end}}">
+          {{.Title}}
+      </a>
+      {{end}}
     </nav>
     <div class="container max-w-screen-md flex flex-col mt-20">
       {{template "main" .}}

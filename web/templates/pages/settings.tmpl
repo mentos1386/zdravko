@@ -1,9 +1,24 @@
-{{define "title"}}Settings{{end}}
-
 {{define "main"}}
-  <h1>The settings!</h1>
-  <p>You are logged in as {{.Email}}.</p>
-  <p>Your id is {{.ID}}.</p>
-  <p>Your access expieres at {{.OAuth2Expiry}}.</p>
-  <a href="/oauth2/logout">Logout</a>
+<div class="grid grid-cols-[1fr_auto] gap-8">
+  <ul class="sidebar">
+    <li>
+      <a aria-current="true" class="active" href="/settings">Overview</a>
+    </li>
+    <li>
+      <a href="/settings/healthchecks">Healthchecks</a>
+    </li>
+    <li>
+      <a href="/settings/workers">Workers</a>
+    </li>
+    <li>
+      <a href="/oauth2/logout">Logout</a>
+    </li>
+  </ul>
+
+  <div class="shadow-inner bg-gray-200 p-5 rounded-lg">
+    <h1 class="text-xl mb-4">Hi {{.User.Email}}!</h1>
+    <p>Your id is {{.User.ID}}.</p>
+    <p>Your access expieres at {{.User.OAuth2Expiry}}.</p>
+  </div>
+</div>
 {{end}}

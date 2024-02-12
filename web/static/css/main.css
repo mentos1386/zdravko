@@ -24,3 +24,23 @@
 .btn-active:hover {
   @apply shadow;
 }
+
+.sidebar {
+  @apply w-48 h-fit text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg;
+}
+
+.sidebar li:first-child a {
+  @apply rounded-t-lg;
+}
+
+.sidebar li:last-child a {
+  @apply rounded-b-lg;
+}
+
+.sidebar a {
+  @apply w-full block px-4 py-2 border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700;
+}
+
+.sidebar a.active {
+  @apply bg-blue-700 text-white;
+}
