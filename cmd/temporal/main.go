@@ -106,7 +106,7 @@ func frontendServer() {
 		Port:                8223,
 		TemporalGRPCAddress: "localhost:7233",
 		EnableUI:            true,
-		UIAssetPath:         "",
+		PublicPath:          "/temporal",
 		Codec: uiconfig.Codec{
 			Endpoint: "",
 		},
@@ -121,6 +121,7 @@ func frontendServer() {
 	if err := server.Start(); err != nil {
 		panic(err)
 	}
+	server.Stop()
 }
 
 func main() {

@@ -54,6 +54,9 @@ func main() {
 	r.HandleFunc("/oauth2/callback", h.OAuth2CallbackGET).Methods("GET")
 	r.HandleFunc("/oauth2/logout", h.Authenticated(h.OAuth2LogoutGET)).Methods("GET")
 
+	// Temporal UI
+	r.PathPrefix("/temporal").HandlerFunc(h.Authenticated(h.Temporal))
+
 	// 404
 	r.PathPrefix("/").HandlerFunc(h.Error404).Methods("GET")
 
