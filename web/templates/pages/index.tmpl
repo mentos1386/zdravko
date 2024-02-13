@@ -14,9 +14,9 @@
     <div class="grid grid-cols-2 gap-2">
       <div class="flex items-center">
         {{ if .Healthy }}
-        <span class="flex w-3 h-3 me-2 bg-green-500 rounded-full"></span>
+        <span class="flex w-3 h-3 me-2 bg-green-400 rounded-full"></span>
         {{ else }}
-        <span class="flex w-3 h-3 me-2 bg-red-500 rounded-full"></span>
+        <span class="flex w-3 h-3 me-2 bg-red-400 rounded-full"></span>
         {{ end }}
         <p>{{ .Domain }}</p>
       </div>
@@ -24,9 +24,9 @@
       <div class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden">
         {{ range .History }}
         {{ if . }}
-        <div class="bg-green-500 hover:bg-green-700 flex-auto"></div>
+        <div class="bg-green-400 hover:bg-green-500 flex-auto"></div>
         {{ else }}
-        <div class="bg-red-500 hover:bg-red-700 flex-auto"></div>
+        <div class="bg-red-400 hover:bg-red-500 flex-auto"></div>
         {{ end }}
         {{ end }}
      </div>

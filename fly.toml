@@ -21,7 +21,7 @@ primary_region = 'waw'
 
 [processes]
   server = "server"
-  #worker = "worker"
+  worker = "worker"
   temporal = "temporal"
 
 [http_service]

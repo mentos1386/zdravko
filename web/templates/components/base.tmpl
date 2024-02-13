@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="/static/css/tailwind.css">
   </head>
   <body class="bg-gray-100">
-    <nav class="justify-center flex space-x-2 mt-10">
+    <nav class="navbar">
       {{range .Pages}}
       <a
         {{$active := eq .Path $path }}
         {{if $active}}aria-current="true"{{end}}
         href="{{.Path}}"
-        class="btn {{if $active}}btn-active{{end}}">
+        class="{{if $active}}active{{end}}">
           {{.Title}}
       </a>
       {{end}}

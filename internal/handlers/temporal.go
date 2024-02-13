@@ -1,49 +1,26 @@
 package handlers
 
 import (
-	"io"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 )
 
-var customTransport = http.DefaultTransport
-
 func (h *BaseHandler) Temporal(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
-	// Create a new HTTP request with the same method, URL, and body as the original request
-	targetURL := r.URL
-	targetURL.Host = h.config.TEMPORAL_UI_HOST
-	targetURL.Scheme = "http"
+	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
+		Host:   h.config.TEMPORAL_UI_HOST,
+		Scheme: "http",
+	})
 
-	proxyReq, err := http.NewRequest(r.Method, targetURL.String(), r.Body)
-	if err != nil {
-		http.Error(w, "Error creating proxy request", http.StatusInternalServerError)
-		return
+	// TODO: Maybe add a "navbar" in html to go back to Zdravko?
+	proxy.ModifyResponse = func(response *http.Response) error {
+		// Read and update the response here
+
+		// The response here is response from server (proxy B if this is at proxy A)
+		// It is a pointer, so can be modified to update in place
+		// It will not be called if Proxy B is unreachable
+		return nil
 	}
 
-	// Copy the headers from the original request to the proxy request
-	for name, values := range r.Header {
-		for _, value := range values {
-			proxyReq.Header.Add(name, value)
-		}
-	}
-
-	// Send the proxy request using the custom transport
-	resp, err := customTransport.RoundTrip(proxyReq)
-	if err != nil {
-		http.Error(w, "Error sending proxy request", http.StatusInternalServerError)
-		return
-	}
-	defer resp.Body.Close()
-
-	// Copy the headers from the proxy response to the original response
-	for name, values := range resp.Header {
-		for _, value := range values {
-			w.Header().Add(name, value)
-		}
-	}
-
-	// Set the status code of the original response to the status code of the proxy response
-	w.WriteHeader(resp.StatusCode)
-
-	// Copy the body of the proxy response to the original response
-	io.Copy(w, resp.Body)
+	proxy.ServeHTTP(w, r)
 }

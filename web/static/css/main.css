@@ -12,35 +12,37 @@
 @tailwind components;
 @tailwind utilities;
 
-.btn {
-  @apply font-bold py-2 px-4 rounded;
+.navbar {
+  @apply justify-center flex space-x-2 mt-10;
 }
-.btn:hover {
+.navbar a {
+  @apply font-bold py-2 px-4 rounded-lg;
+}
+.navbar a:hover {
   @apply bg-gray-200 shadow-inner;
 }
-.btn-active {
+.navbar a:focus {
+  @apply outline-none ring-2 ring-blue-700 text-blue-700;
+}
+.navbar a.active {
   @apply bg-gray-300 text-black shadow;
 }
-.btn-active:hover {
+.navbar a.active:hover {
   @apply shadow;
 }
 
 .sidebar {
-  @apply w-48 h-fit text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg;
+  @apply w-48 grid gap-2 h-fit text-sm font-medium text-gray-900;
 }
-
-.sidebar li:first-child a {
-  @apply rounded-t-lg;
-}
-
-.sidebar li:last-child a {
-  @apply rounded-b-lg;
-}
-
 .sidebar a {
-  @apply w-full block px-4 py-2 border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700;
+  @apply w-full block rounded-lg px-4 py-2  focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700;
 }
-
+.sidebar a:focus {
+  @apply outline-none ring-2 ring-blue-700 text-blue-700;
+}
+.sidebar a:hover {
+  @apply shadow-inner bg-gray-200 text-blue-700;
+}
 .sidebar a.active {
   @apply bg-blue-700 text-white;
 }
