@@ -2,6 +2,8 @@ dist/
 
 # Database
 zdravko.db
+temporal.db
+temporal.db-journal
 
 # Config
 .env

@@ -11,7 +11,8 @@ run:
 
 # Start temporal which is accassible at http://localhost:8233/
 run-temporal:
- temporal server start-dev
+  go build -o dist/temporal cmd/temporal/main.go
+  ./dist/temporal
 
 # Start web server accessible at http://localhost:8080/
 run-server:
