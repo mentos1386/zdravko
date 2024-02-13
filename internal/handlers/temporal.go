@@ -10,7 +10,7 @@ var customTransport = http.DefaultTransport
 func (h *BaseHandler) Temporal(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
 	// Create a new HTTP request with the same method, URL, and body as the original request
 	targetURL := r.URL
-	targetURL.Host = "localhost:8223"
+	targetURL.Host = h.config.TEMPORAL_UI_HOST
 	targetURL.Scheme = "http"
 
 	proxyReq, err := http.NewRequest(r.Method, targetURL.String(), r.Body)

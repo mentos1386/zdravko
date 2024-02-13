@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"code.tjo.space/mentos1386/zdravko/internal"
 	"go.temporal.io/server/common/cluster"
 	"go.temporal.io/server/common/config"
 	"go.temporal.io/server/common/persistence/sql/sqlplugin/sqlite"
@@ -19,7 +20,7 @@ const HistoryPort = 7234
 const MatchingPort = 7235
 const WorkerPort = 7236
 
-func NewConfig() *config.Config {
+func NewServerConfig(cfg *internal.Config) *config.Config {
 	return &config.Config{
 		Persistence: config.Persistence{
 			DataStores: map[string]config.DataStore{
@@ -28,7 +29,7 @@ func NewConfig() *config.Config {
 					ConnectAttributes: map[string]string{
 						"mode": "rwc",
 					},
-					DatabaseName: "temporal.db",
+					DatabaseName: cfg.TEMPORAL_DATABASE_PATH,
 				},
 				},
 			},
@@ -49,7 +50,7 @@ func NewConfig() *config.Config {
 					GRPCPort:        FrontendPort,
 					MembershipPort:  FrontendPort + 100,
 					BindOnLocalHost: false,
-					BindOnIP:        "0.0.0.0",
+					BindOnIP:        cfg.TEMPORAL_LISTEN_ADDRESS,
 				},
 			},
 			"history": {

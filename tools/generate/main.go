@@ -16,7 +16,7 @@ func main() {
 		FieldNullable: true,
 	})
 
-	db, _, _ := internal.ConnectToDatabase(config.SQLITE_DB_PATH)
+	db, _, _ := internal.ConnectToDatabase(config.ZDRAVKO_DATABASE_PATH)
 
 	// Use the above `*gorm.DB` instance to initialize the generator,
 	// which is required to generate structs from db when using `GenerateModel/GenerateModelAs`

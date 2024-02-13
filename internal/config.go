@@ -9,8 +9,6 @@ type Config struct {
 	PORT     string
 	ROOT_URL string // Needed for oauth2 redirect
 
-	SQLITE_DB_PATH string
-
 	SESSION_SECRET string
 
 	OAUTH2_CLIENT_ID              string
@@ -20,6 +18,13 @@ type Config struct {
 	OAUTH2_ENDPOINT_AUTH_URL      string
 	OAUTH2_ENDPOINT_USER_INFO_URL string
 	OAUTH2_ENDPOINT_LOGOUT_URL    string
+
+	ZDRAVKO_DATABASE_PATH string
+
+	TEMPORAL_DATABASE_PATH  string
+	TEMPORAL_LISTEN_ADDRESS string
+	TEMPORAL_UI_HOST        string
+	TEMPORAL_SERVER_HOST    string
 }
 
 func getEnv(key, fallback string) string {
@@ -41,15 +46,21 @@ func NewConfig() *Config {
 		PORT:     getEnv("PORT", "8000"),
 		ROOT_URL: getEnvRequired("ROOT_URL"),
 
-		SQLITE_DB_PATH: getEnv("SQLITE_DB_PATH", "zdravko.db"),
 		SESSION_SECRET: getEnvRequired("SESSION_SECRET"),
 
 		OAUTH2_CLIENT_ID:              getEnvRequired("OAUTH2_CLIENT_ID"),
 		OAUTH2_CLIENT_SECRET:          getEnvRequired("OAUTH2_CLIENT_SECRET"),
-		OAUTH2_SCOPES:                 strings.Split(getEnvRequired("OAUTH2_SCOPES"), ","),
+		OAUTH2_SCOPES:                 strings.Split(getEnv("OAUTH2_SCOPES", "openid,profile,email"), ","),
 		OAUTH2_ENDPOINT_TOKEN_URL:     getEnvRequired("OAUTH2_ENDPOINT_TOKEN_URL"),
 		OAUTH2_ENDPOINT_AUTH_URL:      getEnvRequired("OAUTH2_ENDPOINT_AUTH_URL"),
 		OAUTH2_ENDPOINT_USER_INFO_URL: getEnvRequired("OAUTH2_ENDPOINT_USER_INFO_URL"),
 		OAUTH2_ENDPOINT_LOGOUT_URL:    getEnvRequired("OAUTH2_ENDPOINT_LOGOUT_URL"),
+
+		ZDRAVKO_DATABASE_PATH: getEnv("ZDRAVKO_DATABASE_PATH", "zdravko.db"),
+
+		TEMPORAL_DATABASE_PATH:  getEnv("TEMPORAL_DATABASE_PATH", "temporal.db"),
+		TEMPORAL_LISTEN_ADDRESS: getEnv("TEMPORAL_LISTEN_ADDRESS", "0.0.0.0"),
+		TEMPORAL_UI_HOST:        getEnv("TEMPORAL_UI_HOST", "localhost:8223"),
+		TEMPORAL_SERVER_HOST:    getEnv("TEMPORAL_SERVER_HOST", "localhost:7233"),
 	}
 }

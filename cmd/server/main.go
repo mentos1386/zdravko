@@ -16,7 +16,7 @@ func main() {
 
 	r := mux.NewRouter()
 
-	db, query, err := internal.ConnectToDatabase(config.SQLITE_DB_PATH)
+	db, query, err := internal.ConnectToDatabase(config.ZDRAVKO_DATABASE_PATH)
 	if err != nil {
 		log.Fatal(err)
 	}
