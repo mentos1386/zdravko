@@ -6,7 +6,7 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
 
 ### Roadmap
  - [x] SSO Support for authentication.
- - [ ] SQLite for database.
+ - [x] SQLite for database.
     - This means for main app db as well as temporal db.
  - [ ] Single binary.
     - One binary to run worker, server and temporal all together.
