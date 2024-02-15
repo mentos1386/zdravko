@@ -132,5 +132,5 @@ func (h *BaseHandler) SettingsHealthchecksCreatePOST(w http.ResponseWriter, r *h
 	}
 	h.db.Create(healthcheck)
 
-	http.Redirect(w, r, "/settings/healthchecks", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/settings/healthchecks", http.StatusSeeOther)
 }
