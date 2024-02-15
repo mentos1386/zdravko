@@ -2,6 +2,7 @@
 
 {{ $description := "Healthchecks represent periodic checks of some HTTP or TCP service, to see if it's responding correctly to deterime if it's healthy or not." }}
 
+{{ if eq .HealthchecksLength 0 }}
 <section>
     <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
         <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
@@ -11,25 +12,28 @@
         {{ $description }}
         </p>
         <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-            <a href="#" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
-                Create Healthcheck
-                <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-                </svg>
+            <a href="/settings/healthchecks/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+              Create First Healthcheck
+              <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
             </a>
         </div>
     </div>
 </section>
-
-
+{{ else }}
 <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
     <table class="w-full text-sm text-left rtl:text-right text-gray-500">
         <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
           List of Healthchecks
-          <p class="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">
-          Healthchecks represent periodic checks of some HTTP or TCP service, to see if it's
-          responding correctly to deterime if it's healthy or not.
-          </p>
+          <div class="mt-1 flex">
+            <p class="mt-1 text-sm font-normal text-gray-500">
+              Healthchecks represent periodic checks of some HTTP or TCP service, to see if it's
+              responding correctly to deterime if it's healthy or not.
+            </p>
+            <a href="/settings/healthchecks/create" class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+              Create New
+              <svg class="feather h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
+            </a>
+          </div>
         </caption>
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
@@ -43,100 +47,35 @@
                     Status
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Cron
+                    Schedule
                 </th>
                 <th scope="col" class="px-6 py-3">
                     Action
                 </th>
             </tr>
         </thead>
+        {{range .Healthchecks}}
         <tbody>
             <tr class="odd:bg-white even:bg-gray-50">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    Apple MacBook Pro 17"
+                    {{.Name}}
                 </th>
                 <td class="px-6 py-4">
-                    Silver
+                    HTTP
                 </td>
                 <td class="px-6 py-4">
-                    Laptop
+                    OK
                 </td>
                 <td class="px-6 py-4">
-                    $2999
+                    {{.Schedule}}
                 </td>
                 <td class="px-6 py-4">
-                    <a href="#" class="font-medium text-blue-600 hover:underline">Details</a>
-                </td>
-            </tr>
-            <tr class="odd:bg-white even:bg-gray-50">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    Microsoft Surface Pro
-                </th>
-                <td class="px-6 py-4">
-                    White
-                </td>
-                <td class="px-6 py-4">
-                    Laptop PC
-                </td>
-                <td class="px-6 py-4">
-                    $1999
-                </td>
-                <td class="px-6 py-4">
-                    <a href="#" class="font-medium text-blue-600 hover:underline">Details</a>
-                </td>
-            </tr>
-            <tr class="odd:bg-white even:bg-gray-50 border-b">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    Magic Mouse 2
-                </th>
-                <td class="px-6 py-4">
-                    Black
-                </td>
-                <td class="px-6 py-4">
-                    Accessories
-                </td>
-                <td class="px-6 py-4">
-                    $99
-                </td>
-                <td class="px-6 py-4">
-                    <a href="#" class="font-medium text-blue-600 hover:underline">Details</a>
-                </td>
-            </tr>
-            <tr class="odd:bg-white even:bg-gray-50 border-b">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    Google Pixel Phone
-                </th>
-                <td class="px-6 py-4">
-                    Gray
-                </td>
-                <td class="px-6 py-4">
-                    Phone
-                </td>
-                <td class="px-6 py-4">
-                    $799
-                </td>
-                <td class="px-6 py-4">
-                    <a href="#" class="font-medium text-blue-600 hover:underline">Details</a>
-                </td>
-            </tr>
-            <tr class="odd:bg-white even:bg-gray-50 border-b">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    Apple Watch 5
-                </th>
-                <td class="px-6 py-4">
-                    Red
-                </td>
-                <td class="px-6 py-4">
-                    Wearables
-                </td>
-                <td class="px-6 py-4">
-                    $999
-                </td>
-                <td class="px-6 py-4">
-                    <a href="#" class="font-medium text-blue-600 hover:underline">Details</a>
+                    <a href="/settings/healthchecks/{{.ID}}" class="font-medium text-blue-600 hover:underline">Details</a>
                 </td>
             </tr>
         </tbody>
+        {{end}}
     </table>
 </div>
+{{end}}
 {{end}}

@@ -7,22 +7,23 @@ import (
 	"github.com/gorilla/mux"
 
 	"code.tjo.space/mentos1386/zdravko/internal"
+	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/handlers"
 	"code.tjo.space/mentos1386/zdravko/web/static"
 )
 
 func main() {
-	config := internal.NewConfig()
+	cfg := config.NewConfig()
 
 	r := mux.NewRouter()
 
-	db, query, err := internal.ConnectToDatabase(config.DatabasePath)
+	db, query, err := internal.ConnectToDatabase(cfg.DatabasePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("Connected to database")
 
-	h := handlers.NewBaseHandler(db, query, config)
+	h := handlers.NewBaseHandler(db, query, cfg)
 
 	// Health
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
@@ -48,6 +49,9 @@ func main() {
 	// Authenticated routes
 	r.HandleFunc("/settings", h.Authenticated(h.SettingsOverviewGET)).Methods("GET")
 	r.HandleFunc("/settings/healthchecks", h.Authenticated(h.SettingsHealthchecksGET)).Methods("GET")
+	r.HandleFunc("/settings/healthchecks/create", h.Authenticated(h.SettingsHealthchecksCreateGET)).Methods("GET")
+	r.HandleFunc("/settings/healthchecks/create", h.Authenticated(h.SettingsHealthchecksCreatePOST)).Methods("POST")
+	r.HandleFunc("/settings/healthchecks/{id}", h.Authenticated(h.SettingsHealthchecksDescribeGET)).Methods("GET")
 
 	// OAuth2
 	r.HandleFunc("/oauth2/login", h.OAuth2LoginGET).Methods("GET")
@@ -60,6 +64,6 @@ func main() {
 	// 404
 	r.PathPrefix("/").HandlerFunc(h.Error404).Methods("GET")
 
-	log.Println("Server started on", config.Port)
-	log.Fatal(http.ListenAndServe(":"+config.Port, r))
+	log.Println("Server started on", cfg.Port)
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, r))
 }

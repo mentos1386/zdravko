@@ -14,7 +14,12 @@ func ConnectToDatabase(path string) (*gorm.DB, *query.Query, error) {
 		return nil, nil, err
 	}
 
-	err = db.AutoMigrate(&models.Healthcheck{}, &models.OAuth2State{})
+	err = db.AutoMigrate(
+		&models.HealthcheckHTTP{},
+		&models.HealthcheckTCP{},
+		&models.Cronjob{},
+		&models.OAuth2State{},
+	)
 	if err != nil {
 		return nil, nil, err
 	}

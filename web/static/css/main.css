@@ -13,7 +13,7 @@
 @tailwind utilities;
 
 .navbar {
-  @apply justify-center flex space-x-2 mt-10;
+  @apply justify-center flex flex-wrap space-x-2 gap-2 mt-10;
 }
 .navbar a {
   @apply font-bold py-2 px-4 rounded-lg;
@@ -32,7 +32,7 @@
 }
 
 .sidebar {
-  @apply w-48 grid gap-2 h-fit text-sm font-medium text-gray-900;
+  @apply flex flex-row flex-wrap justify-center lg:flex-col lg:w-48 gap-2 h-fit text-sm font-medium text-gray-900;
 }
 .sidebar a {
   @apply w-full block rounded-lg px-4 py-2  focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700;
@@ -47,10 +47,13 @@
   @apply bg-blue-700 text-white;
 }
 
+.breadcrumb {
+  @apply flex mb-4;
+}
+
 .healthchecks {
   @apply grid justify-items-stretch justify-stretch items-center mt-20 bg-white shadow-md p-5 rounded-lg;
 }
-
 .healthchecks > div:not(:last-child) {
   @apply mb-3;
 }

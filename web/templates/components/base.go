@@ -1,11 +1,12 @@
 package components
 
 type Page struct {
-	Path  string
-	Title string
+	Path       string
+	Title      string
+	Breadcrumb string
 }
 
 type Base struct {
-	Page  *Page
-	Pages []*Page
+	Navbar       []*Page
+	NavbarActive *Page
 }

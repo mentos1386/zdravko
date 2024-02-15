@@ -1,13 +1,15 @@
 package main
 
 import (
-	"code.tjo.space/mentos1386/zdravko/internal"
+	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gen"
+	"gorm.io/gorm"
 )
 
 func main() {
-	config := internal.NewConfig()
+	config := config.NewConfig()
 
 	// Initialize the generator with configuration
 	g := gen.NewGenerator(gen.Config{
@@ -16,14 +18,17 @@ func main() {
 		FieldNullable: true,
 	})
 
-	db, _, _ := internal.ConnectToDatabase(config.DatabasePath)
+	db, err := gorm.Open(sqlite.Open(config.DatabasePath), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
 
 	// Use the above `*gorm.DB` instance to initialize the generator,
 	// which is required to generate structs from db when using `GenerateModel/GenerateModelAs`
 	g.UseDB(db)
 
 	// Generate default DAO interface for those specified structs
-	g.ApplyBasic(models.Healthcheck{}, models.OAuth2State{})
+	g.ApplyBasic(models.HealthcheckHTTP{}, models.HealthcheckTCP{}, models.Cronjob{}, models.OAuth2State{})
 
 	// Execute the generator
 	g.Execute()

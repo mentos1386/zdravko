@@ -1,0 +1,8 @@
+{{define "settings"}}
+<h1 class="mb-4 text-xl font-bold text-gray-900">
+{{ .Healthcheck.Name }}
+</h1>
+{{ .Healthcheck.ID }}
+{{ .Healthcheck.URL }}
+{{ .Healthcheck.Schedule }}
+{{end}}

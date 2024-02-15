@@ -22,8 +22,8 @@ func (h *BaseHandler) Error404(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 
 	err = ts.ExecuteTemplate(w, "base", &components.Base{
-		Page:  nil,
-		Pages: Pages,
+		NavbarActive: nil,
+		Navbar:       Pages,
 	})
 	if err != nil {
 		fmt.Println("Error", err)

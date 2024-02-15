@@ -51,8 +51,8 @@ func (h *BaseHandler) Index(w http.ResponseWriter, r *http.Request) {
 
 	err = ts.ExecuteTemplate(w, "base", &IndexData{
 		Base: &components.Base{
-			Page:  GetPageByTitle(Pages, "Status"),
-			Pages: Pages,
+			NavbarActive: GetPageByTitle(Pages, "Status"),
+			Navbar:       Pages,
 		},
 		HealthChecks: []*HealthCheck{
 			newMockHealthCheck("example.com"),

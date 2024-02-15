@@ -1,4 +1,4 @@
-package internal
+package config
 
 import (
 	"fmt"
@@ -99,7 +99,11 @@ func NewConfig() *Config {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf("Error reading config file, %s", err)
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// ignore
+		} else {
+			log.Fatalf("Error reading config file, %s", err)
+		}
 	}
 	log.Println("Config file used: ", viper.ConfigFileUsed())
 

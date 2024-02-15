@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"code.tjo.space/mentos1386/zdravko/internal"
+	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"golang.org/x/oauth2"
 )
@@ -29,7 +29,7 @@ func newRandomState() string {
 	return hex.EncodeToString(b)
 }
 
-func newOAuth2(config *internal.Config) *oauth2.Config {
+func newOAuth2(config *config.Config) *oauth2.Config {
 	return &oauth2.Config{
 		ClientID:     config.OAuth2.ClientID,
 		ClientSecret: config.OAuth2.ClientSecret,

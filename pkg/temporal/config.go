@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"code.tjo.space/mentos1386/zdravko/internal"
+	internal "code.tjo.space/mentos1386/zdravko/internal/config"
 	"go.temporal.io/server/common/cluster"
 	"go.temporal.io/server/common/config"
 	"go.temporal.io/server/common/persistence/sql/sqlplugin/sqlite"

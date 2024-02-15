@@ -34,6 +34,7 @@ shell:
 
 # Generate and download all external dependencies.
 generate:
+  rm -rf internal/models/query/*
   go generate ./...
 
 _tailwindcss-build:

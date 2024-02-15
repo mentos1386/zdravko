@@ -1,14 +1,14 @@
 {{define "main"}}
 {{ $title := "" }}
 {{ $path := "" }}
-{{ if ne nil .SettingsPage }}
-  {{ $title = .SettingsPage.Title }}
-  {{ $path = .SettingsPage.Path }}
+{{ if ne nil .SettingsSidebarActive }}
+  {{ $title = .SettingsSidebarActive.Title }}
+  {{ $path = .SettingsSidebarActive.Path }}
 {{ end }}
 
-<div class="grid grid-cols-[1fr_100%] gap-8">
+<div class="grid grid-cols-1 lg:grid-cols-[1fr_100%] gap-8">
   <ul class="sidebar">
-    {{range .SettingsPages}}
+    {{range .SettingsSidebar}}
     <li>
       <a
         {{$active := eq .Path $path }}
@@ -20,8 +20,19 @@
     </li>
     {{end}}
   </ul>
-
   <div>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+        {{ range .SettingsBreadcrumbs }}
+        <li class="inline-flex items-center">
+          <a href="{{ .Path }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+            {{ .Breadcrumb }}
+            <svg aria-hidden="true" class="feather h-4 w-4 mx-1 text-gray-400 overflow-visible"><use href="/static/icons/feather-sprite.svg#chevron-right"/></svg>
+          </a>
+        </li>
+        {{ end }}
+      </ol>
+    </nav>
     {{template "settings" .}}
   </div>
 </div>

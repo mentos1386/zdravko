@@ -16,39 +16,49 @@ import (
 )
 
 var (
-	Q           = new(Query)
-	Healthcheck *healthcheck
-	OAuth2State *oAuth2State
+	Q               = new(Query)
+	Cronjob         *cronjob
+	HealthcheckHTTP *healthcheckHTTP
+	HealthcheckTCP  *healthcheckTCP
+	OAuth2State     *oAuth2State
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
-	Healthcheck = &Q.Healthcheck
+	Cronjob = &Q.Cronjob
+	HealthcheckHTTP = &Q.HealthcheckHTTP
+	HealthcheckTCP = &Q.HealthcheckTCP
 	OAuth2State = &Q.OAuth2State
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:          db,
-		Healthcheck: newHealthcheck(db, opts...),
-		OAuth2State: newOAuth2State(db, opts...),
+		db:              db,
+		Cronjob:         newCronjob(db, opts...),
+		HealthcheckHTTP: newHealthcheckHTTP(db, opts...),
+		HealthcheckTCP:  newHealthcheckTCP(db, opts...),
+		OAuth2State:     newOAuth2State(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Healthcheck healthcheck
-	OAuth2State oAuth2State
+	Cronjob         cronjob
+	HealthcheckHTTP healthcheckHTTP
+	HealthcheckTCP  healthcheckTCP
+	OAuth2State     oAuth2State
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:          db,
-		Healthcheck: q.Healthcheck.clone(db),
-		OAuth2State: q.OAuth2State.clone(db),
+		db:              db,
+		Cronjob:         q.Cronjob.clone(db),
+		HealthcheckHTTP: q.HealthcheckHTTP.clone(db),
+		HealthcheckTCP:  q.HealthcheckTCP.clone(db),
+		OAuth2State:     q.OAuth2State.clone(db),
 	}
 }
 
@@ -62,21 +72,27 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:          db,
-		Healthcheck: q.Healthcheck.replaceDB(db),
-		OAuth2State: q.OAuth2State.replaceDB(db),
+		db:              db,
+		Cronjob:         q.Cronjob.replaceDB(db),
+		HealthcheckHTTP: q.HealthcheckHTTP.replaceDB(db),
+		HealthcheckTCP:  q.HealthcheckTCP.replaceDB(db),
+		OAuth2State:     q.OAuth2State.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Healthcheck IHealthcheckDo
-	OAuth2State IOAuth2StateDo
+	Cronjob         ICronjobDo
+	HealthcheckHTTP IHealthcheckHTTPDo
+	HealthcheckTCP  IHealthcheckTCPDo
+	OAuth2State     IOAuth2StateDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Healthcheck: q.Healthcheck.WithContext(ctx),
-		OAuth2State: q.OAuth2State.WithContext(ctx),
+		Cronjob:         q.Cronjob.WithContext(ctx),
+		HealthcheckHTTP: q.HealthcheckHTTP.WithContext(ctx),
+		HealthcheckTCP:  q.HealthcheckTCP.WithContext(ctx),
+		OAuth2State:     q.OAuth2State.WithContext(ctx),
 	}
 }
 
