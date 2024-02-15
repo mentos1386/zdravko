@@ -4,11 +4,17 @@ Golang selfhosted Status/Healthcheck monitoring app.
 
 Mostly just a project to test [temporal.io](https://temporal.io/).
 
-### Expected ~features~ things
- - [ ] SSO or just expect to be run behind a auth proxy.
- - [ ] Abbility for multiple instances/workers.
-   - Otherwise using a cronjob would do the job, no need for temporal.
- - [ ] Some nice UI to try out [htmx](https://htmx.org/).
+### Roadmap
+ - [x] SSO Support for authentication.
+ - [ ] SQLite for database.
+    - This means for main app db as well as temporal db.
+ - [ ] Single binary.
+    - One binary to run worker, server and temporal all together.
+ - [ ] Abbility for multiple workers.
+    - Spread workers across regions to monitor latency from different locations.
+ - [ ] HTTP Healthchecks.
+ - [ ] TCP Healthchecks.
+ - [ ] CronJob Healthchecks (via webhooks).
 
 ![Screenshot](docs/screenshot.png)
 Demo is available at https://zdravko.fly.dev.
