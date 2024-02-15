@@ -18,6 +18,7 @@ type Settings struct {
 var SettingsPages = []*components.Page{
 	{Path: "/settings", Title: "Overview"},
 	{Path: "/settings/healthchecks", Title: "Healthchecks"},
+	{Path: "/settings/cronjobs", Title: "CronJobs"},
 	{Path: "/settings/workers", Title: "Workers"},
 	{Path: "/temporal", Title: "Temporal"},
 	{Path: "/oauth2/logout", Title: "Logout"},

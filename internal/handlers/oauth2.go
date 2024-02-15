@@ -31,13 +31,13 @@ func newRandomState() string {
 
 func newOAuth2(config *internal.Config) *oauth2.Config {
 	return &oauth2.Config{
-		ClientID:     config.OAUTH2_CLIENT_ID,
-		ClientSecret: config.OAUTH2_CLIENT_SECRET,
-		Scopes:       config.OAUTH2_SCOPES,
-		RedirectURL:  config.ROOT_URL + "/oauth2/callback",
+		ClientID:     config.OAuth2.ClientID,
+		ClientSecret: config.OAuth2.ClientSecret,
+		Scopes:       config.OAuth2.Scopes,
+		RedirectURL:  config.RootUrl + "/oauth2/callback",
 		Endpoint: oauth2.Endpoint{
-			TokenURL: config.OAUTH2_ENDPOINT_TOKEN_URL,
-			AuthURL:  config.OAUTH2_ENDPOINT_AUTH_URL,
+			TokenURL: config.OAuth2.EndpointTokenURL,
+			AuthURL:  config.OAuth2.EndpointAuthURL,
 		},
 	}
 }
@@ -119,7 +119,7 @@ func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) 
 
 	// Ge the user information.
 	client := oauth2.NewClient(ctx, oauth2.StaticTokenSource(tok))
-	resp, err := client.Get(h.config.OAUTH2_ENDPOINT_USER_INFO_URL)
+	resp, err := client.Get(h.config.OAuth2.EndpointUserInfoURL)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -156,7 +156,7 @@ func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) 
 func (h *BaseHandler) OAuth2LogoutGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
 	tok := h.AuthenticatedUserToOAuth2Token(user)
 	client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(tok))
-	_, err := client.Get(h.config.OAUTH2_ENDPOINT_USER_INFO_URL)
+	_, err := client.Get(h.config.OAuth2.EndpointLogoutURL)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

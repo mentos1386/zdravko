@@ -29,7 +29,7 @@ func NewServerConfig(cfg *internal.Config) *config.Config {
 					ConnectAttributes: map[string]string{
 						"mode": "rwc",
 					},
-					DatabaseName: cfg.TEMPORAL_DATABASE_PATH,
+					DatabaseName: cfg.Temporal.DatabasePath,
 				},
 				},
 			},
@@ -50,7 +50,7 @@ func NewServerConfig(cfg *internal.Config) *config.Config {
 					GRPCPort:        FrontendPort,
 					MembershipPort:  FrontendPort + 100,
 					BindOnLocalHost: false,
-					BindOnIP:        cfg.TEMPORAL_LISTEN_ADDRESS,
+					BindOnIP:        cfg.Temporal.ListenAddress,
 				},
 			},
 			"history": {

@@ -14,7 +14,7 @@ func main() {
 	// Initialize a Temporal Client
 	// Specify the Namespace in the Client options
 	clientOptions := client.Options{
-		HostPort:  config.TEMPORAL_SERVER_HOST,
+		HostPort:  config.Temporal.ServerHost,
 		Namespace: "default",
 	}
 	temporalClient, err := client.Dial(clientOptions)

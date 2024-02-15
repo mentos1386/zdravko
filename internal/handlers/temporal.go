@@ -8,7 +8,7 @@ import (
 
 func (h *BaseHandler) Temporal(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
 	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-		Host:   h.config.TEMPORAL_UI_HOST,
+		Host:   h.config.Temporal.UIHost,
 		Scheme: "http",
 	})
 

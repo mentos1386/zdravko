@@ -16,7 +16,7 @@ func main() {
 
 	r := mux.NewRouter()
 
-	db, query, err := internal.ConnectToDatabase(config.ZDRAVKO_DATABASE_PATH)
+	db, query, err := internal.ConnectToDatabase(config.DatabasePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,6 +60,6 @@ func main() {
 	// 404
 	r.PathPrefix("/").HandlerFunc(h.Error404).Methods("GET")
 
-	log.Println("Server started on", config.PORT)
-	log.Fatal(http.ListenAndServe(":"+config.PORT, r))
+	log.Println("Server started on", config.Port)
+	log.Fatal(http.ListenAndServe(":"+config.Port, r))
 }

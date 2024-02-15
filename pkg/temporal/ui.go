@@ -9,9 +9,9 @@ import (
 
 func NewUiConfig(cfg *internal.Config) *config.Config {
 	return &config.Config{
-		Host:                cfg.TEMPORAL_LISTEN_ADDRESS,
+		Host:                cfg.Temporal.ListenAddress,
 		Port:                8223,
-		TemporalGRPCAddress: cfg.TEMPORAL_SERVER_HOST,
+		TemporalGRPCAddress: cfg.Temporal.ServerHost,
 		EnableUI:            true,
 		PublicPath:          "/temporal",
 		Codec: config.Codec{
