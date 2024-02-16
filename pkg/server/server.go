@@ -1,34 +1,48 @@
-package main
+package server
 
 import (
+	"context"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
 
 	"code.tjo.space/mentos1386/zdravko/internal"
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/handlers"
+	"code.tjo.space/mentos1386/zdravko/internal/temporal"
 	"code.tjo.space/mentos1386/zdravko/web/static"
+	"github.com/gorilla/mux"
 )
 
-func main() {
-	cfg := config.NewConfig()
+type Server struct {
+	server *http.Server
+	cfg    *config.Config
+}
 
+func NewServer(cfg *config.Config) (*Server, error) {
+	return &Server{
+		cfg: cfg,
+	}, nil
+}
+
+func (s *Server) Name() string {
+	return "HTTP WEB and API Server"
+}
+
+func (s *Server) Start() error {
 	r := mux.NewRouter()
 
-	db, query, err := internal.ConnectToDatabase(cfg.DatabasePath)
+	db, query, err := internal.ConnectToDatabase(s.cfg.DatabasePath)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	log.Println("Connected to database")
 
-	temporalClient, err := internal.ConnectToTemporal(cfg)
+	temporalClient, err := temporal.ConnectToTemporal(s.cfg)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	h := handlers.NewBaseHandler(db, query, temporalClient, cfg)
+	h := handlers.NewBaseHandler(db, query, temporalClient, s.cfg)
 
 	// Health
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
@@ -69,6 +83,15 @@ func main() {
 	// 404
 	r.PathPrefix("/").HandlerFunc(h.Error404).Methods("GET")
 
-	log.Println("Server started on", cfg.Port)
-	log.Fatal(http.ListenAndServe(":"+cfg.Port, r))
+	s.server = &http.Server{
+		Addr:    ":" + s.cfg.Port,
+		Handler: r,
+	}
+
+	return s.server.ListenAndServe()
+}
+
+func (s *Server) Stop() error {
+	ctx := context.Background()
+	return s.server.Shutdown(ctx)
 }

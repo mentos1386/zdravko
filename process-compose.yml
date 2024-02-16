@@ -5,15 +5,7 @@ processes:
     command: watchexec -r -e go,tmpl,css just _tailwindcss-build
     availability:
       restart: "always"
-  server:
-    command: watchexec -r -e go,tmpl,css just run-server
-    availability:
-      restart: "always"
-  worker:
-    command: watchexec -r -e go,tmpl,css just run-worker
-    availability:
-      restart: "always"
-  temporal:
-    command: just run-temporal
+  zdravko:
+    command: watchexec -r -e go,tmpl,css just run-zdravko
     availability:
       restart: "always"

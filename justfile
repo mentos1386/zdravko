@@ -5,28 +5,22 @@ set dotenv-load
 
 STATIC_DIR := "./web/static"
 
+# Build the application
+build:
+  docker build -f build/Dockerfile -t ghcr.io/mentos1386/zdravko:latest .
+
 # Run full development environment
 run:
   devbox services up
 
-# Start temporal which is accassible at http://localhost:8233/
-run-temporal:
-  go build -o dist/temporal cmd/temporal/main.go
-  ./dist/temporal
-
-# Start web server accessible at http://localhost:8080/
-run-server:
-  go build -o dist/server cmd/server/main.go
-  ./dist/server
-
-# Run worker
-run-worker:
-  go build -o dist/worker cmd/worker/main.go
-  ./dist/worker
+# Start zdravko
+run-zdravko:
+  go build -o dist/zdravko cmd/zdravko/main.go
+  ./dist/zdravko
 
 # Deploy the application to fly.io
 deploy:
-  fly deploy
+  fly deploy -c deploy/fly.toml
 
 # Start devbox shell
 shell:
@@ -38,7 +32,7 @@ generate:
   go generate ./...
 
 _tailwindcss-build:
-  tailwindcss build -i {{STATIC_DIR}}/css/main.css -o {{STATIC_DIR}}/css/tailwind.css
+  tailwindcss build -c build/tailwind.config.js -i {{STATIC_DIR}}/css/main.css -o {{STATIC_DIR}}/css/tailwind.css
 
 _htmx-download:
   mkdir -p  {{STATIC_DIR}}/js

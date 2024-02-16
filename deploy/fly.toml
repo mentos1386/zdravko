@@ -4,32 +4,26 @@ app = 'zdravko'
 primary_region = 'waw'
 
 [build]
-  builder = 'paketobuildpacks/builder:base'
-  buildpacks = ['gcr.io/paketo-buildpacks/go']
+  dockerfile = "Dockerfile"
 
 [env]
-  PORT = '8080'
   ROOT_URL = 'https://zdravko.mnts.dev'
-  DATABASE_PATH = '/data/zdravko.db'
 
   OAUTH2_ENDPOINT_TOKEN_URL = 'https://github.com/login/oauth/access_token'
   OAUTH2_ENDPOINT_AUTH_URL = 'https://github.com/login/oauth/authorize'
   OAUTH2_ENDPOINT_USER_INFO_URL = 'https://api.github.com/user'
 
-  TEMPORAL_DATABASE_PATH = '/data/temporal.db'
-  TEMPORAL_UI_HOST = 'temporal.process.zdravko.internal:8223'
-  TEMPORAL_SERVER_HOST = 'temporal.process.zdravko.internal:7233'
+  TEMPORAL_UI_HOST = 'server.process.zdravko.internal:8223'
+  TEMPORAL_SERVER_HOST = 'server.process.zdravko.internal:7233'
 
 [processes]
-  server = "server"
-  worker = "worker"
-  temporal = "temporal"
+  server = "zdravko --temporal=false --server=true --worker=false"
+  worker = "zdravko --temporal=false --server=false --worker=true"
 
 [[mounts]]
-  source = "zdravko_data"
-  destination = "/data"
-  processes = ["server", "temporal"]
-  initial_size = "3GB"
+  source = "litefs"
+  destination = "/var/lib/litefs"
+  processes = ["server"]
 
 [http_service]
   processes = ["server"]
