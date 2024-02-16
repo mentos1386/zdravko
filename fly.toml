@@ -9,7 +9,7 @@ primary_region = 'waw'
 
 [env]
   PORT = '8080'
-  ROOT_URL = 'https://zdravko.fly.dev'
+  ROOT_URL = 'https://zdravko.mnts.dev'
   # Other are defined in secrets
   OAUTH2_ENDPOINT_TOKEN_URL = 'https://github.com/login/oauth/access_token'
   OAUTH2_ENDPOINT_AUTH_URL = 'https://github.com/login/oauth/authorize'
