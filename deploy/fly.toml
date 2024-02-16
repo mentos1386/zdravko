@@ -17,11 +17,11 @@ primary_region = 'waw'
   TEMPORAL_SERVER_HOST = 'server.process.zdravko.internal:7233'
 
 [processes]
-  server = "zdravko --temporal=false --server=true --worker=false"
+  server = "zdravko --temporal=true --server=true --worker=false"
   worker = "zdravko --temporal=false --server=false --worker=true"
 
 [[mounts]]
-  source = "litefs"
+  source = "zdravko_data"
   destination = "/var/lib/litefs"
   processes = ["server"]
 
