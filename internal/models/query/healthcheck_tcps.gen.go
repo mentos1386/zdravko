@@ -31,6 +31,7 @@ func newHealthcheckTcp(db *gorm.DB, opts ...gen.DOOption) healthcheckTcp {
 	_healthcheckTcp.CreatedAt = field.NewTime(tableName, "created_at")
 	_healthcheckTcp.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_healthcheckTcp.DeletedAt = field.NewField(tableName, "deleted_at")
+	_healthcheckTcp.Slug = field.NewString(tableName, "slug")
 	_healthcheckTcp.Name = field.NewString(tableName, "name")
 	_healthcheckTcp.Status = field.NewString(tableName, "status")
 	_healthcheckTcp.UptimePercentage = field.NewFloat64(tableName, "uptime_percentage")
@@ -51,6 +52,7 @@ type healthcheckTcp struct {
 	CreatedAt        field.Time
 	UpdatedAt        field.Time
 	DeletedAt        field.Field
+	Slug             field.String
 	Name             field.String
 	Status           field.String
 	UptimePercentage field.Float64
@@ -77,6 +79,7 @@ func (h *healthcheckTcp) updateTableName(table string) *healthcheckTcp {
 	h.CreatedAt = field.NewTime(table, "created_at")
 	h.UpdatedAt = field.NewTime(table, "updated_at")
 	h.DeletedAt = field.NewField(table, "deleted_at")
+	h.Slug = field.NewString(table, "slug")
 	h.Name = field.NewString(table, "name")
 	h.Status = field.NewString(table, "status")
 	h.UptimePercentage = field.NewFloat64(table, "uptime_percentage")
@@ -111,11 +114,12 @@ func (h *healthcheckTcp) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (h *healthcheckTcp) fillFieldMap() {
-	h.fieldMap = make(map[string]field.Expr, 10)
+	h.fieldMap = make(map[string]field.Expr, 11)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["created_at"] = h.CreatedAt
 	h.fieldMap["updated_at"] = h.UpdatedAt
 	h.fieldMap["deleted_at"] = h.DeletedAt
+	h.fieldMap["slug"] = h.Slug
 	h.fieldMap["name"] = h.Name
 	h.fieldMap["status"] = h.Status
 	h.fieldMap["uptime_percentage"] = h.UptimePercentage

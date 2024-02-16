@@ -1,6 +1,7 @@
 package workflows
 
 import (
+	"fmt"
 	"time"
 
 	"code.tjo.space/mentos1386/zdravko/internal/activities"
@@ -8,7 +9,8 @@ import (
 )
 
 type HealthcheckHttpWorkflowParam struct {
-	Id uint
+	Url    string
+	Method string
 }
 
 func HealthcheckHttpWorkflowDefinition(ctx workflow.Context, param HealthcheckHttpWorkflowParam) error {
@@ -18,12 +20,19 @@ func HealthcheckHttpWorkflowDefinition(ctx workflow.Context, param HealthcheckHt
 	ctx = workflow.WithActivityOptions(ctx, options)
 
 	activityParam := activities.HealtcheckHttpActivityParam{
-		Url:    "https://google.com",
-		Method: "GET",
+		Url:    param.Url,
+		Method: param.Method,
 	}
 
 	var result *activities.HealthcheckHttpActivityResult
 	err := workflow.ExecuteActivity(ctx, activities.HealthcheckHttpActivityDefinition, activityParam).Get(ctx, &result)
+	if err != nil {
+		return err
+	}
 
-	return err
+	if result.StatusCode != 200 {
+		return fmt.Errorf("HealthcheckHttpActivityDefinition produced statuscode %d for url %s", result.StatusCode, param.Url)
+	}
+
+	return nil
 }

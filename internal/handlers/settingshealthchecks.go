@@ -3,9 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
-	"strconv"
 	"text/template"
 
 	"code.tjo.space/mentos1386/zdravko/internal/models"
@@ -13,6 +11,7 @@ import (
 	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/gorilla/mux"
+	"github.com/gosimple/slug"
 )
 
 type SettingsHealthchecks struct {
@@ -58,10 +57,7 @@ func (h *BaseHandler) SettingsHealthchecksGET(w http.ResponseWriter, r *http.Req
 
 func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
 	vars := mux.Vars(r)
-	id, err := strconv.ParseUint(vars["id"], 10, 32)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	slug := vars["slug"]
 
 	ts, err := template.ParseFS(templates.Templates,
 		"components/base.tmpl",
@@ -73,7 +69,7 @@ func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *
 		return
 	}
 
-	healthcheck, err := services.GetHealthcheckHttp(context.Background(), h.query, uint(id))
+	healthcheck, err := services.GetHealthcheckHttp(context.Background(), h.query, slug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -85,7 +81,7 @@ func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *
 			[]*components.Page{
 				GetPageByTitle(SettingsPages, "Healthchecks"),
 				{
-					Path:       fmt.Sprintf("/settings/healthchecks/%d", id),
+					Path:       fmt.Sprintf("/settings/healthchecks/%s", slug),
 					Title:      "Describe",
 					Breadcrumb: healthcheck.Name,
 				},
@@ -124,24 +120,27 @@ func (h *BaseHandler) SettingsHealthchecksCreateGET(w http.ResponseWriter, r *ht
 func (h *BaseHandler) SettingsHealthchecksCreatePOST(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
 	ctx := context.Background()
 
+	healthcheckHttp := &models.HealthcheckHttp{
+		Healthcheck: models.Healthcheck{
+			Name:     r.FormValue("name"),
+			Slug:     slug.Make(r.FormValue("name")),
+			Schedule: r.FormValue("schedule"),
+		},
+		Url:    r.FormValue("url"),
+		Method: r.FormValue("method"),
+	}
+
 	err := services.CreateHealthcheckHttp(
 		ctx,
 		h.db,
-		&models.HealthcheckHttp{
-			Healthcheck: models.Healthcheck{
-				Name:     r.FormValue("name"),
-				Schedule: r.FormValue("schedule"),
-			},
-			URL:    r.FormValue("url"),
-			Method: r.FormValue("method"),
-		})
+		healthcheckHttp,
+	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	err = services.StartHealthcheckHttp(ctx, h.temporal)
+	err = services.StartHealthcheckHttp(ctx, h.temporal, healthcheckHttp)
 	if err != nil {
-		log.Println("Error starting healthcheck workflow", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

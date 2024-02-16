@@ -31,11 +31,12 @@ func newHealthcheckHttp(db *gorm.DB, opts ...gen.DOOption) healthcheckHttp {
 	_healthcheckHttp.CreatedAt = field.NewTime(tableName, "created_at")
 	_healthcheckHttp.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_healthcheckHttp.DeletedAt = field.NewField(tableName, "deleted_at")
+	_healthcheckHttp.Slug = field.NewString(tableName, "slug")
 	_healthcheckHttp.Name = field.NewString(tableName, "name")
 	_healthcheckHttp.Status = field.NewString(tableName, "status")
 	_healthcheckHttp.UptimePercentage = field.NewFloat64(tableName, "uptime_percentage")
 	_healthcheckHttp.Schedule = field.NewString(tableName, "schedule")
-	_healthcheckHttp.URL = field.NewString(tableName, "url")
+	_healthcheckHttp.Url = field.NewString(tableName, "url")
 	_healthcheckHttp.Method = field.NewString(tableName, "method")
 
 	_healthcheckHttp.fillFieldMap()
@@ -51,11 +52,12 @@ type healthcheckHttp struct {
 	CreatedAt        field.Time
 	UpdatedAt        field.Time
 	DeletedAt        field.Field
+	Slug             field.String
 	Name             field.String
 	Status           field.String
 	UptimePercentage field.Float64
 	Schedule         field.String
-	URL              field.String
+	Url              field.String
 	Method           field.String
 
 	fieldMap map[string]field.Expr
@@ -77,11 +79,12 @@ func (h *healthcheckHttp) updateTableName(table string) *healthcheckHttp {
 	h.CreatedAt = field.NewTime(table, "created_at")
 	h.UpdatedAt = field.NewTime(table, "updated_at")
 	h.DeletedAt = field.NewField(table, "deleted_at")
+	h.Slug = field.NewString(table, "slug")
 	h.Name = field.NewString(table, "name")
 	h.Status = field.NewString(table, "status")
 	h.UptimePercentage = field.NewFloat64(table, "uptime_percentage")
 	h.Schedule = field.NewString(table, "schedule")
-	h.URL = field.NewString(table, "url")
+	h.Url = field.NewString(table, "url")
 	h.Method = field.NewString(table, "method")
 
 	h.fillFieldMap()
@@ -111,16 +114,17 @@ func (h *healthcheckHttp) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (h *healthcheckHttp) fillFieldMap() {
-	h.fieldMap = make(map[string]field.Expr, 10)
+	h.fieldMap = make(map[string]field.Expr, 11)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["created_at"] = h.CreatedAt
 	h.fieldMap["updated_at"] = h.UpdatedAt
 	h.fieldMap["deleted_at"] = h.DeletedAt
+	h.fieldMap["slug"] = h.Slug
 	h.fieldMap["name"] = h.Name
 	h.fieldMap["status"] = h.Status
 	h.fieldMap["uptime_percentage"] = h.UptimePercentage
 	h.fieldMap["schedule"] = h.Schedule
-	h.fieldMap["url"] = h.URL
+	h.fieldMap["url"] = h.Url
 	h.fieldMap["method"] = h.Method
 }
 

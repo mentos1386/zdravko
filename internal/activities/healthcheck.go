@@ -2,6 +2,7 @@ package activities
 
 import (
 	"context"
+	"log"
 	"net/http"
 )
 
@@ -11,7 +12,7 @@ type HealtcheckHttpActivityParam struct {
 }
 
 type HealthcheckHttpActivityResult struct {
-	Success bool
+	StatusCode int
 }
 
 func HealthcheckHttpActivityDefinition(ctx context.Context, param HealtcheckHttpActivityParam) (*HealthcheckHttpActivityResult, error) {
@@ -35,5 +36,7 @@ func HealthcheckHttpActivityDefinition(ctx context.Context, param HealtcheckHttp
 		return nil, err
 	}
 
-	return &HealthcheckHttpActivityResult{Success: response.StatusCode == 200}, nil
+	log.Printf("HealthcheckHttpActivityDefinition produced statuscode %d for url %s", response.StatusCode, param.Url)
+
+	return &HealthcheckHttpActivityResult{StatusCode: response.StatusCode}, nil
 }

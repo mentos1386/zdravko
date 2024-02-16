@@ -31,6 +31,7 @@ func newCronjob(db *gorm.DB, opts ...gen.DOOption) cronjob {
 	_cronjob.CreatedAt = field.NewTime(tableName, "created_at")
 	_cronjob.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_cronjob.DeletedAt = field.NewField(tableName, "deleted_at")
+	_cronjob.Slug = field.NewString(tableName, "slug")
 	_cronjob.Name = field.NewString(tableName, "name")
 	_cronjob.Schedule = field.NewString(tableName, "schedule")
 	_cronjob.Buffer = field.NewInt(tableName, "buffer")
@@ -48,6 +49,7 @@ type cronjob struct {
 	CreatedAt field.Time
 	UpdatedAt field.Time
 	DeletedAt field.Field
+	Slug      field.String
 	Name      field.String
 	Schedule  field.String
 	Buffer    field.Int
@@ -71,6 +73,7 @@ func (c *cronjob) updateTableName(table string) *cronjob {
 	c.CreatedAt = field.NewTime(table, "created_at")
 	c.UpdatedAt = field.NewTime(table, "updated_at")
 	c.DeletedAt = field.NewField(table, "deleted_at")
+	c.Slug = field.NewString(table, "slug")
 	c.Name = field.NewString(table, "name")
 	c.Schedule = field.NewString(table, "schedule")
 	c.Buffer = field.NewInt(table, "buffer")
@@ -98,11 +101,12 @@ func (c *cronjob) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *cronjob) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 7)
+	c.fieldMap = make(map[string]field.Expr, 8)
 	c.fieldMap["id"] = c.ID
 	c.fieldMap["created_at"] = c.CreatedAt
 	c.fieldMap["updated_at"] = c.UpdatedAt
 	c.fieldMap["deleted_at"] = c.DeletedAt
+	c.fieldMap["slug"] = c.Slug
 	c.fieldMap["name"] = c.Name
 	c.fieldMap["schedule"] = c.Schedule
 	c.fieldMap["buffer"] = c.Buffer

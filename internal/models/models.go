@@ -13,6 +13,7 @@ type OAuth2State struct {
 
 type Healthcheck struct {
 	gorm.Model
+	Slug             string `gorm:"unique"`
 	Name             string `gorm:"unique"`
 	Status           string // UP, DOWN
 	UptimePercentage float64
@@ -22,7 +23,7 @@ type Healthcheck struct {
 type HealthcheckHttp struct {
 	gorm.Model
 	Healthcheck
-	URL    string
+	Url    string
 	Method string
 }
 
@@ -35,6 +36,7 @@ type HealthcheckTcp struct {
 
 type Cronjob struct {
 	gorm.Model
+	Slug     string `gorm:"unique"`
 	Name     string `gorm:"unique"`
 	Schedule string
 	Buffer   int

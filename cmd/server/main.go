@@ -56,7 +56,7 @@ func main() {
 	r.HandleFunc("/settings/healthchecks", h.Authenticated(h.SettingsHealthchecksGET)).Methods("GET")
 	r.HandleFunc("/settings/healthchecks/create", h.Authenticated(h.SettingsHealthchecksCreateGET)).Methods("GET")
 	r.HandleFunc("/settings/healthchecks/create", h.Authenticated(h.SettingsHealthchecksCreatePOST)).Methods("POST")
-	r.HandleFunc("/settings/healthchecks/{id}", h.Authenticated(h.SettingsHealthchecksDescribeGET)).Methods("GET")
+	r.HandleFunc("/settings/healthchecks/{slug}", h.Authenticated(h.SettingsHealthchecksDescribeGET)).Methods("GET")
 
 	// OAuth2
 	r.HandleFunc("/oauth2/login", h.OAuth2LoginGET).Methods("GET")
