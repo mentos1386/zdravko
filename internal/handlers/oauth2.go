@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"code.tjo.space/mentos1386/zdravko/internal/config"
@@ -16,7 +17,7 @@ import (
 )
 
 type UserInfo struct {
-	Id    int64  `json:"id"` // FIXME: This might not always be int?
+	Id    int    `json:"id"` // FIXME: This might not always be int?
 	Sub   string `json:"sub"`
 	Email string `json:"email"`
 }
@@ -138,9 +139,9 @@ func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	userId := userInfo.Id
-	if userInfo.Sub != "" {
-		userId = userInfo.Sub
+	userId := userInfo.Sub
+	if userInfo.Id != 0 {
+		userId = strconv.Itoa(userInfo.Id)
 	}
 
 	err = h.SetAuthenticatedUserForRequest(w, r, &AuthenticatedUser{
