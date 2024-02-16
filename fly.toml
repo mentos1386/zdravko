@@ -10,11 +10,13 @@ primary_region = 'waw'
 [env]
   PORT = '8080'
   ROOT_URL = 'https://zdravko.mnts.dev'
-  # Other are defined in secrets
+  DATABASE_PATH = '/data/zdravko.db'
+
   OAUTH2_ENDPOINT_TOKEN_URL = 'https://github.com/login/oauth/access_token'
   OAUTH2_ENDPOINT_AUTH_URL = 'https://github.com/login/oauth/authorize'
   OAUTH2_ENDPOINT_USER_INFO_URL = 'https://api.github.com/user'
 
+  TEMPORAL_DATABASE_PATH = '/data/temporal.db'
   TEMPORAL_UI_HOST = 'temporal.process.zdravko.internal:8223'
   TEMPORAL_SERVER_HOST = 'temporal.process.zdravko.internal:7233'
 
@@ -22,6 +24,12 @@ primary_region = 'waw'
   server = "server"
   worker = "worker"
   temporal = "temporal"
+
+[[mounts]]
+  source = "zdravko_data"
+  destination = "/data"
+  processes = ["server", "temporal"]
+  initial_size = "3GB"
 
 [http_service]
   processes = ["server"]
