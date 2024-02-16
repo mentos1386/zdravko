@@ -16,7 +16,7 @@ import (
 )
 
 type UserInfo struct {
-	Id    string `json:"id"`
+	Id    int64  `json:"id"` // FIXME: This might not always be int?
 	Sub   string `json:"sub"`
 	Email string `json:"email"`
 }
