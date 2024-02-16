@@ -19,32 +19,32 @@ import (
 	"code.tjo.space/mentos1386/zdravko/internal/models"
 )
 
-func newHealthcheckHTTP(db *gorm.DB, opts ...gen.DOOption) healthcheckHTTP {
-	_healthcheckHTTP := healthcheckHTTP{}
+func newHealthcheckHttp(db *gorm.DB, opts ...gen.DOOption) healthcheckHttp {
+	_healthcheckHttp := healthcheckHttp{}
 
-	_healthcheckHTTP.healthcheckHTTPDo.UseDB(db, opts...)
-	_healthcheckHTTP.healthcheckHTTPDo.UseModel(&models.HealthcheckHTTP{})
+	_healthcheckHttp.healthcheckHttpDo.UseDB(db, opts...)
+	_healthcheckHttp.healthcheckHttpDo.UseModel(&models.HealthcheckHttp{})
 
-	tableName := _healthcheckHTTP.healthcheckHTTPDo.TableName()
-	_healthcheckHTTP.ALL = field.NewAsterisk(tableName)
-	_healthcheckHTTP.ID = field.NewUint(tableName, "id")
-	_healthcheckHTTP.CreatedAt = field.NewTime(tableName, "created_at")
-	_healthcheckHTTP.UpdatedAt = field.NewTime(tableName, "updated_at")
-	_healthcheckHTTP.DeletedAt = field.NewField(tableName, "deleted_at")
-	_healthcheckHTTP.Name = field.NewString(tableName, "name")
-	_healthcheckHTTP.Status = field.NewString(tableName, "status")
-	_healthcheckHTTP.UptimePercentage = field.NewFloat64(tableName, "uptime_percentage")
-	_healthcheckHTTP.Schedule = field.NewString(tableName, "schedule")
-	_healthcheckHTTP.URL = field.NewString(tableName, "url")
-	_healthcheckHTTP.Method = field.NewString(tableName, "method")
+	tableName := _healthcheckHttp.healthcheckHttpDo.TableName()
+	_healthcheckHttp.ALL = field.NewAsterisk(tableName)
+	_healthcheckHttp.ID = field.NewUint(tableName, "id")
+	_healthcheckHttp.CreatedAt = field.NewTime(tableName, "created_at")
+	_healthcheckHttp.UpdatedAt = field.NewTime(tableName, "updated_at")
+	_healthcheckHttp.DeletedAt = field.NewField(tableName, "deleted_at")
+	_healthcheckHttp.Name = field.NewString(tableName, "name")
+	_healthcheckHttp.Status = field.NewString(tableName, "status")
+	_healthcheckHttp.UptimePercentage = field.NewFloat64(tableName, "uptime_percentage")
+	_healthcheckHttp.Schedule = field.NewString(tableName, "schedule")
+	_healthcheckHttp.URL = field.NewString(tableName, "url")
+	_healthcheckHttp.Method = field.NewString(tableName, "method")
 
-	_healthcheckHTTP.fillFieldMap()
+	_healthcheckHttp.fillFieldMap()
 
-	return _healthcheckHTTP
+	return _healthcheckHttp
 }
 
-type healthcheckHTTP struct {
-	healthcheckHTTPDo healthcheckHTTPDo
+type healthcheckHttp struct {
+	healthcheckHttpDo healthcheckHttpDo
 
 	ALL              field.Asterisk
 	ID               field.Uint
@@ -61,17 +61,17 @@ type healthcheckHTTP struct {
 	fieldMap map[string]field.Expr
 }
 
-func (h healthcheckHTTP) Table(newTableName string) *healthcheckHTTP {
-	h.healthcheckHTTPDo.UseTable(newTableName)
+func (h healthcheckHttp) Table(newTableName string) *healthcheckHttp {
+	h.healthcheckHttpDo.UseTable(newTableName)
 	return h.updateTableName(newTableName)
 }
 
-func (h healthcheckHTTP) As(alias string) *healthcheckHTTP {
-	h.healthcheckHTTPDo.DO = *(h.healthcheckHTTPDo.As(alias).(*gen.DO))
+func (h healthcheckHttp) As(alias string) *healthcheckHttp {
+	h.healthcheckHttpDo.DO = *(h.healthcheckHttpDo.As(alias).(*gen.DO))
 	return h.updateTableName(alias)
 }
 
-func (h *healthcheckHTTP) updateTableName(table string) *healthcheckHTTP {
+func (h *healthcheckHttp) updateTableName(table string) *healthcheckHttp {
 	h.ALL = field.NewAsterisk(table)
 	h.ID = field.NewUint(table, "id")
 	h.CreatedAt = field.NewTime(table, "created_at")
@@ -89,19 +89,19 @@ func (h *healthcheckHTTP) updateTableName(table string) *healthcheckHTTP {
 	return h
 }
 
-func (h *healthcheckHTTP) WithContext(ctx context.Context) IHealthcheckHTTPDo {
-	return h.healthcheckHTTPDo.WithContext(ctx)
+func (h *healthcheckHttp) WithContext(ctx context.Context) IHealthcheckHttpDo {
+	return h.healthcheckHttpDo.WithContext(ctx)
 }
 
-func (h healthcheckHTTP) TableName() string { return h.healthcheckHTTPDo.TableName() }
+func (h healthcheckHttp) TableName() string { return h.healthcheckHttpDo.TableName() }
 
-func (h healthcheckHTTP) Alias() string { return h.healthcheckHTTPDo.Alias() }
+func (h healthcheckHttp) Alias() string { return h.healthcheckHttpDo.Alias() }
 
-func (h healthcheckHTTP) Columns(cols ...field.Expr) gen.Columns {
-	return h.healthcheckHTTPDo.Columns(cols...)
+func (h healthcheckHttp) Columns(cols ...field.Expr) gen.Columns {
+	return h.healthcheckHttpDo.Columns(cols...)
 }
 
-func (h *healthcheckHTTP) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
+func (h *healthcheckHttp) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := h.fieldMap[fieldName]
 	if !ok || _f == nil {
 		return nil, false
@@ -110,7 +110,7 @@ func (h *healthcheckHTTP) GetFieldByName(fieldName string) (field.OrderExpr, boo
 	return _oe, ok
 }
 
-func (h *healthcheckHTTP) fillFieldMap() {
+func (h *healthcheckHttp) fillFieldMap() {
 	h.fieldMap = make(map[string]field.Expr, 10)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["created_at"] = h.CreatedAt
@@ -124,58 +124,58 @@ func (h *healthcheckHTTP) fillFieldMap() {
 	h.fieldMap["method"] = h.Method
 }
 
-func (h healthcheckHTTP) clone(db *gorm.DB) healthcheckHTTP {
-	h.healthcheckHTTPDo.ReplaceConnPool(db.Statement.ConnPool)
+func (h healthcheckHttp) clone(db *gorm.DB) healthcheckHttp {
+	h.healthcheckHttpDo.ReplaceConnPool(db.Statement.ConnPool)
 	return h
 }
 
-func (h healthcheckHTTP) replaceDB(db *gorm.DB) healthcheckHTTP {
-	h.healthcheckHTTPDo.ReplaceDB(db)
+func (h healthcheckHttp) replaceDB(db *gorm.DB) healthcheckHttp {
+	h.healthcheckHttpDo.ReplaceDB(db)
 	return h
 }
 
-type healthcheckHTTPDo struct{ gen.DO }
+type healthcheckHttpDo struct{ gen.DO }
 
-type IHealthcheckHTTPDo interface {
+type IHealthcheckHttpDo interface {
 	gen.SubQuery
-	Debug() IHealthcheckHTTPDo
-	WithContext(ctx context.Context) IHealthcheckHTTPDo
+	Debug() IHealthcheckHttpDo
+	WithContext(ctx context.Context) IHealthcheckHttpDo
 	WithResult(fc func(tx gen.Dao)) gen.ResultInfo
 	ReplaceDB(db *gorm.DB)
-	ReadDB() IHealthcheckHTTPDo
-	WriteDB() IHealthcheckHTTPDo
+	ReadDB() IHealthcheckHttpDo
+	WriteDB() IHealthcheckHttpDo
 	As(alias string) gen.Dao
-	Session(config *gorm.Session) IHealthcheckHTTPDo
+	Session(config *gorm.Session) IHealthcheckHttpDo
 	Columns(cols ...field.Expr) gen.Columns
-	Clauses(conds ...clause.Expression) IHealthcheckHTTPDo
-	Not(conds ...gen.Condition) IHealthcheckHTTPDo
-	Or(conds ...gen.Condition) IHealthcheckHTTPDo
-	Select(conds ...field.Expr) IHealthcheckHTTPDo
-	Where(conds ...gen.Condition) IHealthcheckHTTPDo
-	Order(conds ...field.Expr) IHealthcheckHTTPDo
-	Distinct(cols ...field.Expr) IHealthcheckHTTPDo
-	Omit(cols ...field.Expr) IHealthcheckHTTPDo
-	Join(table schema.Tabler, on ...field.Expr) IHealthcheckHTTPDo
-	LeftJoin(table schema.Tabler, on ...field.Expr) IHealthcheckHTTPDo
-	RightJoin(table schema.Tabler, on ...field.Expr) IHealthcheckHTTPDo
-	Group(cols ...field.Expr) IHealthcheckHTTPDo
-	Having(conds ...gen.Condition) IHealthcheckHTTPDo
-	Limit(limit int) IHealthcheckHTTPDo
-	Offset(offset int) IHealthcheckHTTPDo
+	Clauses(conds ...clause.Expression) IHealthcheckHttpDo
+	Not(conds ...gen.Condition) IHealthcheckHttpDo
+	Or(conds ...gen.Condition) IHealthcheckHttpDo
+	Select(conds ...field.Expr) IHealthcheckHttpDo
+	Where(conds ...gen.Condition) IHealthcheckHttpDo
+	Order(conds ...field.Expr) IHealthcheckHttpDo
+	Distinct(cols ...field.Expr) IHealthcheckHttpDo
+	Omit(cols ...field.Expr) IHealthcheckHttpDo
+	Join(table schema.Tabler, on ...field.Expr) IHealthcheckHttpDo
+	LeftJoin(table schema.Tabler, on ...field.Expr) IHealthcheckHttpDo
+	RightJoin(table schema.Tabler, on ...field.Expr) IHealthcheckHttpDo
+	Group(cols ...field.Expr) IHealthcheckHttpDo
+	Having(conds ...gen.Condition) IHealthcheckHttpDo
+	Limit(limit int) IHealthcheckHttpDo
+	Offset(offset int) IHealthcheckHttpDo
 	Count() (count int64, err error)
-	Scopes(funcs ...func(gen.Dao) gen.Dao) IHealthcheckHTTPDo
-	Unscoped() IHealthcheckHTTPDo
-	Create(values ...*models.HealthcheckHTTP) error
-	CreateInBatches(values []*models.HealthcheckHTTP, batchSize int) error
-	Save(values ...*models.HealthcheckHTTP) error
-	First() (*models.HealthcheckHTTP, error)
-	Take() (*models.HealthcheckHTTP, error)
-	Last() (*models.HealthcheckHTTP, error)
-	Find() ([]*models.HealthcheckHTTP, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.HealthcheckHTTP, err error)
-	FindInBatches(result *[]*models.HealthcheckHTTP, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Scopes(funcs ...func(gen.Dao) gen.Dao) IHealthcheckHttpDo
+	Unscoped() IHealthcheckHttpDo
+	Create(values ...*models.HealthcheckHttp) error
+	CreateInBatches(values []*models.HealthcheckHttp, batchSize int) error
+	Save(values ...*models.HealthcheckHttp) error
+	First() (*models.HealthcheckHttp, error)
+	Take() (*models.HealthcheckHttp, error)
+	Last() (*models.HealthcheckHttp, error)
+	Find() ([]*models.HealthcheckHttp, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.HealthcheckHttp, err error)
+	FindInBatches(result *[]*models.HealthcheckHttp, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*models.HealthcheckHTTP) (info gen.ResultInfo, err error)
+	Delete(...*models.HealthcheckHttp) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -183,163 +183,163 @@ type IHealthcheckHTTPDo interface {
 	UpdateColumnSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	UpdateColumns(value interface{}) (info gen.ResultInfo, err error)
 	UpdateFrom(q gen.SubQuery) gen.Dao
-	Attrs(attrs ...field.AssignExpr) IHealthcheckHTTPDo
-	Assign(attrs ...field.AssignExpr) IHealthcheckHTTPDo
-	Joins(fields ...field.RelationField) IHealthcheckHTTPDo
-	Preload(fields ...field.RelationField) IHealthcheckHTTPDo
-	FirstOrInit() (*models.HealthcheckHTTP, error)
-	FirstOrCreate() (*models.HealthcheckHTTP, error)
-	FindByPage(offset int, limit int) (result []*models.HealthcheckHTTP, count int64, err error)
+	Attrs(attrs ...field.AssignExpr) IHealthcheckHttpDo
+	Assign(attrs ...field.AssignExpr) IHealthcheckHttpDo
+	Joins(fields ...field.RelationField) IHealthcheckHttpDo
+	Preload(fields ...field.RelationField) IHealthcheckHttpDo
+	FirstOrInit() (*models.HealthcheckHttp, error)
+	FirstOrCreate() (*models.HealthcheckHttp, error)
+	FindByPage(offset int, limit int) (result []*models.HealthcheckHttp, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
 	Scan(result interface{}) (err error)
-	Returning(value interface{}, columns ...string) IHealthcheckHTTPDo
+	Returning(value interface{}, columns ...string) IHealthcheckHttpDo
 	UnderlyingDB() *gorm.DB
 	schema.Tabler
 }
 
-func (h healthcheckHTTPDo) Debug() IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Debug() IHealthcheckHttpDo {
 	return h.withDO(h.DO.Debug())
 }
 
-func (h healthcheckHTTPDo) WithContext(ctx context.Context) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) WithContext(ctx context.Context) IHealthcheckHttpDo {
 	return h.withDO(h.DO.WithContext(ctx))
 }
 
-func (h healthcheckHTTPDo) ReadDB() IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) ReadDB() IHealthcheckHttpDo {
 	return h.Clauses(dbresolver.Read)
 }
 
-func (h healthcheckHTTPDo) WriteDB() IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) WriteDB() IHealthcheckHttpDo {
 	return h.Clauses(dbresolver.Write)
 }
 
-func (h healthcheckHTTPDo) Session(config *gorm.Session) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Session(config *gorm.Session) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Session(config))
 }
 
-func (h healthcheckHTTPDo) Clauses(conds ...clause.Expression) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Clauses(conds ...clause.Expression) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Clauses(conds...))
 }
 
-func (h healthcheckHTTPDo) Returning(value interface{}, columns ...string) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Returning(value interface{}, columns ...string) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Returning(value, columns...))
 }
 
-func (h healthcheckHTTPDo) Not(conds ...gen.Condition) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Not(conds ...gen.Condition) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Not(conds...))
 }
 
-func (h healthcheckHTTPDo) Or(conds ...gen.Condition) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Or(conds ...gen.Condition) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Or(conds...))
 }
 
-func (h healthcheckHTTPDo) Select(conds ...field.Expr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Select(conds ...field.Expr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Select(conds...))
 }
 
-func (h healthcheckHTTPDo) Where(conds ...gen.Condition) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Where(conds ...gen.Condition) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Where(conds...))
 }
 
-func (h healthcheckHTTPDo) Order(conds ...field.Expr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Order(conds ...field.Expr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Order(conds...))
 }
 
-func (h healthcheckHTTPDo) Distinct(cols ...field.Expr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Distinct(cols ...field.Expr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Distinct(cols...))
 }
 
-func (h healthcheckHTTPDo) Omit(cols ...field.Expr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Omit(cols ...field.Expr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Omit(cols...))
 }
 
-func (h healthcheckHTTPDo) Join(table schema.Tabler, on ...field.Expr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Join(table schema.Tabler, on ...field.Expr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Join(table, on...))
 }
 
-func (h healthcheckHTTPDo) LeftJoin(table schema.Tabler, on ...field.Expr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) LeftJoin(table schema.Tabler, on ...field.Expr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.LeftJoin(table, on...))
 }
 
-func (h healthcheckHTTPDo) RightJoin(table schema.Tabler, on ...field.Expr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) RightJoin(table schema.Tabler, on ...field.Expr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.RightJoin(table, on...))
 }
 
-func (h healthcheckHTTPDo) Group(cols ...field.Expr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Group(cols ...field.Expr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Group(cols...))
 }
 
-func (h healthcheckHTTPDo) Having(conds ...gen.Condition) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Having(conds ...gen.Condition) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Having(conds...))
 }
 
-func (h healthcheckHTTPDo) Limit(limit int) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Limit(limit int) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Limit(limit))
 }
 
-func (h healthcheckHTTPDo) Offset(offset int) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Offset(offset int) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Offset(offset))
 }
 
-func (h healthcheckHTTPDo) Scopes(funcs ...func(gen.Dao) gen.Dao) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Scopes(funcs ...func(gen.Dao) gen.Dao) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Scopes(funcs...))
 }
 
-func (h healthcheckHTTPDo) Unscoped() IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Unscoped() IHealthcheckHttpDo {
 	return h.withDO(h.DO.Unscoped())
 }
 
-func (h healthcheckHTTPDo) Create(values ...*models.HealthcheckHTTP) error {
+func (h healthcheckHttpDo) Create(values ...*models.HealthcheckHttp) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return h.DO.Create(values)
 }
 
-func (h healthcheckHTTPDo) CreateInBatches(values []*models.HealthcheckHTTP, batchSize int) error {
+func (h healthcheckHttpDo) CreateInBatches(values []*models.HealthcheckHttp, batchSize int) error {
 	return h.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (h healthcheckHTTPDo) Save(values ...*models.HealthcheckHTTP) error {
+func (h healthcheckHttpDo) Save(values ...*models.HealthcheckHttp) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return h.DO.Save(values)
 }
 
-func (h healthcheckHTTPDo) First() (*models.HealthcheckHTTP, error) {
+func (h healthcheckHttpDo) First() (*models.HealthcheckHttp, error) {
 	if result, err := h.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckHTTP), nil
+		return result.(*models.HealthcheckHttp), nil
 	}
 }
 
-func (h healthcheckHTTPDo) Take() (*models.HealthcheckHTTP, error) {
+func (h healthcheckHttpDo) Take() (*models.HealthcheckHttp, error) {
 	if result, err := h.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckHTTP), nil
+		return result.(*models.HealthcheckHttp), nil
 	}
 }
 
-func (h healthcheckHTTPDo) Last() (*models.HealthcheckHTTP, error) {
+func (h healthcheckHttpDo) Last() (*models.HealthcheckHttp, error) {
 	if result, err := h.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckHTTP), nil
+		return result.(*models.HealthcheckHttp), nil
 	}
 }
 
-func (h healthcheckHTTPDo) Find() ([]*models.HealthcheckHTTP, error) {
+func (h healthcheckHttpDo) Find() ([]*models.HealthcheckHttp, error) {
 	result, err := h.DO.Find()
-	return result.([]*models.HealthcheckHTTP), err
+	return result.([]*models.HealthcheckHttp), err
 }
 
-func (h healthcheckHTTPDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.HealthcheckHTTP, err error) {
-	buf := make([]*models.HealthcheckHTTP, 0, batchSize)
+func (h healthcheckHttpDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.HealthcheckHttp, err error) {
+	buf := make([]*models.HealthcheckHttp, 0, batchSize)
 	err = h.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -347,49 +347,49 @@ func (h healthcheckHTTPDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch 
 	return results, err
 }
 
-func (h healthcheckHTTPDo) FindInBatches(result *[]*models.HealthcheckHTTP, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (h healthcheckHttpDo) FindInBatches(result *[]*models.HealthcheckHttp, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return h.DO.FindInBatches(result, batchSize, fc)
 }
 
-func (h healthcheckHTTPDo) Attrs(attrs ...field.AssignExpr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Attrs(attrs ...field.AssignExpr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Attrs(attrs...))
 }
 
-func (h healthcheckHTTPDo) Assign(attrs ...field.AssignExpr) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Assign(attrs ...field.AssignExpr) IHealthcheckHttpDo {
 	return h.withDO(h.DO.Assign(attrs...))
 }
 
-func (h healthcheckHTTPDo) Joins(fields ...field.RelationField) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Joins(fields ...field.RelationField) IHealthcheckHttpDo {
 	for _, _f := range fields {
 		h = *h.withDO(h.DO.Joins(_f))
 	}
 	return &h
 }
 
-func (h healthcheckHTTPDo) Preload(fields ...field.RelationField) IHealthcheckHTTPDo {
+func (h healthcheckHttpDo) Preload(fields ...field.RelationField) IHealthcheckHttpDo {
 	for _, _f := range fields {
 		h = *h.withDO(h.DO.Preload(_f))
 	}
 	return &h
 }
 
-func (h healthcheckHTTPDo) FirstOrInit() (*models.HealthcheckHTTP, error) {
+func (h healthcheckHttpDo) FirstOrInit() (*models.HealthcheckHttp, error) {
 	if result, err := h.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckHTTP), nil
+		return result.(*models.HealthcheckHttp), nil
 	}
 }
 
-func (h healthcheckHTTPDo) FirstOrCreate() (*models.HealthcheckHTTP, error) {
+func (h healthcheckHttpDo) FirstOrCreate() (*models.HealthcheckHttp, error) {
 	if result, err := h.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckHTTP), nil
+		return result.(*models.HealthcheckHttp), nil
 	}
 }
 
-func (h healthcheckHTTPDo) FindByPage(offset int, limit int) (result []*models.HealthcheckHTTP, count int64, err error) {
+func (h healthcheckHttpDo) FindByPage(offset int, limit int) (result []*models.HealthcheckHttp, count int64, err error) {
 	result, err = h.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -404,7 +404,7 @@ func (h healthcheckHTTPDo) FindByPage(offset int, limit int) (result []*models.H
 	return
 }
 
-func (h healthcheckHTTPDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (h healthcheckHttpDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = h.Count()
 	if err != nil {
 		return
@@ -414,15 +414,15 @@ func (h healthcheckHTTPDo) ScanByPage(result interface{}, offset int, limit int)
 	return
 }
 
-func (h healthcheckHTTPDo) Scan(result interface{}) (err error) {
+func (h healthcheckHttpDo) Scan(result interface{}) (err error) {
 	return h.DO.Scan(result)
 }
 
-func (h healthcheckHTTPDo) Delete(models ...*models.HealthcheckHTTP) (result gen.ResultInfo, err error) {
+func (h healthcheckHttpDo) Delete(models ...*models.HealthcheckHttp) (result gen.ResultInfo, err error) {
 	return h.DO.Delete(models)
 }
 
-func (h *healthcheckHTTPDo) withDO(do gen.Dao) *healthcheckHTTPDo {
+func (h *healthcheckHttpDo) withDO(do gen.Dao) *healthcheckHttpDo {
 	h.DO = *do.(*gen.DO)
 	return h
 }

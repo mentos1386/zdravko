@@ -28,7 +28,15 @@ func main() {
 	g.UseDB(db)
 
 	// Generate default DAO interface for those specified structs
-	g.ApplyBasic(models.HealthcheckHTTP{}, models.HealthcheckTCP{}, models.Cronjob{}, models.OAuth2State{})
+	g.ApplyBasic(
+		models.HealthcheckHttp{},
+		models.HealthcheckHttpHistory{},
+		models.HealthcheckTcp{},
+		models.HealthcheckTcpHistory{},
+		models.Cronjob{},
+		models.CronjobHistory{},
+		models.OAuth2State{},
+	)
 
 	// Execute the generator
 	g.Execute()

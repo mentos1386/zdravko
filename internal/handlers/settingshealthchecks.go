@@ -3,11 +3,13 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"text/template"
 
 	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/gorilla/mux"
@@ -15,13 +17,13 @@ import (
 
 type SettingsHealthchecks struct {
 	*Settings
-	Healthchecks       []*models.HealthcheckHTTP
+	Healthchecks       []*models.HealthcheckHttp
 	HealthchecksLength int
 }
 
 type SettingsHealthcheck struct {
 	*Settings
-	Healthcheck *models.HealthcheckHTTP
+	Healthcheck *models.HealthcheckHttp
 }
 
 func (h *BaseHandler) SettingsHealthchecksGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
@@ -35,7 +37,7 @@ func (h *BaseHandler) SettingsHealthchecksGET(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	healthchecks, err := h.query.HealthcheckHTTP.WithContext(context.Background()).Find()
+	healthchecks, err := h.query.HealthcheckHttp.WithContext(context.Background()).Find()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -71,9 +73,7 @@ func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *
 		return
 	}
 
-	healthcheck, err := h.query.HealthcheckHTTP.WithContext(context.Background()).Where(
-		h.query.HealthcheckHTTP.ID.Eq(uint(id)),
-	).First()
+	healthcheck, err := services.GetHealthcheckHttp(context.Background(), h.query, uint(id))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -84,7 +84,7 @@ func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *
 			GetPageByTitle(SettingsPages, "Healthchecks"),
 			[]*components.Page{
 				GetPageByTitle(SettingsPages, "Healthchecks"),
-				&components.Page{
+				{
 					Path:       fmt.Sprintf("/settings/healthchecks/%d", id),
 					Title:      "Describe",
 					Breadcrumb: healthcheck.Name,
@@ -122,15 +122,28 @@ func (h *BaseHandler) SettingsHealthchecksCreateGET(w http.ResponseWriter, r *ht
 }
 
 func (h *BaseHandler) SettingsHealthchecksCreatePOST(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
-	healthcheck := &models.HealthcheckHTTP{
-		Healthcheck: models.Healthcheck{
-			Name:     r.FormValue("name"),
-			Schedule: r.FormValue("schedule"),
-		},
-		URL:    r.FormValue("url"),
-		Method: r.FormValue("method"),
+	ctx := context.Background()
+
+	err := services.CreateHealthcheckHttp(
+		ctx,
+		h.db,
+		&models.HealthcheckHttp{
+			Healthcheck: models.Healthcheck{
+				Name:     r.FormValue("name"),
+				Schedule: r.FormValue("schedule"),
+			},
+			URL:    r.FormValue("url"),
+			Method: r.FormValue("method"),
+		})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	h.db.Create(healthcheck)
+
+	err = services.StartHealthcheckHttp(ctx, h.temporal)
+	if err != nil {
+		log.Println("Error starting healthcheck workflow", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
 	http.Redirect(w, r, "/settings/healthchecks", http.StatusSeeOther)
 }

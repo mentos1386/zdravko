@@ -1,8 +1,10 @@
 {{define "settings"}}
-<h1 class="mb-4 text-xl font-bold text-gray-900">
-{{ .Healthcheck.Name }}
-</h1>
-{{ .Healthcheck.ID }}
-{{ .Healthcheck.URL }}
-{{ .Healthcheck.Schedule }}
+<section class="relative overflow-x-auto shadow-md sm:rounded-lg p-5 text-gray-500 bg-white">
+  <h1 class="text-lg font-semibold text-gray-900">
+  {{ .Healthcheck.Name }}
+  </h1>
+  {{ .Healthcheck.ID }}
+  {{ .Healthcheck.URL }}
+  {{ .Healthcheck.Schedule }}
+</section>
 {{end}}

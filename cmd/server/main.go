@@ -23,7 +23,12 @@ func main() {
 	}
 	log.Println("Connected to database")
 
-	h := handlers.NewBaseHandler(db, query, cfg)
+	temporalClient, err := internal.ConnectToTemporal(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	h := handlers.NewBaseHandler(db, query, temporalClient, cfg)
 
 	// Health
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

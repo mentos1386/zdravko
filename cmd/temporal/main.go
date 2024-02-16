@@ -3,11 +3,11 @@ package main
 import (
 	"log"
 
-	"code.tjo.space/mentos1386/zdravko/internal"
+	"code.tjo.space/mentos1386/zdravko/internal/config"
 	t "code.tjo.space/mentos1386/zdravko/pkg/temporal"
 )
 
-func backendServer(config *internal.Config) {
+func backendServer(config *config.Config) {
 	serverConfig := t.NewServerConfig(config)
 
 	server, err := t.NewServer(serverConfig)
@@ -26,7 +26,7 @@ func backendServer(config *internal.Config) {
 	}
 }
 
-func frontendServer(config *internal.Config) {
+func frontendServer(config *config.Config) {
 	uiConfig := t.NewUiConfig(config)
 
 	uiServer, err := t.NewUiServer(uiConfig)
@@ -43,7 +43,7 @@ func frontendServer(config *internal.Config) {
 }
 
 func main() {
-	config := internal.NewConfig()
+	config := config.NewConfig()
 
 	go func() {
 		frontendServer(config)

@@ -19,14 +19,14 @@ type Healthcheck struct {
 	Schedule         string
 }
 
-type HealthcheckHTTP struct {
+type HealthcheckHttp struct {
 	gorm.Model
 	Healthcheck
 	URL    string
 	Method string
 }
 
-type HealthcheckTCP struct {
+type HealthcheckTcp struct {
 	gorm.Model
 	Healthcheck
 	Hostname string
@@ -38,4 +38,22 @@ type Cronjob struct {
 	Name     string `gorm:"unique"`
 	Schedule string
 	Buffer   int
+}
+
+type HealthcheckHttpHistory struct {
+	gorm.Model
+	HealthcheckHTTP HealthcheckHttp `gorm:"foreignkey:ID"`
+	Status          string
+}
+
+type HealthcheckTcpHistory struct {
+	gorm.Model
+	HealthcheckTCP HealthcheckTcp `gorm:"foreignkey:ID"`
+	Status         string
+}
+
+type CronjobHistory struct {
+	gorm.Model
+	Cronjob Cronjob `gorm:"foreignkey:ID"`
+	Status  string
 }

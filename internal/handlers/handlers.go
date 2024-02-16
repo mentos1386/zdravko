@@ -5,6 +5,7 @@ import (
 	"code.tjo.space/mentos1386/zdravko/internal/models/query"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/gorilla/sessions"
+	"go.temporal.io/sdk/client"
 	"gorm.io/gorm"
 )
 
@@ -28,11 +29,13 @@ type BaseHandler struct {
 	query  *query.Query
 	config *config.Config
 
+	temporal client.Client
+
 	store *sessions.CookieStore
 }
 
-func NewBaseHandler(db *gorm.DB, q *query.Query, config *config.Config) *BaseHandler {
+func NewBaseHandler(db *gorm.DB, q *query.Query, temporal client.Client, config *config.Config) *BaseHandler {
 	store := sessions.NewCookieStore([]byte(config.SessionSecret))
 
-	return &BaseHandler{db, q, config, store}
+	return &BaseHandler{db, q, config, temporal, store}
 }

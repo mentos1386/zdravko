@@ -19,32 +19,32 @@ import (
 	"code.tjo.space/mentos1386/zdravko/internal/models"
 )
 
-func newHealthcheckTCP(db *gorm.DB, opts ...gen.DOOption) healthcheckTCP {
-	_healthcheckTCP := healthcheckTCP{}
+func newHealthcheckTcp(db *gorm.DB, opts ...gen.DOOption) healthcheckTcp {
+	_healthcheckTcp := healthcheckTcp{}
 
-	_healthcheckTCP.healthcheckTCPDo.UseDB(db, opts...)
-	_healthcheckTCP.healthcheckTCPDo.UseModel(&models.HealthcheckTCP{})
+	_healthcheckTcp.healthcheckTcpDo.UseDB(db, opts...)
+	_healthcheckTcp.healthcheckTcpDo.UseModel(&models.HealthcheckTcp{})
 
-	tableName := _healthcheckTCP.healthcheckTCPDo.TableName()
-	_healthcheckTCP.ALL = field.NewAsterisk(tableName)
-	_healthcheckTCP.ID = field.NewUint(tableName, "id")
-	_healthcheckTCP.CreatedAt = field.NewTime(tableName, "created_at")
-	_healthcheckTCP.UpdatedAt = field.NewTime(tableName, "updated_at")
-	_healthcheckTCP.DeletedAt = field.NewField(tableName, "deleted_at")
-	_healthcheckTCP.Name = field.NewString(tableName, "name")
-	_healthcheckTCP.Status = field.NewString(tableName, "status")
-	_healthcheckTCP.UptimePercentage = field.NewFloat64(tableName, "uptime_percentage")
-	_healthcheckTCP.Schedule = field.NewString(tableName, "schedule")
-	_healthcheckTCP.Hostname = field.NewString(tableName, "hostname")
-	_healthcheckTCP.Port = field.NewInt(tableName, "port")
+	tableName := _healthcheckTcp.healthcheckTcpDo.TableName()
+	_healthcheckTcp.ALL = field.NewAsterisk(tableName)
+	_healthcheckTcp.ID = field.NewUint(tableName, "id")
+	_healthcheckTcp.CreatedAt = field.NewTime(tableName, "created_at")
+	_healthcheckTcp.UpdatedAt = field.NewTime(tableName, "updated_at")
+	_healthcheckTcp.DeletedAt = field.NewField(tableName, "deleted_at")
+	_healthcheckTcp.Name = field.NewString(tableName, "name")
+	_healthcheckTcp.Status = field.NewString(tableName, "status")
+	_healthcheckTcp.UptimePercentage = field.NewFloat64(tableName, "uptime_percentage")
+	_healthcheckTcp.Schedule = field.NewString(tableName, "schedule")
+	_healthcheckTcp.Hostname = field.NewString(tableName, "hostname")
+	_healthcheckTcp.Port = field.NewInt(tableName, "port")
 
-	_healthcheckTCP.fillFieldMap()
+	_healthcheckTcp.fillFieldMap()
 
-	return _healthcheckTCP
+	return _healthcheckTcp
 }
 
-type healthcheckTCP struct {
-	healthcheckTCPDo healthcheckTCPDo
+type healthcheckTcp struct {
+	healthcheckTcpDo healthcheckTcpDo
 
 	ALL              field.Asterisk
 	ID               field.Uint
@@ -61,17 +61,17 @@ type healthcheckTCP struct {
 	fieldMap map[string]field.Expr
 }
 
-func (h healthcheckTCP) Table(newTableName string) *healthcheckTCP {
-	h.healthcheckTCPDo.UseTable(newTableName)
+func (h healthcheckTcp) Table(newTableName string) *healthcheckTcp {
+	h.healthcheckTcpDo.UseTable(newTableName)
 	return h.updateTableName(newTableName)
 }
 
-func (h healthcheckTCP) As(alias string) *healthcheckTCP {
-	h.healthcheckTCPDo.DO = *(h.healthcheckTCPDo.As(alias).(*gen.DO))
+func (h healthcheckTcp) As(alias string) *healthcheckTcp {
+	h.healthcheckTcpDo.DO = *(h.healthcheckTcpDo.As(alias).(*gen.DO))
 	return h.updateTableName(alias)
 }
 
-func (h *healthcheckTCP) updateTableName(table string) *healthcheckTCP {
+func (h *healthcheckTcp) updateTableName(table string) *healthcheckTcp {
 	h.ALL = field.NewAsterisk(table)
 	h.ID = field.NewUint(table, "id")
 	h.CreatedAt = field.NewTime(table, "created_at")
@@ -89,19 +89,19 @@ func (h *healthcheckTCP) updateTableName(table string) *healthcheckTCP {
 	return h
 }
 
-func (h *healthcheckTCP) WithContext(ctx context.Context) IHealthcheckTCPDo {
-	return h.healthcheckTCPDo.WithContext(ctx)
+func (h *healthcheckTcp) WithContext(ctx context.Context) IHealthcheckTcpDo {
+	return h.healthcheckTcpDo.WithContext(ctx)
 }
 
-func (h healthcheckTCP) TableName() string { return h.healthcheckTCPDo.TableName() }
+func (h healthcheckTcp) TableName() string { return h.healthcheckTcpDo.TableName() }
 
-func (h healthcheckTCP) Alias() string { return h.healthcheckTCPDo.Alias() }
+func (h healthcheckTcp) Alias() string { return h.healthcheckTcpDo.Alias() }
 
-func (h healthcheckTCP) Columns(cols ...field.Expr) gen.Columns {
-	return h.healthcheckTCPDo.Columns(cols...)
+func (h healthcheckTcp) Columns(cols ...field.Expr) gen.Columns {
+	return h.healthcheckTcpDo.Columns(cols...)
 }
 
-func (h *healthcheckTCP) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
+func (h *healthcheckTcp) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 	_f, ok := h.fieldMap[fieldName]
 	if !ok || _f == nil {
 		return nil, false
@@ -110,7 +110,7 @@ func (h *healthcheckTCP) GetFieldByName(fieldName string) (field.OrderExpr, bool
 	return _oe, ok
 }
 
-func (h *healthcheckTCP) fillFieldMap() {
+func (h *healthcheckTcp) fillFieldMap() {
 	h.fieldMap = make(map[string]field.Expr, 10)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["created_at"] = h.CreatedAt
@@ -124,58 +124,58 @@ func (h *healthcheckTCP) fillFieldMap() {
 	h.fieldMap["port"] = h.Port
 }
 
-func (h healthcheckTCP) clone(db *gorm.DB) healthcheckTCP {
-	h.healthcheckTCPDo.ReplaceConnPool(db.Statement.ConnPool)
+func (h healthcheckTcp) clone(db *gorm.DB) healthcheckTcp {
+	h.healthcheckTcpDo.ReplaceConnPool(db.Statement.ConnPool)
 	return h
 }
 
-func (h healthcheckTCP) replaceDB(db *gorm.DB) healthcheckTCP {
-	h.healthcheckTCPDo.ReplaceDB(db)
+func (h healthcheckTcp) replaceDB(db *gorm.DB) healthcheckTcp {
+	h.healthcheckTcpDo.ReplaceDB(db)
 	return h
 }
 
-type healthcheckTCPDo struct{ gen.DO }
+type healthcheckTcpDo struct{ gen.DO }
 
-type IHealthcheckTCPDo interface {
+type IHealthcheckTcpDo interface {
 	gen.SubQuery
-	Debug() IHealthcheckTCPDo
-	WithContext(ctx context.Context) IHealthcheckTCPDo
+	Debug() IHealthcheckTcpDo
+	WithContext(ctx context.Context) IHealthcheckTcpDo
 	WithResult(fc func(tx gen.Dao)) gen.ResultInfo
 	ReplaceDB(db *gorm.DB)
-	ReadDB() IHealthcheckTCPDo
-	WriteDB() IHealthcheckTCPDo
+	ReadDB() IHealthcheckTcpDo
+	WriteDB() IHealthcheckTcpDo
 	As(alias string) gen.Dao
-	Session(config *gorm.Session) IHealthcheckTCPDo
+	Session(config *gorm.Session) IHealthcheckTcpDo
 	Columns(cols ...field.Expr) gen.Columns
-	Clauses(conds ...clause.Expression) IHealthcheckTCPDo
-	Not(conds ...gen.Condition) IHealthcheckTCPDo
-	Or(conds ...gen.Condition) IHealthcheckTCPDo
-	Select(conds ...field.Expr) IHealthcheckTCPDo
-	Where(conds ...gen.Condition) IHealthcheckTCPDo
-	Order(conds ...field.Expr) IHealthcheckTCPDo
-	Distinct(cols ...field.Expr) IHealthcheckTCPDo
-	Omit(cols ...field.Expr) IHealthcheckTCPDo
-	Join(table schema.Tabler, on ...field.Expr) IHealthcheckTCPDo
-	LeftJoin(table schema.Tabler, on ...field.Expr) IHealthcheckTCPDo
-	RightJoin(table schema.Tabler, on ...field.Expr) IHealthcheckTCPDo
-	Group(cols ...field.Expr) IHealthcheckTCPDo
-	Having(conds ...gen.Condition) IHealthcheckTCPDo
-	Limit(limit int) IHealthcheckTCPDo
-	Offset(offset int) IHealthcheckTCPDo
+	Clauses(conds ...clause.Expression) IHealthcheckTcpDo
+	Not(conds ...gen.Condition) IHealthcheckTcpDo
+	Or(conds ...gen.Condition) IHealthcheckTcpDo
+	Select(conds ...field.Expr) IHealthcheckTcpDo
+	Where(conds ...gen.Condition) IHealthcheckTcpDo
+	Order(conds ...field.Expr) IHealthcheckTcpDo
+	Distinct(cols ...field.Expr) IHealthcheckTcpDo
+	Omit(cols ...field.Expr) IHealthcheckTcpDo
+	Join(table schema.Tabler, on ...field.Expr) IHealthcheckTcpDo
+	LeftJoin(table schema.Tabler, on ...field.Expr) IHealthcheckTcpDo
+	RightJoin(table schema.Tabler, on ...field.Expr) IHealthcheckTcpDo
+	Group(cols ...field.Expr) IHealthcheckTcpDo
+	Having(conds ...gen.Condition) IHealthcheckTcpDo
+	Limit(limit int) IHealthcheckTcpDo
+	Offset(offset int) IHealthcheckTcpDo
 	Count() (count int64, err error)
-	Scopes(funcs ...func(gen.Dao) gen.Dao) IHealthcheckTCPDo
-	Unscoped() IHealthcheckTCPDo
-	Create(values ...*models.HealthcheckTCP) error
-	CreateInBatches(values []*models.HealthcheckTCP, batchSize int) error
-	Save(values ...*models.HealthcheckTCP) error
-	First() (*models.HealthcheckTCP, error)
-	Take() (*models.HealthcheckTCP, error)
-	Last() (*models.HealthcheckTCP, error)
-	Find() ([]*models.HealthcheckTCP, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.HealthcheckTCP, err error)
-	FindInBatches(result *[]*models.HealthcheckTCP, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Scopes(funcs ...func(gen.Dao) gen.Dao) IHealthcheckTcpDo
+	Unscoped() IHealthcheckTcpDo
+	Create(values ...*models.HealthcheckTcp) error
+	CreateInBatches(values []*models.HealthcheckTcp, batchSize int) error
+	Save(values ...*models.HealthcheckTcp) error
+	First() (*models.HealthcheckTcp, error)
+	Take() (*models.HealthcheckTcp, error)
+	Last() (*models.HealthcheckTcp, error)
+	Find() ([]*models.HealthcheckTcp, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.HealthcheckTcp, err error)
+	FindInBatches(result *[]*models.HealthcheckTcp, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*models.HealthcheckTCP) (info gen.ResultInfo, err error)
+	Delete(...*models.HealthcheckTcp) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -183,163 +183,163 @@ type IHealthcheckTCPDo interface {
 	UpdateColumnSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	UpdateColumns(value interface{}) (info gen.ResultInfo, err error)
 	UpdateFrom(q gen.SubQuery) gen.Dao
-	Attrs(attrs ...field.AssignExpr) IHealthcheckTCPDo
-	Assign(attrs ...field.AssignExpr) IHealthcheckTCPDo
-	Joins(fields ...field.RelationField) IHealthcheckTCPDo
-	Preload(fields ...field.RelationField) IHealthcheckTCPDo
-	FirstOrInit() (*models.HealthcheckTCP, error)
-	FirstOrCreate() (*models.HealthcheckTCP, error)
-	FindByPage(offset int, limit int) (result []*models.HealthcheckTCP, count int64, err error)
+	Attrs(attrs ...field.AssignExpr) IHealthcheckTcpDo
+	Assign(attrs ...field.AssignExpr) IHealthcheckTcpDo
+	Joins(fields ...field.RelationField) IHealthcheckTcpDo
+	Preload(fields ...field.RelationField) IHealthcheckTcpDo
+	FirstOrInit() (*models.HealthcheckTcp, error)
+	FirstOrCreate() (*models.HealthcheckTcp, error)
+	FindByPage(offset int, limit int) (result []*models.HealthcheckTcp, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
 	Scan(result interface{}) (err error)
-	Returning(value interface{}, columns ...string) IHealthcheckTCPDo
+	Returning(value interface{}, columns ...string) IHealthcheckTcpDo
 	UnderlyingDB() *gorm.DB
 	schema.Tabler
 }
 
-func (h healthcheckTCPDo) Debug() IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Debug() IHealthcheckTcpDo {
 	return h.withDO(h.DO.Debug())
 }
 
-func (h healthcheckTCPDo) WithContext(ctx context.Context) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) WithContext(ctx context.Context) IHealthcheckTcpDo {
 	return h.withDO(h.DO.WithContext(ctx))
 }
 
-func (h healthcheckTCPDo) ReadDB() IHealthcheckTCPDo {
+func (h healthcheckTcpDo) ReadDB() IHealthcheckTcpDo {
 	return h.Clauses(dbresolver.Read)
 }
 
-func (h healthcheckTCPDo) WriteDB() IHealthcheckTCPDo {
+func (h healthcheckTcpDo) WriteDB() IHealthcheckTcpDo {
 	return h.Clauses(dbresolver.Write)
 }
 
-func (h healthcheckTCPDo) Session(config *gorm.Session) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Session(config *gorm.Session) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Session(config))
 }
 
-func (h healthcheckTCPDo) Clauses(conds ...clause.Expression) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Clauses(conds ...clause.Expression) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Clauses(conds...))
 }
 
-func (h healthcheckTCPDo) Returning(value interface{}, columns ...string) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Returning(value interface{}, columns ...string) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Returning(value, columns...))
 }
 
-func (h healthcheckTCPDo) Not(conds ...gen.Condition) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Not(conds ...gen.Condition) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Not(conds...))
 }
 
-func (h healthcheckTCPDo) Or(conds ...gen.Condition) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Or(conds ...gen.Condition) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Or(conds...))
 }
 
-func (h healthcheckTCPDo) Select(conds ...field.Expr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Select(conds ...field.Expr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Select(conds...))
 }
 
-func (h healthcheckTCPDo) Where(conds ...gen.Condition) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Where(conds ...gen.Condition) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Where(conds...))
 }
 
-func (h healthcheckTCPDo) Order(conds ...field.Expr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Order(conds ...field.Expr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Order(conds...))
 }
 
-func (h healthcheckTCPDo) Distinct(cols ...field.Expr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Distinct(cols ...field.Expr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Distinct(cols...))
 }
 
-func (h healthcheckTCPDo) Omit(cols ...field.Expr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Omit(cols ...field.Expr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Omit(cols...))
 }
 
-func (h healthcheckTCPDo) Join(table schema.Tabler, on ...field.Expr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Join(table schema.Tabler, on ...field.Expr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Join(table, on...))
 }
 
-func (h healthcheckTCPDo) LeftJoin(table schema.Tabler, on ...field.Expr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) LeftJoin(table schema.Tabler, on ...field.Expr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.LeftJoin(table, on...))
 }
 
-func (h healthcheckTCPDo) RightJoin(table schema.Tabler, on ...field.Expr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) RightJoin(table schema.Tabler, on ...field.Expr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.RightJoin(table, on...))
 }
 
-func (h healthcheckTCPDo) Group(cols ...field.Expr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Group(cols ...field.Expr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Group(cols...))
 }
 
-func (h healthcheckTCPDo) Having(conds ...gen.Condition) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Having(conds ...gen.Condition) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Having(conds...))
 }
 
-func (h healthcheckTCPDo) Limit(limit int) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Limit(limit int) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Limit(limit))
 }
 
-func (h healthcheckTCPDo) Offset(offset int) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Offset(offset int) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Offset(offset))
 }
 
-func (h healthcheckTCPDo) Scopes(funcs ...func(gen.Dao) gen.Dao) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Scopes(funcs ...func(gen.Dao) gen.Dao) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Scopes(funcs...))
 }
 
-func (h healthcheckTCPDo) Unscoped() IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Unscoped() IHealthcheckTcpDo {
 	return h.withDO(h.DO.Unscoped())
 }
 
-func (h healthcheckTCPDo) Create(values ...*models.HealthcheckTCP) error {
+func (h healthcheckTcpDo) Create(values ...*models.HealthcheckTcp) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return h.DO.Create(values)
 }
 
-func (h healthcheckTCPDo) CreateInBatches(values []*models.HealthcheckTCP, batchSize int) error {
+func (h healthcheckTcpDo) CreateInBatches(values []*models.HealthcheckTcp, batchSize int) error {
 	return h.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (h healthcheckTCPDo) Save(values ...*models.HealthcheckTCP) error {
+func (h healthcheckTcpDo) Save(values ...*models.HealthcheckTcp) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return h.DO.Save(values)
 }
 
-func (h healthcheckTCPDo) First() (*models.HealthcheckTCP, error) {
+func (h healthcheckTcpDo) First() (*models.HealthcheckTcp, error) {
 	if result, err := h.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckTCP), nil
+		return result.(*models.HealthcheckTcp), nil
 	}
 }
 
-func (h healthcheckTCPDo) Take() (*models.HealthcheckTCP, error) {
+func (h healthcheckTcpDo) Take() (*models.HealthcheckTcp, error) {
 	if result, err := h.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckTCP), nil
+		return result.(*models.HealthcheckTcp), nil
 	}
 }
 
-func (h healthcheckTCPDo) Last() (*models.HealthcheckTCP, error) {
+func (h healthcheckTcpDo) Last() (*models.HealthcheckTcp, error) {
 	if result, err := h.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckTCP), nil
+		return result.(*models.HealthcheckTcp), nil
 	}
 }
 
-func (h healthcheckTCPDo) Find() ([]*models.HealthcheckTCP, error) {
+func (h healthcheckTcpDo) Find() ([]*models.HealthcheckTcp, error) {
 	result, err := h.DO.Find()
-	return result.([]*models.HealthcheckTCP), err
+	return result.([]*models.HealthcheckTcp), err
 }
 
-func (h healthcheckTCPDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.HealthcheckTCP, err error) {
-	buf := make([]*models.HealthcheckTCP, 0, batchSize)
+func (h healthcheckTcpDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*models.HealthcheckTcp, err error) {
+	buf := make([]*models.HealthcheckTcp, 0, batchSize)
 	err = h.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -347,49 +347,49 @@ func (h healthcheckTCPDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch i
 	return results, err
 }
 
-func (h healthcheckTCPDo) FindInBatches(result *[]*models.HealthcheckTCP, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (h healthcheckTcpDo) FindInBatches(result *[]*models.HealthcheckTcp, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return h.DO.FindInBatches(result, batchSize, fc)
 }
 
-func (h healthcheckTCPDo) Attrs(attrs ...field.AssignExpr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Attrs(attrs ...field.AssignExpr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Attrs(attrs...))
 }
 
-func (h healthcheckTCPDo) Assign(attrs ...field.AssignExpr) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Assign(attrs ...field.AssignExpr) IHealthcheckTcpDo {
 	return h.withDO(h.DO.Assign(attrs...))
 }
 
-func (h healthcheckTCPDo) Joins(fields ...field.RelationField) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Joins(fields ...field.RelationField) IHealthcheckTcpDo {
 	for _, _f := range fields {
 		h = *h.withDO(h.DO.Joins(_f))
 	}
 	return &h
 }
 
-func (h healthcheckTCPDo) Preload(fields ...field.RelationField) IHealthcheckTCPDo {
+func (h healthcheckTcpDo) Preload(fields ...field.RelationField) IHealthcheckTcpDo {
 	for _, _f := range fields {
 		h = *h.withDO(h.DO.Preload(_f))
 	}
 	return &h
 }
 
-func (h healthcheckTCPDo) FirstOrInit() (*models.HealthcheckTCP, error) {
+func (h healthcheckTcpDo) FirstOrInit() (*models.HealthcheckTcp, error) {
 	if result, err := h.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckTCP), nil
+		return result.(*models.HealthcheckTcp), nil
 	}
 }
 
-func (h healthcheckTCPDo) FirstOrCreate() (*models.HealthcheckTCP, error) {
+func (h healthcheckTcpDo) FirstOrCreate() (*models.HealthcheckTcp, error) {
 	if result, err := h.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*models.HealthcheckTCP), nil
+		return result.(*models.HealthcheckTcp), nil
 	}
 }
 
-func (h healthcheckTCPDo) FindByPage(offset int, limit int) (result []*models.HealthcheckTCP, count int64, err error) {
+func (h healthcheckTcpDo) FindByPage(offset int, limit int) (result []*models.HealthcheckTcp, count int64, err error) {
 	result, err = h.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -404,7 +404,7 @@ func (h healthcheckTCPDo) FindByPage(offset int, limit int) (result []*models.He
 	return
 }
 
-func (h healthcheckTCPDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
+func (h healthcheckTcpDo) ScanByPage(result interface{}, offset int, limit int) (count int64, err error) {
 	count, err = h.Count()
 	if err != nil {
 		return
@@ -414,15 +414,15 @@ func (h healthcheckTCPDo) ScanByPage(result interface{}, offset int, limit int) 
 	return
 }
 
-func (h healthcheckTCPDo) Scan(result interface{}) (err error) {
+func (h healthcheckTcpDo) Scan(result interface{}) (err error) {
 	return h.DO.Scan(result)
 }
 
-func (h healthcheckTCPDo) Delete(models ...*models.HealthcheckTCP) (result gen.ResultInfo, err error) {
+func (h healthcheckTcpDo) Delete(models ...*models.HealthcheckTcp) (result gen.ResultInfo, err error) {
 	return h.DO.Delete(models)
 }
 
-func (h *healthcheckTCPDo) withDO(do gen.Dao) *healthcheckTCPDo {
+func (h *healthcheckTcpDo) withDO(do gen.Dao) *healthcheckTcpDo {
 	h.DO = *do.(*gen.DO)
 	return h
 }

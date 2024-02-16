@@ -3,13 +3,15 @@ package main
 import (
 	"log"
 
-	"code.tjo.space/mentos1386/zdravko/internal"
+	"code.tjo.space/mentos1386/zdravko/internal/activities"
+	"code.tjo.space/mentos1386/zdravko/internal/config"
+	"code.tjo.space/mentos1386/zdravko/internal/workflows"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 )
 
 func main() {
-	config := internal.NewConfig()
+	config := config.NewConfig()
 
 	// Initialize a Temporal Client
 	// Specify the Namespace in the Client options
@@ -25,14 +27,16 @@ func main() {
 
 	// Create a new Worker
 	// TODO: Maybe identify by region or something?
-	yourWorker := worker.New(temporalClient, "default", worker.Options{})
+	w := worker.New(temporalClient, "default", worker.Options{})
 
 	// Register Workflows
-	//yourWorker.RegisterWorkflow(workflows.default)
+	w.RegisterWorkflow(workflows.HealthcheckHttpWorkflowDefinition)
+
 	// Register Activities
-	//yourWorker.RegisterActivity(activities.SSNTraceActivity)
+	w.RegisterActivity(activities.HealthcheckHttpActivityDefinition)
+
 	// Start the the Worker Process
-	err = yourWorker.Run(worker.InterruptCh())
+	err = w.Run(worker.InterruptCh())
 	if err != nil {
 		log.Fatalln("Unable to start the Worker Process", err)
 	}
