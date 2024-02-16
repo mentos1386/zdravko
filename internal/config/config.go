@@ -32,7 +32,7 @@ type OAuth2 struct {
 	EndpointTokenURL    string   `validate:"required"`
 	EndpointAuthURL     string   `validate:"required"`
 	EndpointUserInfoURL string   `validate:"required"`
-	EndpointLogoutURL   string   `validate:"required"`
+	EndpointLogoutURL   string   // Optional as not all SSO support this.
 }
 
 type Temporal struct {

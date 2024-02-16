@@ -16,6 +16,7 @@ import (
 )
 
 type UserInfo struct {
+	Id    string `json:"id"`
 	Sub   string `json:"sub"`
 	Email string `json:"email"`
 }
@@ -137,8 +138,13 @@ func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	userId := userInfo.Id
+	if userInfo.Sub != "" {
+		userId = userInfo.Sub
+	}
+
 	err = h.SetAuthenticatedUserForRequest(w, r, &AuthenticatedUser{
-		ID:                 userInfo.Sub,
+		ID:                 userId,
 		Email:              userInfo.Email,
 		OAuth2AccessToken:  tok.AccessToken,
 		OAuth2RefreshToken: tok.RefreshToken,
@@ -154,15 +160,17 @@ func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *BaseHandler) OAuth2LogoutGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
-	tok := h.AuthenticatedUserToOAuth2Token(user)
-	client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(tok))
-	_, err := client.Get(h.config.OAuth2.EndpointLogoutURL)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if h.config.OAuth2.EndpointLogoutURL != "" {
+		tok := h.AuthenticatedUserToOAuth2Token(user)
+		client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(tok))
+		_, err := client.Get(h.config.OAuth2.EndpointLogoutURL)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
-	err = h.ClearAuthenticatedUserForRequest(w, r)
+	err := h.ClearAuthenticatedUserForRequest(w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
