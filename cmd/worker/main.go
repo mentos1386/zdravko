@@ -3,25 +3,19 @@ package main
 import (
 	"log"
 
+	"code.tjo.space/mentos1386/zdravko/internal"
 	"code.tjo.space/mentos1386/zdravko/internal/activities"
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/workflows"
-	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
 )
 
 func main() {
-	config := config.NewConfig()
+	cfg := config.NewConfig()
 
-	// Initialize a Temporal Client
-	// Specify the Namespace in the Client options
-	clientOptions := client.Options{
-		HostPort:  config.Temporal.ServerHost,
-		Namespace: "default",
-	}
-	temporalClient, err := client.Dial(clientOptions)
+	temporalClient, err := internal.ConnectToTemporal(cfg)
 	if err != nil {
-		log.Fatalln("Unable to create a Temporal Client", err)
+		log.Fatal(err)
 	}
 	defer temporalClient.Close()
 
