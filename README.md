@@ -8,7 +8,7 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
  - [x] SSO Support for authentication.
  - [x] SQLite for database.
     - This means for main app db as well as temporal db.
- - [ ] Single binary.
+ - [x] Single binary.
     - One binary to run worker, server and temporal all together.
  - [ ] Abbility for multiple workers.
     - Spread workers across regions to monitor latency from different locations.
