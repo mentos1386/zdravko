@@ -37,7 +37,7 @@ func (w *Worker) Start() error {
 	w.worker.RegisterWorkflow(workflows.HealthcheckHttpWorkflowDefinition)
 
 	// Register Activities
-	w.worker.RegisterActivity(activities.HealthcheckHttpActivityDefinition)
+	w.worker.RegisterActivity(activities.HealthcheckHttp)
 
 	return w.worker.Run(worker.InterruptCh())
 }

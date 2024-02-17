@@ -7,9 +7,6 @@ fuse:
 data:
   dir: "/var/lib/litefs"
 
-exec:
-  - cmd: "/zdravko --temporal=true --server=true --worker=false"
-
 lease:
   type: "consul"
 

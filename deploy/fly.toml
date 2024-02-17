@@ -5,6 +5,7 @@ primary_region = 'waw'
 
 [build]
   dockerfile = "Dockerfile"
+  context = "deploy"
 
 [env]
   ROOT_URL = 'https://zdravko.mnts.dev'
@@ -17,8 +18,8 @@ primary_region = 'waw'
   TEMPORAL_SERVER_HOST = 'server.process.zdravko.internal:7233'
 
 [processes]
-  server = "zdravko --temporal=true --server=true --worker=false"
-  worker = "zdravko --temporal=false --server=false --worker=true"
+  server = "/zdravko --temporal=true --server=true --worker=false"
+  worker = "/zdravko --temporal=false --server=false --worker=true"
 
 [[mounts]]
   source = "zdravko_data"

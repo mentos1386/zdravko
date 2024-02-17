@@ -86,10 +86,12 @@ func main() {
 		for sig := range c {
 			log.Printf("Received signal: %v", sig)
 			for _, s := range servers {
-				println("Stopping", s.Name())
-				err := s.Stop()
-				if err != nil {
-					log.Fatalf("Unable to stop server %s: %v", s.Name(), err)
+				if s != nil {
+					println("Stopping", s.Name())
+					err := s.Stop()
+					if err != nil {
+						log.Fatalf("Unable to stop server %s: %v", s.Name(), err)
+					}
 				}
 			}
 		}

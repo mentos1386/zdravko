@@ -19,13 +19,13 @@ func HealthcheckHttpWorkflowDefinition(ctx workflow.Context, param HealthcheckHt
 	}
 	ctx = workflow.WithActivityOptions(ctx, options)
 
-	activityParam := activities.HealtcheckHttpActivityParam{
+	activityParam := activities.HealtcheckHttpParam{
 		Url:    param.Url,
 		Method: param.Method,
 	}
 
-	var result *activities.HealthcheckHttpActivityResult
-	err := workflow.ExecuteActivity(ctx, activities.HealthcheckHttpActivityDefinition, activityParam).Get(ctx, &result)
+	var result *activities.HealthcheckHttpResult
+	err := workflow.ExecuteActivity(ctx, activities.HealthcheckHttp, activityParam).Get(ctx, &result)
 	if err != nil {
 		return err
 	}

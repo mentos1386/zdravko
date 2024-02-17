@@ -1,11 +1,14 @@
 # syntax=docker/dockerfile:1
-ARG ALPINE_VERSION=3.14
+ARG ZDRAVKO_VERSION=main
 
-FROM alpine:${ALPINE_VERSION} as temporal
-RUN apk add ca-certificates fuse3 sqlite
+FROM ghcr.io/mentos1386/zdravko:${ZDRAVKO_VERSION}
+RUN apt-get update -y \
+  && apt-get install -y ca-certificates fuse3 sqlite3
+
 COPY --from=flyio/litefs:0.5 /usr/local/bin/litefs /usr/local/bin/litefs
-COPY litefs.yaml /etc/litefs.yaml
 
-COPY --from=ghcr.io/mentos1386/zdravko /zdravko /zdravko
+COPY deploy/litefs.yaml /etc/litefs.yml
+COPY deploy/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT litefs mount
+ENTRYPOINT ["/entrypoint.sh"]

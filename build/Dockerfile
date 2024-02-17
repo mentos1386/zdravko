@@ -12,12 +12,12 @@ RUN go mod download
 COPY . ./
 
 # Build
-RUN CGO_ENABLED=1 GOOS=linux go build -o /zdravko cmd/zdravko/main.go
+RUN CGO_ENABLED=1 GOOS=linux go build -o /bin/zdravko cmd/zdravko/main.go
 
 ###
 # Final production
-FROM gcr.io/distroless/base-debian12:nonroot as production
-COPY --from=builder /zdravko /zdravko
+FROM debian:12-slim as production
+COPY --from=builder /bin/zdravko /bin/zdravko
 COPY LICENSE /LICENSE
 COPY README.md /README.md
 
