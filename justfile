@@ -20,7 +20,7 @@ run-zdravko:
 
 # Deploy the application to fly.io
 deploy:
-  fly deploy -c deploy/fly.toml
+  fly deploy --ha=false -c deploy/fly.toml
 
 # Start devbox shell
 shell:

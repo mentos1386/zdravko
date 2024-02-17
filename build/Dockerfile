@@ -35,4 +35,4 @@ VOLUME /data
 ENV DATABASE_PATH=/data/zdravko.db
 ENV TEMPORAL_DATABASE_PATH=/data/temporal.db
 
-ENTRYPOINT ["/zdravko"]
+ENTRYPOINT ["/bin/zdravko"]

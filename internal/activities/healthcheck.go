@@ -50,28 +50,7 @@ type HealtcheckHttpAddToHistoryParam struct {
 type HealthcheckHttpAddToHistoryResult struct {
 }
 
-func HealthcheckHttpWriteResult(ctx context.Context, param HealtcheckHttpParam) (*HealthcheckHttpResult, error) {
-	if param.Method == "" {
-		param.Method = "GET"
-	}
+func HealthcheckHttpAddToHistory(ctx context.Context, param HealtcheckHttpAddToHistoryParam) (*HealthcheckHttpAddToHistoryResult, error) {
 
-	var (
-		response *http.Response
-		err      error
-	)
-
-	switch param.Method {
-	case "GET":
-		response, err = http.Get(param.Url)
-	case "POST":
-		response, err = http.Post(param.Url, "application/json", nil)
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	log.Printf("HealthcheckHttpActivityDefinition produced statuscode %d for url %s", response.StatusCode, param.Url)
-
-	return &HealthcheckHttpResult{StatusCode: response.StatusCode}, nil
+	return &HealthcheckHttpAddToHistoryResult{}, nil
 }

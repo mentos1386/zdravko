@@ -1,39 +1,52 @@
+# fly.toml app configuration file generated for zdravko on 2024-02-17T21:20:17+01:00
+#
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
 app = 'zdravko'
 primary_region = 'waw'
 
 [build]
-  dockerfile = "Dockerfile"
-  context = "deploy"
+  image = 'ghcr.io/mentos1386/zdravko:main'
 
 [env]
-  ROOT_URL = 'https://zdravko.mnts.dev'
-
-  OAUTH2_ENDPOINT_TOKEN_URL = 'https://github.com/login/oauth/access_token'
   OAUTH2_ENDPOINT_AUTH_URL = 'https://github.com/login/oauth/authorize'
+  OAUTH2_ENDPOINT_TOKEN_URL = 'https://github.com/login/oauth/access_token'
   OAUTH2_ENDPOINT_USER_INFO_URL = 'https://api.github.com/user'
-
-  TEMPORAL_UI_HOST = 'server.process.zdravko.internal:8223'
+  ROOT_URL = 'https://zdravko.mnts.dev'
   TEMPORAL_SERVER_HOST = 'server.process.zdravko.internal:7233'
 
 [processes]
-  server = "/zdravko --temporal=true --server=true --worker=false"
-  worker = "/zdravko --temporal=false --server=false --worker=true"
+  server = '--temporal=true --server=true --worker=false'
+  worker = '--temporal=false --server=false --worker=true'
 
 [[mounts]]
-  source = "zdravko_data"
-  destination = "/var/lib/litefs"
-  processes = ["server"]
+  source = 'data'
+  destination = '/data'
+  processes = ['server']
 
 [http_service]
-  processes = ["server"]
   internal_port = 8080
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
+  min_machines_running = 0
+  processes = ['server']
+
+[[services]]
+  protocol = 'tcp'
+  internal_port = 7233
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['server']
+
+[[services.ports]]
+    port = 7233
+    handlers = ['tls']
 
 [[vm]]
   cpu_kind = 'shared'
   cpus = 1
   memory_mb = 256
+  processes = ['server', 'worker']
