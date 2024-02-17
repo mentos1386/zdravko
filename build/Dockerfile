@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-ARG GO_VERSION=1.21.0
+ARG GO_VERSION=1.21
 FROM golang:${GO_VERSION} as builder
 # Set destination for COPY
 WORKDIR /app
