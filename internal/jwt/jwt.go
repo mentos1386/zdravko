@@ -8,6 +8,7 @@ import (
 
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/pkg/errors"
 )
 
 func JwtPublicKeyID(key *rsa.PublicKey) string {
@@ -16,11 +17,19 @@ func JwtPublicKeyID(key *rsa.PublicKey) string {
 }
 
 func JwtPrivateKey(c *config.Config) (*rsa.PrivateKey, error) {
-	return jwt.ParseRSAPrivateKeyFromPEM([]byte(c.Jwt.PrivateKey))
+	key, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(c.Jwt.PrivateKey))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse private key")
+	}
+	return key, nil
 }
 
 func JwtPublicKey(c *config.Config) (*rsa.PublicKey, error) {
-	return jwt.ParseRSAPublicKeyFromPEM([]byte(c.Jwt.PublicKey))
+	key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(c.Jwt.PublicKey))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse public key")
+	}
+	return key, nil
 }
 
 // Ref: https://docs.temporal.io/self-hosted-guide/security#authorization

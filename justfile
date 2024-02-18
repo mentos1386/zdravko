@@ -49,6 +49,12 @@ generate-jwt-key:
 deploy:
   fly deploy --ha=false -c deploy/fly.toml -i {{DOCKER_IMAGE}}
 
+
+deploy-set-jwt-key-secrets:
+  @fly secrets set -c deploy/fly.toml \
+    "JWT_PRIVATE_KEY={{JWT_PRIVATE_KEY}}" \
+    "JWT_PUBLIC_KEY={{JWT_PUBLIC_KEY}}"
+
 # Start devbox shell
 shell:
   devbox shell
