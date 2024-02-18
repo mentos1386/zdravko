@@ -25,9 +25,9 @@ func main() {
 	var startWorker bool
 	var startTemporal bool
 
-	flag.BoolVar(&startServer, "server", true, "Start the server")
-	flag.BoolVar(&startWorker, "worker", true, "Start the worker")
-	flag.BoolVar(&startTemporal, "temporal", true, "Start the temporal")
+	flag.BoolVar(&startServer, "server", false, "Start the server")
+	flag.BoolVar(&startWorker, "worker", false, "Start the worker")
+	flag.BoolVar(&startTemporal, "temporal", false, "Start the temporal")
 
 	flag.Parse()
 
@@ -35,6 +35,10 @@ func main() {
 	println("Server:   ", startServer)
 	println("Worker:   ", startWorker)
 	println("Temporal: ", startTemporal)
+
+	if !startServer && !startWorker && !startTemporal {
+		log.Fatal("At least one of the following must be set: --server, --worker, --temporal")
+	}
 
 	cfg := config.NewConfig()
 

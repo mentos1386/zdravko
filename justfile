@@ -33,17 +33,17 @@ run:
 
 run-worker:
   go build -o dist/zdravko cmd/zdravko/main.go
-  ./dist/zdravko --worker=true --server=false --temporal=false
+  ./dist/zdravko --worker
+
+# Start zdravko
+run-zdravko:
+  go build -o dist/zdravko cmd/zdravko/main.go
+  ./dist/zdravko --server --temporal
 
 # Generates new jwt key pair
 generate-jwt-key:
   openssl genrsa -out jwt.private.pem 2048
   openssl rsa -pubout -in jwt.private.pem -out jwt.public.pem
-
-# Start zdravko
-run-zdravko:
-  go build -o dist/zdravko cmd/zdravko/main.go
-  ./dist/zdravko --worker=false
 
 # Deploy the application to fly.io
 deploy:

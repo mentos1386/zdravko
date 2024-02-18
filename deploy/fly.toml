@@ -17,8 +17,8 @@ primary_region = 'waw'
   TEMPORAL_SERVER_HOST = 'server.process.zdravko.internal:7233'
 
 [processes]
-  server = '--temporal=true --server=true --worker=false'
-  worker = '--temporal=false --server=false --worker=true'
+  server = '--temporal --server'
+  worker = '--worker'
 
 [[mounts]]
   source = 'data'
