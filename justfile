@@ -4,8 +4,8 @@ set shell := ["devbox", "run"]
 set dotenv-load
 
 # Load public and private keys
-export JWT_PRIVATE_KEY := `cat jwt.private.pem`
-export JWT_PUBLIC_KEY := `cat jwt.public.pem`
+export JWT_PRIVATE_KEY := `cat jwt.private.pem || echo ""`
+export JWT_PUBLIC_KEY := `cat jwt.public.pem || echo ""`
 
 GIT_SHA := `git rev-parse --short HEAD`
 DOCKER_IMAGE := "ghcr.io/mentos1386/zdravko:sha-"+GIT_SHA
