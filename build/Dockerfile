@@ -31,6 +31,7 @@ EXPOSE 7233
 
 # Volume to persist sqlite databases
 VOLUME /data
+RUN mkdir -p /data && chown -R nonroot:nonroot /data
 
 ENV DATABASE_PATH=/data/zdravko.db
 ENV TEMPORAL_DATABASE_PATH=/data/temporal.db
