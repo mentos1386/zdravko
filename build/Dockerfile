@@ -16,7 +16,7 @@ RUN CGO_ENABLED=1 GOOS=linux go build -o /bin/zdravko cmd/zdravko/main.go
 
 ###
 # Final production
-FROM debian:12 as production
+FROM gcr.io/distroless/base-debian12:nonroot as production
 COPY --from=builder /bin/zdravko /bin/zdravko
 COPY LICENSE /LICENSE
 COPY README.md /README.md
