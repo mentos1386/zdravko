@@ -3,11 +3,13 @@ set shell := ["devbox", "run"]
 # Load dotenv
 set dotenv-load
 
+GIT_SHA := `git rev-parse --short HEAD`
+DOCKER_IMAGE := "ghcr.io/mentos1386/zdravko:sha-"+GIT_SHA
 STATIC_DIR := "./web/static"
 
 # Build the application
 build:
-  docker build -f build/Dockerfile -t ghcr.io/mentos1386/zdravko:latest .
+  docker build -f build/Dockerfile -t {{DOCKER_IMAGE}} .
 
 # Run full development environment
 run:
@@ -20,7 +22,7 @@ run-zdravko:
 
 # Deploy the application to fly.io
 deploy:
-  fly deploy --ha=false -c deploy/fly.toml
+  fly deploy --ha=false --smoke-checks=false -c deploy/fly.toml -i {{DOCKER_IMAGE}}
 
 # Start devbox shell
 shell:

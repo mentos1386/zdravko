@@ -40,10 +40,9 @@ primary_region = 'waw'
   auto_start_machines = true
   min_machines_running = 0
   processes = ['server']
-
-[[services.ports]]
-    port = 7233
-    handlers = ['tls']
+  [[services.ports]]
+      port = 7233
+      handlers = ['tls']
 
 [[vm]]
   cpu_kind = 'shared'

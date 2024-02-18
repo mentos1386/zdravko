@@ -69,6 +69,10 @@ func main() {
 
 	for _, s := range servers {
 		srv := s
+		if srv == nil {
+			continue
+		}
+
 		println("Starting", srv.Name())
 		wg.Add(1)
 		go func() {
@@ -85,13 +89,15 @@ func main() {
 	go func() {
 		for sig := range c {
 			log.Printf("Received signal: %v", sig)
-			for _, s := range servers {
-				if s != nil {
-					println("Stopping", s.Name())
-					err := s.Stop()
-					if err != nil {
-						log.Fatalf("Unable to stop server %s: %v", s.Name(), err)
-					}
+			for _, srv := range servers {
+				if srv == nil {
+					continue
+				}
+
+				println("Stopping", srv.Name())
+				err := srv.Stop()
+				if err != nil {
+					log.Fatalf("Unable to stop server %s: %v", srv.Name(), err)
 				}
 			}
 		}
