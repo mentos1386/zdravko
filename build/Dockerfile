@@ -19,7 +19,7 @@ RUN mkdir -p /data
 
 ###
 # Final production
-FROM gcr.io/distroless/base-debian12:nonroot as production
+FROM gcr.io/distroless/base-debian12:latest as production
 COPY --from=builder /bin/zdravko /bin/zdravko
 COPY LICENSE /LICENSE
 COPY README.md /README.md

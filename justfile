@@ -11,6 +11,17 @@ STATIC_DIR := "./web/static"
 build:
   docker build -f build/Dockerfile -t {{DOCKER_IMAGE}} .
 
+run-docker:
+  docker run -p 8080:8080 \
+  -e  SESSION_SECRET \
+  -e OAUTH2_CLIENT_ID \
+  -e OAUTH2_CLIENT_SECRET \
+  -e OAUTH2_ENDPOINT_TOKEN_URL \
+  -e OAUTH2_ENDPOINT_AUTH_URL \
+  -e OAUTH2_ENDPOINT_USER_INFO_URL \
+  -e OAUTH2_ENDPOINT_LOGOUT_URL \
+  {{DOCKER_IMAGE}}
+
 # Run full development environment
 run:
   devbox services up
