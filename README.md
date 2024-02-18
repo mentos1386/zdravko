@@ -8,7 +8,7 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
  - [x] SSO Support for authentication.
  - [x] SQLite for database.
     - This means for main app db as well as temporal db.
- - [x] Single binary.
+ - [ ] Single binary.
     - One binary to run worker, server and temporal all together.
  - [ ] Abbility for multiple workers.
     - Spread workers across regions to monitor latency from different locations.
@@ -23,7 +23,7 @@ Demo is available at https://zdravko.fly.dev.
 
 ### Dependencies
  * [devbox](https://www.jetpack.io/devbox)
- * [justfile](https://github.com/casey/just)
+ * [justfile](https://github.com/casey/just) (optional, `devbox run -- just` can be used instead)
 
 ```sh
 # Configure
