@@ -37,10 +37,11 @@ func (s *Server) Start() error {
 	}
 	log.Println("Connected to database")
 
-	temporalClient, err := temporal.ConnectToTemporal(s.cfg)
+	temporalClient, err := temporal.ConnectServerToTemporal(s.cfg)
 	if err != nil {
 		return err
 	}
+	log.Println("Connected to Temporal")
 
 	h := handlers.NewBaseHandler(db, query, temporalClient, s.cfg)
 
@@ -71,6 +72,11 @@ func (s *Server) Start() error {
 	r.HandleFunc("/settings/healthchecks/create", h.Authenticated(h.SettingsHealthchecksCreateGET)).Methods("GET")
 	r.HandleFunc("/settings/healthchecks/create", h.Authenticated(h.SettingsHealthchecksCreatePOST)).Methods("POST")
 	r.HandleFunc("/settings/healthchecks/{slug}", h.Authenticated(h.SettingsHealthchecksDescribeGET)).Methods("GET")
+	r.HandleFunc("/settings/workers", h.Authenticated(h.SettingsWorkersGET)).Methods("GET")
+	r.HandleFunc("/settings/workers/create", h.Authenticated(h.SettingsWorkersCreateGET)).Methods("GET")
+	r.HandleFunc("/settings/workers/create", h.Authenticated(h.SettingsWorkersCreatePOST)).Methods("POST")
+	r.HandleFunc("/settings/workers/{slug}", h.Authenticated(h.SettingsWorkersDescribeGET)).Methods("GET")
+	r.HandleFunc("/settings/workers/{slug}/token", h.Authenticated(h.SettingsWorkersTokenGET)).Methods("GET")
 
 	// OAuth2
 	r.HandleFunc("/oauth2/login", h.OAuth2LoginGET).Methods("GET")

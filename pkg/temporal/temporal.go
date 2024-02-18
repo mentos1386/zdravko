@@ -13,7 +13,8 @@ type Temporal struct {
 
 func NewTemporal(cfg *config.Config) (*Temporal, error) {
 	serverConfig := NewServerConfig(cfg)
-	server, err := NewServer(serverConfig)
+	tokenKeyProvider := TokenKeyProvider{config: cfg}
+	server, err := NewServer(serverConfig, &tokenKeyProvider)
 	if err != nil {
 		return nil, err
 	}
@@ -45,11 +46,12 @@ func (t *Temporal) Start() error {
 }
 
 func (t *Temporal) Stop() error {
+	t.uiServer.Stop()
+
 	err := t.server.Stop()
 	if err != nil {
 		return err
 	}
-	t.uiServer.Stop()
 
 	return nil
 }

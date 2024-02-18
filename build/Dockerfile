@@ -14,9 +14,6 @@ COPY . ./
 # Build
 RUN CGO_ENABLED=1 GOOS=linux go build -o /bin/zdravko cmd/zdravko/main.go
 
-# Prepare the data directory
-RUN mkdir -p /data
-
 ###
 # Final production
 FROM gcr.io/distroless/base-debian12:latest as production
@@ -34,7 +31,6 @@ EXPOSE 7233
 
 # Volume to persist sqlite databases
 VOLUME /data
-COPY --from=builder --chown=nonroot:nonroot /data /data
 
 ENV DATABASE_PATH=/data/zdravko.db
 ENV TEMPORAL_DATABASE_PATH=/data/temporal.db

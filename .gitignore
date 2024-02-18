@@ -5,5 +5,8 @@ zdravko.db
 temporal.db
 temporal.db-journal
 
+# Keys
+*.pem
+
 # Config
 .env

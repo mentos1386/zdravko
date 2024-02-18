@@ -29,6 +29,9 @@ Demo is available at https://zdravko.fly.dev.
 # Configure
 cp example.env .env
 
+# Generate JWT key
+just generate-jwt-key
+
 # Start development environment
 just run
 ```

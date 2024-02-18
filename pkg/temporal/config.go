@@ -1,10 +1,13 @@
 package temporal
 
 import (
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"fmt"
 	"time"
 
 	internal "code.tjo.space/mentos1386/zdravko/internal/config"
+	"code.tjo.space/mentos1386/zdravko/internal/jwt"
 	"go.temporal.io/server/common/cluster"
 	"go.temporal.io/server/common/config"
 	"go.temporal.io/server/common/persistence/sql/sqlplugin/sqlite"
@@ -19,6 +22,29 @@ const FrontendPort = 7233
 const HistoryPort = 7234
 const MatchingPort = 7235
 const WorkerPort = 7236
+
+type TokenKeyProvider struct {
+	config *internal.Config
+}
+
+func (p *TokenKeyProvider) SupportedMethods() []string {
+	return []string{"RS256", "RS384", "RS512"}
+}
+
+func (p *TokenKeyProvider) HmacKey(alg string, kid string) ([]byte, error) {
+	return nil, fmt.Errorf("HMAC key is not supported")
+}
+
+func (p *TokenKeyProvider) EcdsaKey(alg string, kid string) (*ecdsa.PublicKey, error) {
+	return nil, fmt.Errorf("ECDSA key is not supported")
+}
+
+func (p *TokenKeyProvider) RsaKey(alg string, kid string) (*rsa.PublicKey, error) {
+	return jwt.JwtPublicKey(p.config)
+}
+
+func (p *TokenKeyProvider) Close() {
+}
 
 func NewServerConfig(cfg *internal.Config) *config.Config {
 	return &config.Config{
@@ -42,6 +68,7 @@ func NewServerConfig(cfg *internal.Config) *config.Config {
 				MaxJoinDuration:  30 * time.Second,
 				BroadcastAddress: BroadcastAddress,
 			},
+			Authorization: config.Authorization{},
 		},
 		Services: map[string]config.Service{
 			"frontend": {
@@ -65,14 +92,6 @@ func NewServerConfig(cfg *internal.Config) *config.Config {
 				RPC: config.RPC{
 					GRPCPort:        MatchingPort,
 					MembershipPort:  MatchingPort + 100,
-					BindOnLocalHost: true,
-					BindOnIP:        "",
-				},
-			},
-			"worker": {
-				RPC: config.RPC{
-					GRPCPort:        WorkerPort,
-					MembershipPort:  WorkerPort + 100,
 					BindOnLocalHost: true,
 					BindOnIP:        "",
 				},

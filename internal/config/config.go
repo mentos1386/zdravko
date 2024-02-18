@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
@@ -16,12 +15,17 @@ type Config struct {
 	DatabasePath  string `validate:"required"`
 	SessionSecret string `validate:"required"`
 
+	Jwt    Jwt    `validate:"required"`
 	OAuth2 OAuth2 `validate:"required"`
 
 	Temporal Temporal `validate:"required"`
 
-	HealthChecks []Healthcheck
-	CronJobs     []CronJob
+	Worker Worker `validate:"required"`
+}
+
+type Jwt struct {
+	PrivateKey string `validate:"required"`
+	PublicKey  string `validate:"required"`
 }
 
 type OAuth2 struct {
@@ -41,30 +45,8 @@ type Temporal struct {
 	ServerHost    string `validate:"required"`
 }
 
-type HealthCheckHTTP struct {
-	URL    string `validate:"required,url"`
-	Method string `validate:"required,oneof=GET POST PUT"`
-}
-
-type HealthCheckTCP struct {
-	Host string `validate:"required,hostname"`
-	Port int    `validate:"required,gte=1,lte=65535"`
-}
-
-type Healthcheck struct {
-	Name     string        `validate:"required"`
-	Retries  int           `validate:"optional,gte=0"`
-	Schedule string        `validate:"required,cron"`
-	Timeout  time.Duration `validate:"required"`
-
-	HTTP HealthCheckHTTP `validate:"required"`
-	TCP  HealthCheckTCP  `validate:"required"`
-}
-
-type CronJob struct {
-	Name     string        `validate:"required"`
-	Schedule string        `validate:"required,cron"`
-	Buffer   time.Duration `validate:"required"`
+type Worker struct {
+	Token string `validate:"required"`
 }
 
 func GetEnvOrDefault(key, def string) string {
@@ -93,6 +75,8 @@ func NewConfig() *Config {
 	viper.SetDefault("temporal.listenaddress", GetEnvOrDefault("TEMPORAL_LISTEN_ADDRESS", "0.0.0.0"))
 	viper.SetDefault("temporal.uihost", GetEnvOrDefault("TEMPORAL_UI_HOST", "127.0.0.1:8223"))
 	viper.SetDefault("temporal.serverhost", GetEnvOrDefault("TEMPORAL_SERVER_HOST", "127.0.0.1:7233"))
+	viper.SetDefault("jwt.privatekey", os.Getenv("JWT_PRIVATE_KEY"))
+	viper.SetDefault("jwt.publickey", os.Getenv("JWT_PUBLIC_KEY"))
 	viper.SetDefault("oauth2.clientid", os.Getenv("OAUTH2_CLIENT_ID"))
 	viper.SetDefault("oauth2.clientsecret", os.Getenv("OAUTH2_CLIENT_SECRET"))
 	viper.SetDefault("oauth2.scopes", GetEnvOrDefault("OAUTH2_ENDPOINT_SCOPES", "openid profile email"))
@@ -100,6 +84,7 @@ func NewConfig() *Config {
 	viper.SetDefault("oauth2.endpointauthurl", os.Getenv("OAUTH2_ENDPOINT_AUTH_URL"))
 	viper.SetDefault("oauth2.endpointuserinfourl", os.Getenv("OAUTH2_ENDPOINT_USER_INFO_URL"))
 	viper.SetDefault("oauth2.endpointlogouturl", GetEnvOrDefault("OAUTH2_ENDPOINT_LOGOUT_URL", ""))
+	viper.SetDefault("worker.token", os.Getenv("WORKER_TOKEN"))
 
 	err := viper.ReadInConfig()
 	if err != nil {

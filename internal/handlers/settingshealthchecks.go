@@ -10,6 +10,7 @@ import (
 	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/gosimple/slug"
 )
@@ -130,7 +131,12 @@ func (h *BaseHandler) SettingsHealthchecksCreatePOST(w http.ResponseWriter, r *h
 		Method: r.FormValue("method"),
 	}
 
-	err := services.CreateHealthcheckHttp(
+	err := validator.New(validator.WithRequiredStructEnabled()).Struct(healthcheckHttp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	err = services.CreateHealthcheckHttp(
 		ctx,
 		h.db,
 		healthcheckHttp,

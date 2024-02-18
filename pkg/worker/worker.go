@@ -24,14 +24,14 @@ func (w *Worker) Name() string {
 }
 
 func (w *Worker) Start() error {
-	temporalClient, err := temporal.ConnectToTemporal(w.cfg)
+	temporalClient, err := temporal.ConnectWorkerToTemporal(w.cfg)
 	if err != nil {
 		return err
 	}
 
 	// Create a new Worker
 	// TODO: Maybe identify by region or something?
-	w.worker = worker.New(temporalClient, "default", worker.Options{})
+	w.worker = worker.New(temporalClient, "test", worker.Options{})
 
 	// Register Workflows
 	w.worker.RegisterWorkflow(workflows.HealthcheckHttpWorkflowDefinition)

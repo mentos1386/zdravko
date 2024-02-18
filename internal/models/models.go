@@ -11,27 +11,34 @@ type OAuth2State struct {
 	Expiry time.Time
 }
 
+type Worker struct {
+	gorm.Model
+	Name   string `gorm:"unique" validate:"required"`
+	Slug   string `gorm:"unique"`
+	Status string
+}
+
 type Healthcheck struct {
 	gorm.Model
 	Slug             string `gorm:"unique"`
-	Name             string `gorm:"unique"`
+	Name             string `gorm:"unique" validate:"required"`
 	Status           string // UP, DOWN
 	UptimePercentage float64
-	Schedule         string
+	Schedule         string `validate:"required,cron"`
 }
 
 type HealthcheckHttp struct {
 	gorm.Model
 	Healthcheck
-	Url    string
-	Method string
+	Url    string `validate:"required,url"`
+	Method string `validate:"required,oneof=GET POST"`
 }
 
 type HealthcheckTcp struct {
 	gorm.Model
 	Healthcheck
-	Hostname string
-	Port     int
+	Hostname string `validate:"required,hostname"`
+	Port     int    `validate:"required,gte=1,lte=65535"`
 }
 
 type Cronjob struct {

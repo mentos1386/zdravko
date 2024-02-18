@@ -35,6 +35,7 @@ var SettingsPages = []*components.Page{
 	{Path: "/settings/healthchecks/create", Title: "Healthchecks Create", Breadcrumb: "Create"},
 	{Path: "/settings/cronjobs", Title: "Cronjobs", Breadcrumb: "Cronjobs"},
 	{Path: "/settings/workers", Title: "Workers", Breadcrumb: "Workers"},
+	{Path: "/settings/workers/create", Title: "Workers Create", Breadcrumb: "Create"},
 	{Path: "/temporal", Title: "Temporal", Breadcrumb: "Temporal"},
 	{Path: "/oauth2/logout", Title: "Logout", Breadcrumb: "Logout"},
 }

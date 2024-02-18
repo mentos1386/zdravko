@@ -8,11 +8,12 @@ import (
 	"go.temporal.io/server/common/authorization"
 	"go.temporal.io/server/common/config"
 	"go.temporal.io/server/common/log"
+	"go.temporal.io/server/common/primitives"
 	"go.temporal.io/server/schema/sqlite"
 	t "go.temporal.io/server/temporal"
 )
 
-func NewServer(cfg *config.Config) (t.Server, error) {
+func NewServer(cfg *config.Config, tokenKeyProvider authorization.TokenKeyProvider) (t.Server, error) {
 	logger := log.NewZapLogger(log.BuildZapLogger(log.Config{
 		Stdout:     true,
 		Level:      "info",
@@ -43,15 +44,8 @@ func NewServer(cfg *config.Config) (t.Server, error) {
 		return nil, err
 	}
 
-	authorizer, err := authorization.GetAuthorizerFromConfig(&cfg.Global.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	claimMapper, err := authorization.GetClaimMapperFromConfig(&cfg.Global.Authorization, logger)
-	if err != nil {
-		return nil, err
-	}
+	authorizer := authorization.NewDefaultAuthorizer()
+	claimMapper := authorization.NewDefaultJWTClaimMapper(tokenKeyProvider, &cfg.Global.Authorization, logger)
 
 	ctx := context.Background()
 	interruptChan := make(chan interface{}, 1)
@@ -67,12 +61,16 @@ func NewServer(cfg *config.Config) (t.Server, error) {
 
 	return t.NewServer(
 		t.WithConfig(cfg),
-		t.ForServices(t.DefaultServices),
+		t.ForServices([]string{
+			string(primitives.FrontendService),
+			string(primitives.HistoryService),
+			string(primitives.MatchingService),
+		}),
 		t.WithLogger(logger),
+		t.InterruptOn(interruptChan),
 		t.WithAuthorizer(authorizer),
 		t.WithClaimMapper(func(cfg *config.Config) authorization.ClaimMapper {
 			return claimMapper
 		}),
-		t.InterruptOn(interruptChan),
 	)
 }

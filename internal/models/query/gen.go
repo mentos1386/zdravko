@@ -24,6 +24,7 @@ var (
 	HealthcheckTcp         *healthcheckTcp
 	HealthcheckTcpHistory  *healthcheckTcpHistory
 	OAuth2State            *oAuth2State
+	Worker                 *worker
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
@@ -35,6 +36,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	HealthcheckTcp = &Q.HealthcheckTcp
 	HealthcheckTcpHistory = &Q.HealthcheckTcpHistory
 	OAuth2State = &Q.OAuth2State
+	Worker = &Q.Worker
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
@@ -47,6 +49,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		HealthcheckTcp:         newHealthcheckTcp(db, opts...),
 		HealthcheckTcpHistory:  newHealthcheckTcpHistory(db, opts...),
 		OAuth2State:            newOAuth2State(db, opts...),
+		Worker:                 newWorker(db, opts...),
 	}
 }
 
@@ -60,6 +63,7 @@ type Query struct {
 	HealthcheckTcp         healthcheckTcp
 	HealthcheckTcpHistory  healthcheckTcpHistory
 	OAuth2State            oAuth2State
+	Worker                 worker
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -74,6 +78,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		HealthcheckTcp:         q.HealthcheckTcp.clone(db),
 		HealthcheckTcpHistory:  q.HealthcheckTcpHistory.clone(db),
 		OAuth2State:            q.OAuth2State.clone(db),
+		Worker:                 q.Worker.clone(db),
 	}
 }
 
@@ -95,6 +100,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		HealthcheckTcp:         q.HealthcheckTcp.replaceDB(db),
 		HealthcheckTcpHistory:  q.HealthcheckTcpHistory.replaceDB(db),
 		OAuth2State:            q.OAuth2State.replaceDB(db),
+		Worker:                 q.Worker.replaceDB(db),
 	}
 }
 
@@ -106,6 +112,7 @@ type queryCtx struct {
 	HealthcheckTcp         IHealthcheckTcpDo
 	HealthcheckTcpHistory  IHealthcheckTcpHistoryDo
 	OAuth2State            IOAuth2StateDo
+	Worker                 IWorkerDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
@@ -117,6 +124,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		HealthcheckTcp:         q.HealthcheckTcp.WithContext(ctx),
 		HealthcheckTcpHistory:  q.HealthcheckTcpHistory.WithContext(ctx),
 		OAuth2State:            q.OAuth2State.WithContext(ctx),
+		Worker:                 q.Worker.WithContext(ctx),
 	}
 }
 

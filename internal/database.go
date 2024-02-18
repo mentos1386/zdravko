@@ -15,6 +15,7 @@ func ConnectToDatabase(path string) (*gorm.DB, *query.Query, error) {
 	}
 
 	err = db.AutoMigrate(
+		models.Worker{},
 		models.HealthcheckHttp{},
 		models.HealthcheckHttpHistory{},
 		models.HealthcheckTcp{},

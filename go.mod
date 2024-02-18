@@ -3,8 +3,13 @@ module code.tjo.space/mentos1386/zdravko
 go 1.21.6
 
 require (
+	github.com/go-playground/validator/v10 v10.18.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/sessions v1.2.2
+	github.com/gosimple/slug v1.13.1
+	github.com/spf13/viper v1.18.2
 	github.com/temporalio/ui-server/v2 v2.23.0
 	go.temporal.io/sdk v1.26.0-rc.2
 	go.temporal.io/server v1.22.4
@@ -45,11 +50,9 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.18.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gocql/gocql v1.5.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.7.0-rc.1 // indirect
@@ -60,7 +63,6 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gosimple/slug v1.13.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
@@ -109,7 +111,6 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.18.2 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect

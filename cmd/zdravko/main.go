@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"sync"
+	"syscall"
 
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/pkg/server"
@@ -85,7 +86,7 @@ func main() {
 	}
 
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		for sig := range c {
 			log.Printf("Received signal: %v", sig)
@@ -97,7 +98,7 @@ func main() {
 				println("Stopping", srv.Name())
 				err := srv.Stop()
 				if err != nil {
-					log.Fatalf("Unable to stop server %s: %v", srv.Name(), err)
+					log.Printf("Unable to stop server %s: %v", srv.Name(), err)
 				}
 			}
 		}
