@@ -36,6 +36,7 @@ func newHealthcheckHttp(db *gorm.DB, opts ...gen.DOOption) healthcheckHttp {
 	_healthcheckHttp.Status = field.NewString(tableName, "status")
 	_healthcheckHttp.UptimePercentage = field.NewFloat64(tableName, "uptime_percentage")
 	_healthcheckHttp.Schedule = field.NewString(tableName, "schedule")
+	_healthcheckHttp.Groups = field.NewField(tableName, "groups")
 	_healthcheckHttp.Url = field.NewString(tableName, "url")
 	_healthcheckHttp.Method = field.NewString(tableName, "method")
 
@@ -57,6 +58,7 @@ type healthcheckHttp struct {
 	Status           field.String
 	UptimePercentage field.Float64
 	Schedule         field.String
+	Groups           field.Field
 	Url              field.String
 	Method           field.String
 
@@ -84,6 +86,7 @@ func (h *healthcheckHttp) updateTableName(table string) *healthcheckHttp {
 	h.Status = field.NewString(table, "status")
 	h.UptimePercentage = field.NewFloat64(table, "uptime_percentage")
 	h.Schedule = field.NewString(table, "schedule")
+	h.Groups = field.NewField(table, "groups")
 	h.Url = field.NewString(table, "url")
 	h.Method = field.NewString(table, "method")
 
@@ -114,7 +117,7 @@ func (h *healthcheckHttp) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (h *healthcheckHttp) fillFieldMap() {
-	h.fieldMap = make(map[string]field.Expr, 11)
+	h.fieldMap = make(map[string]field.Expr, 12)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["created_at"] = h.CreatedAt
 	h.fieldMap["updated_at"] = h.UpdatedAt
@@ -124,6 +127,7 @@ func (h *healthcheckHttp) fillFieldMap() {
 	h.fieldMap["status"] = h.Status
 	h.fieldMap["uptime_percentage"] = h.UptimePercentage
 	h.fieldMap["schedule"] = h.Schedule
+	h.fieldMap["groups"] = h.Groups
 	h.fieldMap["url"] = h.Url
 	h.fieldMap["method"] = h.Method
 }

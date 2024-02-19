@@ -85,7 +85,7 @@ func main() {
 			defer wg.Done()
 			err := srv.Start()
 			if err != nil {
-				log.Fatalf("Unable to start server %s: %v", srv.Name(), err)
+				log.Fatalf("Unable to start %s: %v", srv.Name(), err)
 			}
 		}()
 	}

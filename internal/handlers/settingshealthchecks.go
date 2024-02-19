@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"text/template"
 
 	"code.tjo.space/mentos1386/zdravko/internal/models"
@@ -123,9 +124,10 @@ func (h *BaseHandler) SettingsHealthchecksCreatePOST(w http.ResponseWriter, r *h
 
 	healthcheckHttp := &models.HealthcheckHttp{
 		Healthcheck: models.Healthcheck{
-			Name:     r.FormValue("name"),
-			Slug:     slug.Make(r.FormValue("name")),
-			Schedule: r.FormValue("schedule"),
+			Name:         r.FormValue("name"),
+			Slug:         slug.Make(r.FormValue("name")),
+			Schedule:     r.FormValue("schedule"),
+			WorkerGroups: strings.Split(r.FormValue("workergroups"), ","),
 		},
 		Url:    r.FormValue("url"),
 		Method: r.FormValue("method"),

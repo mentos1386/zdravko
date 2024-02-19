@@ -29,21 +29,26 @@ func StartHealthcheckHttp(ctx context.Context, t client.Client, healthcheckHttp 
 	args := make([]interface{}, 0)
 	args = append(args, workflows.HealthcheckHttpWorkflowParam{Url: healthcheckHttp.Url, Method: healthcheckHttp.Method})
 
-	_, err := t.ScheduleClient().Create(ctx, client.ScheduleOptions{
-		ID: "healthcheck-http-" + healthcheckHttp.Slug,
-		Spec: client.ScheduleSpec{
-			CronExpressions: []string{healthcheckHttp.Schedule},
-		},
-		Action: &client.ScheduleWorkflowAction{
-			ID:        "healthcheck-http-id-workflow",
-			Workflow:  workflows.HealthcheckHttpWorkflowDefinition,
-			Args:      args,
-			TaskQueue: "default",
-			RetryPolicy: &temporal.RetryPolicy{
-				MaximumAttempts: 3,
+	for _, group := range healthcheckHttp.WorkerGroups {
+		_, err := t.ScheduleClient().Create(ctx, client.ScheduleOptions{
+			ID: "healthcheck-http-" + healthcheckHttp.Slug,
+			Spec: client.ScheduleSpec{
+				CronExpressions: []string{healthcheckHttp.Schedule},
 			},
-		},
-	})
+			Action: &client.ScheduleWorkflowAction{
+				ID:        "healthcheck-http-" + healthcheckHttp.Slug,
+				Workflow:  workflows.HealthcheckHttpWorkflowDefinition,
+				Args:      args,
+				TaskQueue: group,
+				RetryPolicy: &temporal.RetryPolicy{
+					MaximumAttempts: 3,
+				},
+			},
+		})
+		if err != nil {
+			return err
+		}
+	}
 
-	return err
+	return nil
 }

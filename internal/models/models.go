@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +26,8 @@ type Healthcheck struct {
 	Name             string `gorm:"unique" validate:"required"`
 	Status           string // UP, DOWN
 	UptimePercentage float64
-	Schedule         string `validate:"required,cron"`
+	Schedule         string         `validate:"required,cron"`
+	WorkerGroups     pq.StringArray `gorm:"type:text[]"`
 }
 
 type HealthcheckHttp struct {
