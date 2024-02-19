@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"time"
 
-	"code.tjo.space/mentos1386/zdravko/internal/config"
+	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/pkg/errors"
 )
@@ -16,58 +16,115 @@ func JwtPublicKeyID(key *rsa.PublicKey) string {
 	return hex.EncodeToString(hash[:])
 }
 
-func JwtPrivateKey(c *config.Config) (*rsa.PrivateKey, error) {
-	key, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(c.Jwt.PrivateKey))
+func JwtPrivateKey(privateKey string) (*rsa.PrivateKey, error) {
+	key, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privateKey))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse private key")
 	}
 	return key, nil
 }
 
-func JwtPublicKey(c *config.Config) (*rsa.PublicKey, error) {
-	key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(c.Jwt.PublicKey))
+func JwtPublicKey(publicKey string) (*rsa.PublicKey, error) {
+	key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(publicKey))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse public key")
 	}
 	return key, nil
 }
 
-// Ref: https://docs.temporal.io/self-hosted-guide/security#authorization
-func NewToken(config *config.Config, permissions []string, subject string) (string, error) {
-	privateKey, err := JwtPrivateKey(config)
-	if err != nil {
-		return "", err
-	}
+type Claims struct {
+	jwt.RegisteredClaims
+	Permissions []string `json:"permissions"`
+	WorkerGroup string   `json:"group"`
+}
 
-	publicKey, err := JwtPublicKey(config)
-	if err != nil {
-		return "", err
-	}
-
-	type WorkerClaims struct {
-		jwt.RegisteredClaims
-		Permissions []string `json:"permissions"`
-	}
-
+func NewTokenForUser(privateKey string, publicKey string, email string) (string, error) {
 	// Create claims with multiple fields populated
-	claims := WorkerClaims{
+	claims := Claims{
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(12 * 30 * 24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    "zdravko",
-			Subject:   subject,
+			Subject:   "user:" + email,
 		},
-		permissions,
+		// Ref: https://docs.temporal.io/self-hosted-guide/security#authorization
+		[]string{"temporal-system:admin", "default:admin"},
+		"",
+	}
+
+	return NewToken(privateKey, publicKey, claims)
+}
+
+func NewTokenForServer(privateKey string, publicKey string) (string, error) {
+	// Create claims with multiple fields populated
+	claims := Claims{
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(12 * 30 * 24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			Issuer:    "zdravko",
+			Subject:   "server",
+		},
+		// Ref: https://docs.temporal.io/self-hosted-guide/security#authorization
+		[]string{"temporal-system:admin", "default:admin"},
+		"",
+	}
+
+	return NewToken(privateKey, publicKey, claims)
+}
+
+func NewTokenForWorker(privateKey string, publicKey string, worker *models.Worker) (string, error) {
+	// Create claims with multiple fields populated
+	claims := Claims{
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(12 * 30 * 24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+			Issuer:    "zdravko",
+			Subject:   "worker:" + worker.Slug,
+		},
+		// Ref: https://docs.temporal.io/self-hosted-guide/security#authorization
+		[]string{"default:read", "default:write", "default:worker"},
+		worker.Group,
+	}
+
+	return NewToken(privateKey, publicKey, claims)
+}
+
+func NewToken(privateKey string, publicKey string, claims Claims) (string, error) {
+	privKey, err := JwtPrivateKey(privateKey)
+	if err != nil {
+		return "", err
+	}
+
+	pubKey, err := JwtPublicKey(publicKey)
+	if err != nil {
+		return "", err
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-	token.Header["kid"] = JwtPublicKeyID(publicKey)
+	token.Header["kid"] = JwtPublicKeyID(pubKey)
 
-	signedToken, err := token.SignedString(privateKey)
+	signedToken, err := token.SignedString(privKey)
 	if err != nil {
 		return "", err
 	}
 
 	return signedToken, nil
+}
+
+func ParseToken(tokenString string, publicKey string) (*jwt.Token, *Claims, error) {
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
+		return JwtPublicKey(publicKey)
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return token, claims, nil
 }

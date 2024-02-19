@@ -1,0 +1,41 @@
+version: '3.8'
+
+volumes:
+  server_data:
+  temporal_data:
+
+services:
+  server:
+    image: ghcr.io/mentos1386/zdravko:main
+    command: ["--server"]
+    volumes:
+      - server_data:/data
+    ports:
+      - 8000:8000
+    environment:
+      - ROOT_URL=http://localhost:8000
+      - SESSION_SECRET=change-me
+      - JWT_PUBLIC_KEY=change-me
+      - JWT_PRIVATE_KEY=change-me
+      - OAUTH2_CLIENT_ID=change-me
+      - OAUTH2_CLIENT_SECRET=change-me
+      - OAUTH2_ENDPOINT_TOKEN_URL=change-me
+      - OAUTH2_ENDPOINT_AUTH_URL=change-me
+      - OAUTH2_ENDPOINT_USER_INFO_URL=change-me
+      - TEMPORAL_UI_HOST=temporal:8223
+      - TEMPORAL_SERVER_HOST=temporal:7233
+
+  temporal:
+    image: ghcr.io/mentos1386/zdravko:main
+    command: ["--temporal"]
+    volumes:
+      - temporal_data:/data
+    environment:
+      - JWT_PUBLIC_KEY=change-me
+
+  worker:
+    image: ghcr.io/mentos1386/zdravko:main
+    command: ["--worker"]
+    environment:
+      - WORKER_TOKEN=change-me
+      - WORKER_API_URL=http://server:8000

@@ -33,6 +33,7 @@ func newWorker(db *gorm.DB, opts ...gen.DOOption) worker {
 	_worker.DeletedAt = field.NewField(tableName, "deleted_at")
 	_worker.Name = field.NewString(tableName, "name")
 	_worker.Slug = field.NewString(tableName, "slug")
+	_worker.Group = field.NewString(tableName, "group")
 	_worker.Status = field.NewString(tableName, "status")
 
 	_worker.fillFieldMap()
@@ -50,6 +51,7 @@ type worker struct {
 	DeletedAt field.Field
 	Name      field.String
 	Slug      field.String
+	Group     field.String
 	Status    field.String
 
 	fieldMap map[string]field.Expr
@@ -73,6 +75,7 @@ func (w *worker) updateTableName(table string) *worker {
 	w.DeletedAt = field.NewField(table, "deleted_at")
 	w.Name = field.NewString(table, "name")
 	w.Slug = field.NewString(table, "slug")
+	w.Group = field.NewString(table, "group")
 	w.Status = field.NewString(table, "status")
 
 	w.fillFieldMap()
@@ -98,13 +101,14 @@ func (w *worker) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (w *worker) fillFieldMap() {
-	w.fieldMap = make(map[string]field.Expr, 7)
+	w.fieldMap = make(map[string]field.Expr, 8)
 	w.fieldMap["id"] = w.ID
 	w.fieldMap["created_at"] = w.CreatedAt
 	w.fieldMap["updated_at"] = w.UpdatedAt
 	w.fieldMap["deleted_at"] = w.DeletedAt
 	w.fieldMap["name"] = w.Name
 	w.fieldMap["slug"] = w.Slug
+	w.fieldMap["group"] = w.Group
 	w.fieldMap["status"] = w.Status
 }
 

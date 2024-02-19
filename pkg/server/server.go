@@ -15,10 +15,10 @@ import (
 
 type Server struct {
 	server *http.Server
-	cfg    *config.Config
+	cfg    *config.ServerConfig
 }
 
-func NewServer(cfg *config.Config) (*Server, error) {
+func NewServer(cfg *config.ServerConfig) (*Server, error) {
 	return &Server{
 		cfg: cfg,
 	}, nil
@@ -85,6 +85,9 @@ func (s *Server) Start() error {
 
 	// Temporal UI
 	r.PathPrefix("/temporal").HandlerFunc(h.Authenticated(h.Temporal))
+
+	// API
+	r.HandleFunc("/api/v1/workers/connect", h.Authenticated(h.ApiV1WorkersConnectGET)).Methods("GET")
 
 	// 404
 	r.PathPrefix("/").HandlerFunc(h.Error404).Methods("GET")

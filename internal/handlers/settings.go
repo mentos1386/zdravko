@@ -49,7 +49,7 @@ var SettingsNavbar = []*components.Page{
 	GetPageByTitle(SettingsPages, "Logout"),
 }
 
-func (h *BaseHandler) SettingsOverviewGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsOverviewGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	ts, err := template.ParseFS(templates.Templates,
 		"components/base.tmpl",
 		"components/settings.tmpl",
@@ -61,7 +61,7 @@ func (h *BaseHandler) SettingsOverviewGET(w http.ResponseWriter, r *http.Request
 	}
 
 	err = ts.ExecuteTemplate(w, "base", NewSettings(
-		user,
+		principal.User,
 		GetPageByTitle(SettingsPages, "Overview"),
 		[]*components.Page{GetPageByTitle(SettingsPages, "Overview")},
 	))

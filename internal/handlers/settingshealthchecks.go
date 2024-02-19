@@ -26,7 +26,7 @@ type SettingsHealthcheck struct {
 	Healthcheck *models.HealthcheckHttp
 }
 
-func (h *BaseHandler) SettingsHealthchecksGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsHealthchecksGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	ts, err := template.ParseFS(templates.Templates,
 		"components/base.tmpl",
 		"components/settings.tmpl",
@@ -44,7 +44,7 @@ func (h *BaseHandler) SettingsHealthchecksGET(w http.ResponseWriter, r *http.Req
 
 	err = ts.ExecuteTemplate(w, "base", &SettingsHealthchecks{
 		Settings: NewSettings(
-			user,
+			principal.User,
 			GetPageByTitle(SettingsPages, "Healthchecks"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Healthchecks")},
 		),
@@ -56,7 +56,7 @@ func (h *BaseHandler) SettingsHealthchecksGET(w http.ResponseWriter, r *http.Req
 	}
 }
 
-func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	vars := mux.Vars(r)
 	slug := vars["slug"]
 
@@ -77,7 +77,7 @@ func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *
 
 	err = ts.ExecuteTemplate(w, "base", &SettingsHealthcheck{
 		Settings: NewSettings(
-			user,
+			principal.User,
 			GetPageByTitle(SettingsPages, "Healthchecks"),
 			[]*components.Page{
 				GetPageByTitle(SettingsPages, "Healthchecks"),
@@ -94,7 +94,7 @@ func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *
 	}
 }
 
-func (h *BaseHandler) SettingsHealthchecksCreateGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsHealthchecksCreateGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	ts, err := template.ParseFS(templates.Templates,
 		"components/base.tmpl",
 		"components/settings.tmpl",
@@ -106,7 +106,7 @@ func (h *BaseHandler) SettingsHealthchecksCreateGET(w http.ResponseWriter, r *ht
 	}
 
 	err = ts.ExecuteTemplate(w, "base", NewSettings(
-		user,
+		principal.User,
 		GetPageByTitle(SettingsPages, "Healthchecks"),
 		[]*components.Page{
 			GetPageByTitle(SettingsPages, "Healthchecks"),
@@ -118,7 +118,7 @@ func (h *BaseHandler) SettingsHealthchecksCreateGET(w http.ResponseWriter, r *ht
 	}
 }
 
-func (h *BaseHandler) SettingsHealthchecksCreatePOST(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsHealthchecksCreatePOST(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	ctx := context.Background()
 
 	healthcheckHttp := &models.HealthcheckHttp{

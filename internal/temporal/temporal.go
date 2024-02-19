@@ -7,6 +7,7 @@ import (
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/jwt"
 	"code.tjo.space/mentos1386/zdravko/pkg/retry"
+	"github.com/pkg/errors"
 	"go.temporal.io/sdk/client"
 )
 
@@ -20,9 +21,9 @@ func (p *AuthHeadersProvider) GetHeaders(ctx context.Context) (map[string]string
 	}, nil
 }
 
-func ConnectServerToTemporal(cfg *config.Config) (client.Client, error) {
+func ConnectServerToTemporal(cfg *config.ServerConfig) (client.Client, error) {
 	// For server we generate new token with admin permissions
-	token, err := jwt.NewToken(cfg, []string{"temporal-system:admin", "default:admin"}, "server")
+	token, err := jwt.NewTokenForServer(cfg.Jwt.PrivateKey, cfg.Jwt.PublicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -38,15 +39,20 @@ func ConnectServerToTemporal(cfg *config.Config) (client.Client, error) {
 	})
 }
 
-func ConnectWorkerToTemporal(cfg *config.Config) (client.Client, error) {
-	provider := &AuthHeadersProvider{cfg.Worker.Token}
+func ConnectWorkerToTemporal(token string, temporalHost string, identity string) (client.Client, error) {
+	provider := &AuthHeadersProvider{token}
 
 	// Try to connect to the Temporal Server
 	return retry.Retry(5, 6*time.Second, func() (client.Client, error) {
-		return client.Dial(client.Options{
-			HostPort:        cfg.Temporal.ServerHost,
+		client, err := client.Dial(client.Options{
+			HostPort:        temporalHost,
 			HeadersProvider: provider,
 			Namespace:       "default",
+			Identity:        identity,
 		})
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to connect to Temporal Server: "+temporalHost)
+		}
+		return client, nil
 	})
 }

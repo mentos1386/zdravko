@@ -7,13 +7,14 @@ import (
 	"github.com/temporalio/ui-server/v2/server/server_options"
 )
 
-func NewUiConfig(cfg *internal.Config) *config.Config {
+func NewUiConfig(cfg *internal.TemporalConfig) *config.Config {
 	return &config.Config{
-		Host:                cfg.Temporal.ListenAddress,
+		Host:                cfg.ListenAddress,
 		Port:                8223,
-		TemporalGRPCAddress: cfg.Temporal.ServerHost,
+		TemporalGRPCAddress: "localhost:7233",
 		EnableUI:            true,
 		PublicPath:          "/temporal",
+		ForwardHeaders:      []string{"Authorization"},
 		Codec: config.Codec{
 			Endpoint: "",
 		},

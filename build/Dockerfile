@@ -36,3 +36,4 @@ ENV DATABASE_PATH=/data/zdravko.db
 ENV TEMPORAL_DATABASE_PATH=/data/temporal.db
 
 ENTRYPOINT ["/bin/zdravko"]
+CMD ["--server", "--temporal", "--worker"]

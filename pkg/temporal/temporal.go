@@ -11,7 +11,7 @@ type Temporal struct {
 	uiServer *server.Server
 }
 
-func NewTemporal(cfg *config.Config) (*Temporal, error) {
+func NewTemporal(cfg *config.TemporalConfig) (*Temporal, error) {
 	serverConfig := NewServerConfig(cfg)
 	tokenKeyProvider := TokenKeyProvider{config: cfg}
 	server, err := NewServer(serverConfig, &tokenKeyProvider)

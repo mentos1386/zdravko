@@ -15,6 +15,7 @@ type Worker struct {
 	gorm.Model
 	Name   string `gorm:"unique" validate:"required"`
 	Slug   string `gorm:"unique"`
+	Group  string `validate:"required"`
 	Status string
 }
 

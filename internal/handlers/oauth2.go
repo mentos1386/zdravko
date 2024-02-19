@@ -31,7 +31,7 @@ func newRandomState() string {
 	return hex.EncodeToString(b)
 }
 
-func newOAuth2(config *config.Config) *oauth2.Config {
+func newOAuth2(config *config.ServerConfig) *oauth2.Config {
 	return &oauth2.Config{
 		ClientID:     config.OAuth2.ClientID,
 		ClientSecret: config.OAuth2.ClientSecret,
@@ -160,9 +160,9 @@ func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) 
 	http.Redirect(w, r, "/settings", http.StatusTemporaryRedirect)
 }
 
-func (h *BaseHandler) OAuth2LogoutGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) OAuth2LogoutGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	if h.config.OAuth2.EndpointLogoutURL != "" {
-		tok := h.AuthenticatedUserToOAuth2Token(user)
+		tok := h.AuthenticatedUserToOAuth2Token(principal.User)
 		client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(tok))
 		_, err := client.Get(h.config.OAuth2.EndpointLogoutURL)
 		if err != nil {

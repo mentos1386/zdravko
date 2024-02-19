@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	config := config.NewConfig()
+	config := config.NewServerConfig()
 
 	// Initialize the generator with configuration
 	g := gen.NewGenerator(gen.Config{

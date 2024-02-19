@@ -6,6 +6,6 @@ processes:
     availability:
       restart: "always"
   zdravko:
-    command: watchexec -r -e go,tmpl,css just run-zdravko
+    command: watchexec -r -e go,tmpl,css just run-server
     availability:
       restart: "always"

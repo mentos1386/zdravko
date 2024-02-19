@@ -24,7 +24,7 @@ const MatchingPort = 7235
 const WorkerPort = 7236
 
 type TokenKeyProvider struct {
-	config *internal.Config
+	config *internal.TemporalConfig
 }
 
 func (p *TokenKeyProvider) SupportedMethods() []string {
@@ -40,13 +40,13 @@ func (p *TokenKeyProvider) EcdsaKey(alg string, kid string) (*ecdsa.PublicKey, e
 }
 
 func (p *TokenKeyProvider) RsaKey(alg string, kid string) (*rsa.PublicKey, error) {
-	return jwt.JwtPublicKey(p.config)
+	return jwt.JwtPublicKey(p.config.Jwt.PublicKey)
 }
 
 func (p *TokenKeyProvider) Close() {
 }
 
-func NewServerConfig(cfg *internal.Config) *config.Config {
+func NewServerConfig(cfg *internal.TemporalConfig) *config.Config {
 	return &config.Config{
 		Persistence: config.Persistence{
 			DataStores: map[string]config.DataStore{
@@ -55,7 +55,7 @@ func NewServerConfig(cfg *internal.Config) *config.Config {
 					ConnectAttributes: map[string]string{
 						"mode": "rwc",
 					},
-					DatabaseName: cfg.Temporal.DatabasePath,
+					DatabaseName: cfg.DatabasePath,
 				},
 				},
 			},
@@ -77,7 +77,7 @@ func NewServerConfig(cfg *internal.Config) *config.Config {
 					GRPCPort:        FrontendPort,
 					MembershipPort:  FrontendPort + 100,
 					BindOnLocalHost: false,
-					BindOnIP:        cfg.Temporal.ListenAddress,
+					BindOnIP:        cfg.ListenAddress,
 				},
 			},
 			"history": {

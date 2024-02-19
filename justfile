@@ -11,32 +11,20 @@ GIT_SHA := `git rev-parse --short HEAD`
 DOCKER_IMAGE := "ghcr.io/mentos1386/zdravko:sha-"+GIT_SHA
 STATIC_DIR := "./web/static"
 
-# Build the application
-build:
-  docker build -f build/Dockerfile -t {{DOCKER_IMAGE}} .
-
-# Run Docker application.
-run-docker:
-  docker run -p 8080:8080 \
-  -e  SESSION_SECRET \
-  -e OAUTH2_CLIENT_ID \
-  -e OAUTH2_CLIENT_SECRET \
-  -e OAUTH2_ENDPOINT_TOKEN_URL \
-  -e OAUTH2_ENDPOINT_AUTH_URL \
-  -e OAUTH2_ENDPOINT_USER_INFO_URL \
-  -e OAUTH2_ENDPOINT_LOGOUT_URL \
-  {{DOCKER_IMAGE}}
+_default:
+  @just --list
 
 # Run full development environment
 run:
   devbox services up
 
+# Start worker
 run-worker:
   go build -o dist/zdravko cmd/zdravko/main.go
   ./dist/zdravko --worker
 
-# Start zdravko
-run-zdravko:
+# Start server
+run-server:
   go build -o dist/zdravko cmd/zdravko/main.go
   ./dist/zdravko --server --temporal
 
@@ -49,11 +37,34 @@ generate-jwt-key:
 deploy:
   fly deploy --ha=false -c deploy/fly.toml -i {{DOCKER_IMAGE}}
 
-
+# Read local jwt key and set it as fly secret
 deploy-set-jwt-key-secrets:
-  @fly secrets set -c deploy/fly.toml \
-    "JWT_PRIVATE_KEY={{JWT_PRIVATE_KEY}}" \
-    "JWT_PUBLIC_KEY={{JWT_PUBLIC_KEY}}"
+  #!/bin/bash
+  # https://github.com/superfly/flyctl/issues/589
+  cat <<EOF | fly secrets import -c deploy/fly.toml
+  JWT_PRIVATE_KEY="""{{JWT_PRIVATE_KEY}}"""
+  JWT_PUBLIC_KEY="""{{JWT_PUBLIC_KEY}}"""
+  EOF
+
+# Build the application
+build:
+  docker build -f build/Dockerfile -t {{DOCKER_IMAGE}} .
+
+# Run Docker application.
+run-docker:
+  docker run -p 8080:8080 \
+  -it --rm \
+  -e SESSION_SECRET \
+  -e OAUTH2_CLIENT_ID \
+  -e OAUTH2_CLIENT_SECRET \
+  -e OAUTH2_ENDPOINT_TOKEN_URL \
+  -e OAUTH2_ENDPOINT_AUTH_URL \
+  -e OAUTH2_ENDPOINT_USER_INFO_URL \
+  -e OAUTH2_ENDPOINT_LOGOUT_URL \
+  -e JWT_PRIVATE_KEY \
+  -e JWT_PUBLIC_KEY \
+  -e WORKER_TOKEN \
+  {{DOCKER_IMAGE}} --server --temporal --worker
 
 # Start devbox shell
 shell:

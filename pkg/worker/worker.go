@@ -1,19 +1,59 @@
 package worker
 
 import (
+	"encoding/json"
+	"io"
+	"log"
+	"net/http"
+
 	"code.tjo.space/mentos1386/zdravko/internal/activities"
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/temporal"
 	"code.tjo.space/mentos1386/zdravko/internal/workflows"
+	"github.com/pkg/errors"
 	"go.temporal.io/sdk/worker"
 )
 
-type Worker struct {
-	worker worker.Worker
-	cfg    *config.Config
+type ConnectionConfig struct {
+	Endpoint string `json:"endpoint"`
+	Slug     string `json:"slug"`
+	Group    string `json:"group"`
 }
 
-func NewWorker(cfg *config.Config) (*Worker, error) {
+func getConnectionConfig(token string, apiUrl string) (*ConnectionConfig, error) {
+	url := apiUrl + "/api/v1/workers/connect"
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to connect to API")
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read response body")
+	}
+
+	config := ConnectionConfig{}
+	err = json.Unmarshal(body, &config)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal connection config")
+	}
+
+	return &config, nil
+}
+
+type Worker struct {
+	worker worker.Worker
+	cfg    *config.WorkerConfig
+}
+
+func NewWorker(cfg *config.WorkerConfig) (*Worker, error) {
 	return &Worker{
 		cfg: cfg,
 	}, nil
@@ -24,14 +64,22 @@ func (w *Worker) Name() string {
 }
 
 func (w *Worker) Start() error {
-	temporalClient, err := temporal.ConnectWorkerToTemporal(w.cfg)
+	config, err := getConnectionConfig(w.cfg.Token, w.cfg.ApiUrl)
+	if err != nil {
+		return err
+	}
+
+	log.Println("Worker slug:", config.Slug)
+	log.Println("Worker group:", config.Group)
+
+	temporalClient, err := temporal.ConnectWorkerToTemporal(w.cfg.Token, config.Endpoint, config.Slug)
 	if err != nil {
 		return err
 	}
 
 	// Create a new Worker
 	// TODO: Maybe identify by region or something?
-	w.worker = worker.New(temporalClient, "test", worker.Options{})
+	w.worker = worker.New(temporalClient, config.Group, worker.Options{})
 
 	// Register Workflows
 	w.worker.RegisterWorkflow(workflows.HealthcheckHttpWorkflowDefinition)

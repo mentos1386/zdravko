@@ -27,14 +27,14 @@ func GetPageByTitle(pages []*components.Page, title string) *components.Page {
 type BaseHandler struct {
 	db     *gorm.DB
 	query  *query.Query
-	config *config.Config
+	config *config.ServerConfig
 
 	temporal client.Client
 
 	store *sessions.CookieStore
 }
 
-func NewBaseHandler(db *gorm.DB, q *query.Query, temporal client.Client, config *config.Config) *BaseHandler {
+func NewBaseHandler(db *gorm.DB, q *query.Query, temporal client.Client, config *config.ServerConfig) *BaseHandler {
 	store := sessions.NewCookieStore([]byte(config.SessionSecret))
 
 	return &BaseHandler{db, q, config, temporal, store}

@@ -27,7 +27,7 @@ type SettingsWorker struct {
 	Worker *models.Worker
 }
 
-func (h *BaseHandler) SettingsWorkersGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsWorkersGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	ts, err := template.ParseFS(templates.Templates,
 		"components/base.tmpl",
 		"components/settings.tmpl",
@@ -45,7 +45,7 @@ func (h *BaseHandler) SettingsWorkersGET(w http.ResponseWriter, r *http.Request,
 
 	err = ts.ExecuteTemplate(w, "base", &SettingsWorkers{
 		Settings: NewSettings(
-			user,
+			principal.User,
 			GetPageByTitle(SettingsPages, "Workers"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Workers")},
 		),
@@ -57,7 +57,7 @@ func (h *BaseHandler) SettingsWorkersGET(w http.ResponseWriter, r *http.Request,
 	}
 }
 
-func (h *BaseHandler) SettingsWorkersDescribeGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsWorkersDescribeGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	vars := mux.Vars(r)
 	slug := vars["slug"]
 
@@ -78,7 +78,7 @@ func (h *BaseHandler) SettingsWorkersDescribeGET(w http.ResponseWriter, r *http.
 
 	err = ts.ExecuteTemplate(w, "base", &SettingsWorker{
 		Settings: NewSettings(
-			user,
+			principal.User,
 			GetPageByTitle(SettingsPages, "Workers"),
 			[]*components.Page{
 				GetPageByTitle(SettingsPages, "Workers"),
@@ -95,7 +95,7 @@ func (h *BaseHandler) SettingsWorkersDescribeGET(w http.ResponseWriter, r *http.
 	}
 }
 
-func (h *BaseHandler) SettingsWorkersCreateGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsWorkersCreateGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	ts, err := template.ParseFS(templates.Templates,
 		"components/base.tmpl",
 		"components/settings.tmpl",
@@ -107,7 +107,7 @@ func (h *BaseHandler) SettingsWorkersCreateGET(w http.ResponseWriter, r *http.Re
 	}
 
 	err = ts.ExecuteTemplate(w, "base", NewSettings(
-		user,
+		principal.User,
 		GetPageByTitle(SettingsPages, "Workers"),
 		[]*components.Page{
 			GetPageByTitle(SettingsPages, "Workers"),
@@ -119,12 +119,13 @@ func (h *BaseHandler) SettingsWorkersCreateGET(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func (h *BaseHandler) SettingsWorkersCreatePOST(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsWorkersCreatePOST(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	ctx := context.Background()
 
 	worker := &models.Worker{
-		Name: r.FormValue("name"),
-		Slug: slug.Make(r.FormValue("name")),
+		Name:  r.FormValue("name"),
+		Slug:  slug.Make(r.FormValue("name")),
+		Group: r.FormValue("group"),
 	}
 
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(worker)
@@ -144,7 +145,7 @@ func (h *BaseHandler) SettingsWorkersCreatePOST(w http.ResponseWriter, r *http.R
 	http.Redirect(w, r, "/settings/workers", http.StatusSeeOther)
 }
 
-func (h *BaseHandler) SettingsWorkersTokenGET(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) {
+func (h *BaseHandler) SettingsWorkersTokenGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
 	vars := mux.Vars(r)
 	slug := vars["slug"]
 
@@ -154,7 +155,7 @@ func (h *BaseHandler) SettingsWorkersTokenGET(w http.ResponseWriter, r *http.Req
 	}
 
 	// Allow write access to default namespace
-	token, err := jwt.NewToken(h.config, []string{"default:write"}, worker.Slug)
+	token, err := jwt.NewTokenForWorker(h.config.Jwt.PrivateKey, h.config.Jwt.PublicKey, worker)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

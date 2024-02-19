@@ -40,13 +40,12 @@ func main() {
 		log.Fatal("At least one of the following must be set: --server, --worker, --temporal")
 	}
 
-	cfg := config.NewConfig()
-
 	var servers [3]StartableAndStoppable
 	var wg sync.WaitGroup
 
 	if startTemporal {
 		log.Println("Setting up Temporal")
+		cfg := config.NewTemporalConfig()
 		temporal, err := temporal.NewTemporal(cfg)
 		if err != nil {
 			log.Fatalf("Unable to create temporal: %v", err)
@@ -56,6 +55,7 @@ func main() {
 
 	if startServer {
 		log.Println("Setting up Server")
+		cfg := config.NewServerConfig()
 		server, err := server.NewServer(cfg)
 		if err != nil {
 			log.Fatalf("Unable to create server: %v", err)
@@ -65,6 +65,7 @@ func main() {
 
 	if startWorker {
 		log.Println("Setting up Worker")
+		cfg := config.NewWorkerConfig()
 		worker, err := worker.NewWorker(cfg)
 		if err != nil {
 			log.Fatalf("Unable to create worker: %v", err)
