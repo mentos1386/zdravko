@@ -18,7 +18,7 @@ func NewWorkerConfig() *WorkerConfig {
 
 	// Set defaults
 	v.SetDefault("token", os.Getenv("WORKER_TOKEN"))
-	v.SetDefault("apiurl", os.Getenv("WORKER_API_URL"))
+	v.SetDefault("apiurl", GetEnvOrDefault("WORKER_API_URL", "http://localhost:8000"))
 
 	err := v.ReadInConfig()
 	if err != nil {
