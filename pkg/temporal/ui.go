@@ -13,7 +13,7 @@ func NewUiConfig(cfg *internal.TemporalConfig) *config.Config {
 		Port:                8223,
 		TemporalGRPCAddress: "localhost:7233",
 		EnableUI:            true,
-		PublicPath:          "/temporal",
+		PublicPath:          "/settings/temporal",
 		ForwardHeaders:      []string{"Authorization"},
 		Codec: config.Codec{
 			Endpoint: "",

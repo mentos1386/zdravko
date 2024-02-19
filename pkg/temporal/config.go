@@ -22,6 +22,7 @@ const FrontendPort = 7233
 const HistoryPort = 7234
 const MatchingPort = 7235
 const WorkerPort = 7236
+const InternalFrontendPort = 7237
 
 type TokenKeyProvider struct {
 	config *internal.TemporalConfig
@@ -96,6 +97,22 @@ func NewServerConfig(cfg *internal.TemporalConfig) *config.Config {
 					BindOnIP:        "",
 				},
 			},
+			"worker": {
+				RPC: config.RPC{
+					GRPCPort:        WorkerPort,
+					MembershipPort:  WorkerPort + 100,
+					BindOnLocalHost: true,
+					BindOnIP:        "",
+				},
+			},
+			"internal-frontend": {
+				RPC: config.RPC{
+					GRPCPort:        InternalFrontendPort,
+					MembershipPort:  InternalFrontendPort + 100,
+					BindOnLocalHost: true,
+					BindOnIP:        "",
+				},
+			},
 		},
 		ClusterMetadata: &cluster.Config{
 			EnableGlobalNamespace:    false,
@@ -106,7 +123,7 @@ func NewServerConfig(cfg *internal.TemporalConfig) *config.Config {
 				"active": {
 					Enabled:                true,
 					InitialFailoverVersion: 1,
-					RPCAddress:             fmt.Sprintf("%s:%d", BroadcastAddress, FrontendPort),
+					RPCAddress:             fmt.Sprintf("%s:%d", BroadcastAddress, InternalFrontendPort),
 					ClusterID:              "todo",
 				},
 			},
@@ -125,9 +142,6 @@ func NewServerConfig(cfg *internal.TemporalConfig) *config.Config {
 				EnableRead: false,
 				Provider:   nil,
 			},
-		},
-		PublicClient: config.PublicClient{
-			HostPort: fmt.Sprintf("%s:%d", BroadcastAddress, FrontendPort),
 		},
 		NamespaceDefaults: config.NamespaceDefaults{
 			Archival: config.ArchivalNamespaceDefaults{

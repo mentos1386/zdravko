@@ -65,6 +65,8 @@ func NewServer(cfg *config.Config, tokenKeyProvider authorization.TokenKeyProvid
 			string(primitives.FrontendService),
 			string(primitives.HistoryService),
 			string(primitives.MatchingService),
+			string(primitives.WorkerService),
+			string(primitives.InternalFrontendService),
 		}),
 		t.WithLogger(logger),
 		t.InterruptOn(interruptChan),

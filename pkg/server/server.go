@@ -66,7 +66,7 @@ func (s *Server) Start() error {
 
 	r.HandleFunc("/", h.Index).Methods("GET")
 
-	// Authenticated routes
+	// Settings
 	r.HandleFunc("/settings", h.Authenticated(h.SettingsOverviewGET)).Methods("GET")
 	r.HandleFunc("/settings/healthchecks", h.Authenticated(h.SettingsHealthchecksGET)).Methods("GET")
 	r.HandleFunc("/settings/healthchecks/create", h.Authenticated(h.SettingsHealthchecksCreateGET)).Methods("GET")
@@ -77,14 +77,12 @@ func (s *Server) Start() error {
 	r.HandleFunc("/settings/workers/create", h.Authenticated(h.SettingsWorkersCreatePOST)).Methods("POST")
 	r.HandleFunc("/settings/workers/{slug}", h.Authenticated(h.SettingsWorkersDescribeGET)).Methods("GET")
 	r.HandleFunc("/settings/workers/{slug}/token", h.Authenticated(h.SettingsWorkersTokenGET)).Methods("GET")
+	r.PathPrefix("/settings/temporal").HandlerFunc(h.Authenticated(h.Temporal))
 
 	// OAuth2
 	r.HandleFunc("/oauth2/login", h.OAuth2LoginGET).Methods("GET")
 	r.HandleFunc("/oauth2/callback", h.OAuth2CallbackGET).Methods("GET")
 	r.HandleFunc("/oauth2/logout", h.Authenticated(h.OAuth2LogoutGET)).Methods("GET")
-
-	// Temporal UI
-	r.PathPrefix("/temporal").HandlerFunc(h.Authenticated(h.Temporal))
 
 	// API
 	r.HandleFunc("/api/v1/workers/connect", h.Authenticated(h.ApiV1WorkersConnectGET)).Methods("GET")
