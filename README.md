@@ -17,7 +17,7 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
  - [ ] CronJob Healthchecks (via webhooks).
 
 ![Screenshot](docs/screenshot.png)
-Demo is available at https://zdravko.fly.dev.
+Demo is available at https://zdravko.mnts.dev.
 
 # Development
 
