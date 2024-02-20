@@ -36,7 +36,7 @@ func newHealthcheckTcp(db *gorm.DB, opts ...gen.DOOption) healthcheckTcp {
 	_healthcheckTcp.Status = field.NewString(tableName, "status")
 	_healthcheckTcp.UptimePercentage = field.NewFloat64(tableName, "uptime_percentage")
 	_healthcheckTcp.Schedule = field.NewString(tableName, "schedule")
-	_healthcheckTcp.Groups = field.NewField(tableName, "groups")
+	_healthcheckTcp.WorkerGroups = field.NewField(tableName, "worker_groups")
 	_healthcheckTcp.Hostname = field.NewString(tableName, "hostname")
 	_healthcheckTcp.Port = field.NewInt(tableName, "port")
 
@@ -58,7 +58,7 @@ type healthcheckTcp struct {
 	Status           field.String
 	UptimePercentage field.Float64
 	Schedule         field.String
-	Groups           field.Field
+	WorkerGroups     field.Field
 	Hostname         field.String
 	Port             field.Int
 
@@ -86,7 +86,7 @@ func (h *healthcheckTcp) updateTableName(table string) *healthcheckTcp {
 	h.Status = field.NewString(table, "status")
 	h.UptimePercentage = field.NewFloat64(table, "uptime_percentage")
 	h.Schedule = field.NewString(table, "schedule")
-	h.Groups = field.NewField(table, "groups")
+	h.WorkerGroups = field.NewField(table, "worker_groups")
 	h.Hostname = field.NewString(table, "hostname")
 	h.Port = field.NewInt(table, "port")
 
@@ -127,7 +127,7 @@ func (h *healthcheckTcp) fillFieldMap() {
 	h.fieldMap["status"] = h.Status
 	h.fieldMap["uptime_percentage"] = h.UptimePercentage
 	h.fieldMap["schedule"] = h.Schedule
-	h.fieldMap["groups"] = h.Groups
+	h.fieldMap["worker_groups"] = h.WorkerGroups
 	h.fieldMap["hostname"] = h.Hostname
 	h.fieldMap["port"] = h.Port
 }

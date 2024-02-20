@@ -35,6 +35,8 @@ type HealthcheckHttp struct {
 	Healthcheck
 	Url    string `validate:"required,url"`
 	Method string `validate:"required,oneof=GET POST"`
+
+	History []HealthcheckHttpHistory `gorm:"foreignKey:ID"`
 }
 
 type HealthcheckTcp struct {

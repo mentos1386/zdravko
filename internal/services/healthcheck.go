@@ -29,14 +29,16 @@ func StartHealthcheckHttp(ctx context.Context, t client.Client, healthcheckHttp 
 	args := make([]interface{}, 0)
 	args = append(args, workflows.HealthcheckHttpWorkflowParam{Url: healthcheckHttp.Url, Method: healthcheckHttp.Method})
 
+	id := "healthcheck-http-" + healthcheckHttp.Slug
+
 	for _, group := range healthcheckHttp.WorkerGroups {
 		_, err := t.ScheduleClient().Create(ctx, client.ScheduleOptions{
-			ID: "healthcheck-http-" + healthcheckHttp.Slug,
+			ID: id + "-" + group,
 			Spec: client.ScheduleSpec{
 				CronExpressions: []string{healthcheckHttp.Schedule},
 			},
 			Action: &client.ScheduleWorkflowAction{
-				ID:        "healthcheck-http-" + healthcheckHttp.Slug,
+				ID:        id + "-" + group,
 				Workflow:  workflows.HealthcheckHttpWorkflowDefinition,
 				Args:      args,
 				TaskQueue: group,
@@ -51,4 +53,8 @@ func StartHealthcheckHttp(ctx context.Context, t client.Client, healthcheckHttp 
 	}
 
 	return nil
+}
+
+func CreateHealthcheckHistory(ctx context.Context, db *gorm.DB, healthcheckHistory *models.HealthcheckHttpHistory) error {
+	return db.WithContext(ctx).Create(healthcheckHistory).Error
 }

@@ -5,15 +5,13 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"text/template"
 
 	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
-	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/go-playground/validator/v10"
-	"github.com/gorilla/mux"
 	"github.com/gosimple/slug"
+	"github.com/labstack/echo/v4"
 )
 
 type SettingsHealthchecks struct {
@@ -27,58 +25,38 @@ type SettingsHealthcheck struct {
 	Healthcheck *models.HealthcheckHttp
 }
 
-func (h *BaseHandler) SettingsHealthchecksGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
-	ts, err := template.ParseFS(templates.Templates,
-		"components/base.tmpl",
-		"components/settings.tmpl",
-		"pages/settings_healthchecks.tmpl",
-	)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (h *BaseHandler) SettingsHealthchecksGET(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
 
 	healthchecks, err := h.query.HealthcheckHttp.WithContext(context.Background()).Find()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
-	err = ts.ExecuteTemplate(w, "base", &SettingsHealthchecks{
+	return c.Render(http.StatusOK, "settings_healthchecks.tmpl", &SettingsHealthchecks{
 		Settings: NewSettings(
-			principal.User,
+			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Healthchecks"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Healthchecks")},
 		),
 		Healthchecks:       healthchecks,
 		HealthchecksLength: len(healthchecks),
 	})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
-func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
-	vars := mux.Vars(r)
-	slug := vars["slug"]
+func (h *BaseHandler) SettingsHealthchecksDescribeGET(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
 
-	ts, err := template.ParseFS(templates.Templates,
-		"components/base.tmpl",
-		"components/settings.tmpl",
-		"pages/settings_healthchecks_describe.tmpl",
-	)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	slug := c.Param("slug")
 
 	healthcheck, err := services.GetHealthcheckHttp(context.Background(), h.query, slug)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
-	err = ts.ExecuteTemplate(w, "base", &SettingsHealthcheck{
+	return c.Render(http.StatusOK, "settings_healthchecks_describe.tmpl", &SettingsHealthcheck{
 		Settings: NewSettings(
-			principal.User,
+			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Healthchecks"),
 			[]*components.Page{
 				GetPageByTitle(SettingsPages, "Healthchecks"),
@@ -90,52 +68,38 @@ func (h *BaseHandler) SettingsHealthchecksDescribeGET(w http.ResponseWriter, r *
 			}),
 		Healthcheck: healthcheck,
 	})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
-func (h *BaseHandler) SettingsHealthchecksCreateGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
-	ts, err := template.ParseFS(templates.Templates,
-		"components/base.tmpl",
-		"components/settings.tmpl",
-		"pages/settings_healthchecks_create.tmpl",
-	)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (h *BaseHandler) SettingsHealthchecksCreateGET(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
 
-	err = ts.ExecuteTemplate(w, "base", NewSettings(
-		principal.User,
+	return c.Render(http.StatusOK, "settings_healthchecks_create.tmpl", NewSettings(
+		cc.Principal.User,
 		GetPageByTitle(SettingsPages, "Healthchecks"),
 		[]*components.Page{
 			GetPageByTitle(SettingsPages, "Healthchecks"),
 			GetPageByTitle(SettingsPages, "Healthchecks Create"),
 		},
 	))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
-func (h *BaseHandler) SettingsHealthchecksCreatePOST(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
+func (h *BaseHandler) SettingsHealthchecksCreatePOST(c echo.Context) error {
 	ctx := context.Background()
 
 	healthcheckHttp := &models.HealthcheckHttp{
 		Healthcheck: models.Healthcheck{
-			Name:         r.FormValue("name"),
-			Slug:         slug.Make(r.FormValue("name")),
-			Schedule:     r.FormValue("schedule"),
-			WorkerGroups: strings.Split(r.FormValue("workergroups"), ","),
+			Name:         c.FormValue("name"),
+			Slug:         slug.Make(c.FormValue("name")),
+			Schedule:     c.FormValue("schedule"),
+			WorkerGroups: strings.Split(c.FormValue("workergroups"), ","),
 		},
-		Url:    r.FormValue("url"),
-		Method: r.FormValue("method"),
+		Url:    c.FormValue("url"),
+		Method: c.FormValue("method"),
 	}
 
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(healthcheckHttp)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
 	err = services.CreateHealthcheckHttp(
@@ -144,13 +108,13 @@ func (h *BaseHandler) SettingsHealthchecksCreatePOST(w http.ResponseWriter, r *h
 		healthcheckHttp,
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
 	err = services.StartHealthcheckHttp(ctx, h.temporal, healthcheckHttp)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
-	http.Redirect(w, r, "/settings/healthchecks", http.StatusSeeOther)
+	return c.Redirect(http.StatusSeeOther, "/settings/healthchecks")
 }

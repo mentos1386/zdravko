@@ -2,10 +2,9 @@ package handlers
 
 import (
 	"net/http"
-	"text/template"
 
-	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
+	"github.com/labstack/echo/v4"
 )
 
 type Settings struct {
@@ -49,23 +48,12 @@ var SettingsNavbar = []*components.Page{
 	GetPageByTitle(SettingsPages, "Logout"),
 }
 
-func (h *BaseHandler) SettingsOverviewGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
-	ts, err := template.ParseFS(templates.Templates,
-		"components/base.tmpl",
-		"components/settings.tmpl",
-		"pages/settings_overview.tmpl",
-	)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (h *BaseHandler) SettingsOverviewGET(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
 
-	err = ts.ExecuteTemplate(w, "base", NewSettings(
-		principal.User,
+	return c.Render(http.StatusOK, "settings_overview.tmpl", NewSettings(
+		cc.Principal.User,
 		GetPageByTitle(SettingsPages, "Overview"),
 		[]*components.Page{GetPageByTitle(SettingsPages, "Overview")},
 	))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }

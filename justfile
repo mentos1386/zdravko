@@ -26,7 +26,12 @@ run-worker:
 # Start server
 run-server:
   go build -o dist/zdravko cmd/zdravko/main.go
-  ./dist/zdravko --server --temporal
+  ./dist/zdravko --server
+
+# Start temporal
+run-temporal:
+  go build -o dist/zdravko cmd/zdravko/main.go
+  ./dist/zdravko --temporal
 
 # Generates new jwt key pair
 generate-jwt-key:

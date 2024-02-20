@@ -36,9 +36,27 @@ func newHealthcheckHttp(db *gorm.DB, opts ...gen.DOOption) healthcheckHttp {
 	_healthcheckHttp.Status = field.NewString(tableName, "status")
 	_healthcheckHttp.UptimePercentage = field.NewFloat64(tableName, "uptime_percentage")
 	_healthcheckHttp.Schedule = field.NewString(tableName, "schedule")
-	_healthcheckHttp.Groups = field.NewField(tableName, "groups")
+	_healthcheckHttp.WorkerGroups = field.NewField(tableName, "worker_groups")
 	_healthcheckHttp.Url = field.NewString(tableName, "url")
 	_healthcheckHttp.Method = field.NewString(tableName, "method")
+	_healthcheckHttp.History = healthcheckHttpHasManyHistory{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("History", "models.HealthcheckHttpHistory"),
+		HealthcheckHTTP: struct {
+			field.RelationField
+			History struct {
+				field.RelationField
+			}
+		}{
+			RelationField: field.NewRelation("History.HealthcheckHTTP", "models.HealthcheckHttp"),
+			History: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("History.HealthcheckHTTP.History", "models.HealthcheckHttpHistory"),
+			},
+		},
+	}
 
 	_healthcheckHttp.fillFieldMap()
 
@@ -58,9 +76,10 @@ type healthcheckHttp struct {
 	Status           field.String
 	UptimePercentage field.Float64
 	Schedule         field.String
-	Groups           field.Field
+	WorkerGroups     field.Field
 	Url              field.String
 	Method           field.String
+	History          healthcheckHttpHasManyHistory
 
 	fieldMap map[string]field.Expr
 }
@@ -86,7 +105,7 @@ func (h *healthcheckHttp) updateTableName(table string) *healthcheckHttp {
 	h.Status = field.NewString(table, "status")
 	h.UptimePercentage = field.NewFloat64(table, "uptime_percentage")
 	h.Schedule = field.NewString(table, "schedule")
-	h.Groups = field.NewField(table, "groups")
+	h.WorkerGroups = field.NewField(table, "worker_groups")
 	h.Url = field.NewString(table, "url")
 	h.Method = field.NewString(table, "method")
 
@@ -117,7 +136,7 @@ func (h *healthcheckHttp) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (h *healthcheckHttp) fillFieldMap() {
-	h.fieldMap = make(map[string]field.Expr, 12)
+	h.fieldMap = make(map[string]field.Expr, 13)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["created_at"] = h.CreatedAt
 	h.fieldMap["updated_at"] = h.UpdatedAt
@@ -127,9 +146,10 @@ func (h *healthcheckHttp) fillFieldMap() {
 	h.fieldMap["status"] = h.Status
 	h.fieldMap["uptime_percentage"] = h.UptimePercentage
 	h.fieldMap["schedule"] = h.Schedule
-	h.fieldMap["groups"] = h.Groups
+	h.fieldMap["worker_groups"] = h.WorkerGroups
 	h.fieldMap["url"] = h.Url
 	h.fieldMap["method"] = h.Method
+
 }
 
 func (h healthcheckHttp) clone(db *gorm.DB) healthcheckHttp {
@@ -140,6 +160,84 @@ func (h healthcheckHttp) clone(db *gorm.DB) healthcheckHttp {
 func (h healthcheckHttp) replaceDB(db *gorm.DB) healthcheckHttp {
 	h.healthcheckHttpDo.ReplaceDB(db)
 	return h
+}
+
+type healthcheckHttpHasManyHistory struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	HealthcheckHTTP struct {
+		field.RelationField
+		History struct {
+			field.RelationField
+		}
+	}
+}
+
+func (a healthcheckHttpHasManyHistory) Where(conds ...field.Expr) *healthcheckHttpHasManyHistory {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a healthcheckHttpHasManyHistory) WithContext(ctx context.Context) *healthcheckHttpHasManyHistory {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a healthcheckHttpHasManyHistory) Session(session *gorm.Session) *healthcheckHttpHasManyHistory {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a healthcheckHttpHasManyHistory) Model(m *models.HealthcheckHttp) *healthcheckHttpHasManyHistoryTx {
+	return &healthcheckHttpHasManyHistoryTx{a.db.Model(m).Association(a.Name())}
+}
+
+type healthcheckHttpHasManyHistoryTx struct{ tx *gorm.Association }
+
+func (a healthcheckHttpHasManyHistoryTx) Find() (result []*models.HealthcheckHttpHistory, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a healthcheckHttpHasManyHistoryTx) Append(values ...*models.HealthcheckHttpHistory) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a healthcheckHttpHasManyHistoryTx) Replace(values ...*models.HealthcheckHttpHistory) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a healthcheckHttpHasManyHistoryTx) Delete(values ...*models.HealthcheckHttpHistory) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a healthcheckHttpHasManyHistoryTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a healthcheckHttpHasManyHistoryTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type healthcheckHttpDo struct{ gen.DO }

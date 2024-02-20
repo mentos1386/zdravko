@@ -1,8 +1,12 @@
 package handlers
 
 import (
-	"encoding/json"
+	"context"
 	"net/http"
+
+	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"code.tjo.space/mentos1386/zdravko/internal/services"
+	"github.com/labstack/echo/v4"
 )
 
 type ApiV1WorkersConnectGETResponse struct {
@@ -11,25 +15,38 @@ type ApiV1WorkersConnectGETResponse struct {
 	Slug     string `json:"slug"`
 }
 
-func (h *BaseHandler) ApiV1WorkersConnectGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
-	// Json response containing temporal endpoint
-	w.Header().Set("Content-Type", "application/json")
+func (h *BaseHandler) ApiV1WorkersConnectGET(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
 
 	response := ApiV1WorkersConnectGETResponse{
 		Endpoint: h.config.Temporal.ServerHost,
-		Group:    principal.Worker.Group,
-		Slug:     principal.Worker.Slug,
+		Group:    cc.Principal.Worker.Group,
+		Slug:     cc.Principal.Worker.Slug,
 	}
 
-	responseJson, err := json.Marshal(response)
+	return c.JSON(http.StatusOK, response)
+}
+
+// TODO: Can we instead get this from the Workflow outcome?
+//
+//	To somehow listen for the outcomes and then store them automatically.
+func (h *BaseHandler) ApiV1HealthchecksHistoryPOST(c echo.Context) error {
+	ctx := context.Background()
+
+	slug := c.Param("slug")
+
+	healthcheck, err := services.GetHealthcheckHttp(ctx, h.query, slug)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
-	_, err = w.Write(responseJson)
+	err = h.query.HealthcheckHttp.History.Model(healthcheck).Append(
+		&models.HealthcheckHttpHistory{
+			Status: "UP",
+		})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
+
+	return c.JSON(http.StatusCreated, map[string]string{"status": "ok"})
 }

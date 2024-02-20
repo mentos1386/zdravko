@@ -3,12 +3,12 @@ package handlers
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	jwtInternal "code.tjo.space/mentos1386/zdravko/internal/jwt"
+	"github.com/labstack/echo/v4"
 )
 
 const sessionName = "zdravko-hey"
@@ -148,30 +148,33 @@ func (h *BaseHandler) ClearAuthenticatedUserForRequest(w http.ResponseWriter, r 
 
 type AuthenticatedHandler func(http.ResponseWriter, *http.Request, *AuthenticatedPrincipal)
 
-func (h *BaseHandler) Authenticated(next AuthenticatedHandler) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+type AuthenticatedContext struct {
+	echo.Context
+	Principal *AuthenticatedPrincipal
+}
+
+func (h *BaseHandler) Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
 		// First try cookie authentication
-		user, err := h.AuthenticateRequestWithCookies(r)
+		user, err := h.AuthenticateRequestWithCookies(c.Request())
 		if err == nil {
 			if user.OAuth2Expiry.Before(time.Now()) {
-				user, err = h.RefreshToken(w, r, user)
+				user, err = h.RefreshToken(c.Response(), c.Request(), user)
 				if err != nil {
-					http.Redirect(w, r, "/oauth2/login", http.StatusTemporaryRedirect)
-					return
+					return c.Redirect(http.StatusTemporaryRedirect, "/oauth2/login")
 				}
 			}
-			next(w, r, &AuthenticatedPrincipal{user, nil})
-			return
+
+			cc := AuthenticatedContext{c, &AuthenticatedPrincipal{user, nil}}
+			return next(cc)
 		}
 		// Then try token based authentication
-		principal, err := h.AuthenticateRequestWithToken(r)
+		principal, err := h.AuthenticateRequestWithToken(c.Request())
 		if err == nil {
-			next(w, r, principal)
-			return
+			cc := AuthenticatedContext{c, principal}
+			return next(cc)
 		}
 
-		log.Println("err: ", err)
-
-		http.Redirect(w, r, "/oauth2/login", http.StatusTemporaryRedirect)
+		return c.Redirect(http.StatusTemporaryRedirect, "/oauth2/login")
 	}
 }

@@ -4,16 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"text/template"
 
 	"code.tjo.space/mentos1386/zdravko/internal/jwt"
 	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
-	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/go-playground/validator/v10"
-	"github.com/gorilla/mux"
 	"github.com/gosimple/slug"
+	"github.com/labstack/echo/v4"
 )
 
 type SettingsWorkers struct {
@@ -27,58 +25,38 @@ type SettingsWorker struct {
 	Worker *models.Worker
 }
 
-func (h *BaseHandler) SettingsWorkersGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
-	ts, err := template.ParseFS(templates.Templates,
-		"components/base.tmpl",
-		"components/settings.tmpl",
-		"pages/settings_workers.tmpl",
-	)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (h *BaseHandler) SettingsWorkersGET(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
 
 	workers, err := h.query.Worker.WithContext(context.Background()).Find()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
-	err = ts.ExecuteTemplate(w, "base", &SettingsWorkers{
+	return c.Render(http.StatusOK, "settings_workers.tmpl", &SettingsWorkers{
 		Settings: NewSettings(
-			principal.User,
+			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Workers"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Workers")},
 		),
 		Workers:       workers,
 		WorkersLength: len(workers),
 	})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
-func (h *BaseHandler) SettingsWorkersDescribeGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
-	vars := mux.Vars(r)
-	slug := vars["slug"]
+func (h *BaseHandler) SettingsWorkersDescribeGET(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
 
-	ts, err := template.ParseFS(templates.Templates,
-		"components/base.tmpl",
-		"components/settings.tmpl",
-		"pages/settings_workers_describe.tmpl",
-	)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	slug := c.Param("slug")
 
 	worker, err := services.GetWorker(context.Background(), h.query, slug)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
-	err = ts.ExecuteTemplate(w, "base", &SettingsWorker{
+	return c.Render(http.StatusOK, "setting_workers_describe.tmpl", &SettingsWorker{
 		Settings: NewSettings(
-			principal.User,
+			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Workers"),
 			[]*components.Page{
 				GetPageByTitle(SettingsPages, "Workers"),
@@ -90,47 +68,33 @@ func (h *BaseHandler) SettingsWorkersDescribeGET(w http.ResponseWriter, r *http.
 			}),
 		Worker: worker,
 	})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
-func (h *BaseHandler) SettingsWorkersCreateGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
-	ts, err := template.ParseFS(templates.Templates,
-		"components/base.tmpl",
-		"components/settings.tmpl",
-		"pages/settings_workers_create.tmpl",
-	)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (h *BaseHandler) SettingsWorkersCreateGET(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
 
-	err = ts.ExecuteTemplate(w, "base", NewSettings(
-		principal.User,
+	return c.Render(http.StatusOK, "settings_workers_create.tmpl", NewSettings(
+		cc.Principal.User,
 		GetPageByTitle(SettingsPages, "Workers"),
 		[]*components.Page{
 			GetPageByTitle(SettingsPages, "Workers"),
 			GetPageByTitle(SettingsPages, "Workers Create"),
 		},
 	))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
-func (h *BaseHandler) SettingsWorkersCreatePOST(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
+func (h *BaseHandler) SettingsWorkersCreatePOST(c echo.Context) error {
 	ctx := context.Background()
 
 	worker := &models.Worker{
-		Name:  r.FormValue("name"),
-		Slug:  slug.Make(r.FormValue("name")),
-		Group: r.FormValue("group"),
+		Name:  c.FormValue("name"),
+		Slug:  slug.Make(c.FormValue("name")),
+		Group: c.FormValue("group"),
 	}
 
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(worker)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
 	err = services.CreateWorker(
@@ -139,27 +103,25 @@ func (h *BaseHandler) SettingsWorkersCreatePOST(w http.ResponseWriter, r *http.R
 		worker,
 	)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
-	http.Redirect(w, r, "/settings/workers", http.StatusSeeOther)
+	return c.Redirect(http.StatusSeeOther, "/settings/workers")
 }
 
-func (h *BaseHandler) SettingsWorkersTokenGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
-	vars := mux.Vars(r)
-	slug := vars["slug"]
+func (h *BaseHandler) SettingsWorkersTokenGET(c echo.Context) error {
+	slug := c.Param("slug")
 
 	worker, err := services.GetWorker(context.Background(), h.query, slug)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
 	// Allow write access to default namespace
 	token, err := jwt.NewTokenForWorker(h.config.Jwt.PrivateKey, h.config.Jwt.PublicKey, worker)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write([]byte(`{"token": "` + token + `"}`))
+	return c.JSON(http.StatusOK, map[string]string{"token": token})
 }

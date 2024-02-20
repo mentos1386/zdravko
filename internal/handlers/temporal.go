@@ -6,9 +6,12 @@ import (
 	"net/url"
 
 	"code.tjo.space/mentos1386/zdravko/internal/jwt"
+	"github.com/labstack/echo/v4"
 )
 
-func (h *BaseHandler) Temporal(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
+func (h *BaseHandler) Temporal(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
+
 	proxy := httputil.NewSingleHostReverseProxy(&url.URL{
 		Host:   h.config.Temporal.UIHost,
 		Scheme: "http",
@@ -23,10 +26,11 @@ func (h *BaseHandler) Temporal(w http.ResponseWriter, r *http.Request, principal
 		token, _ := jwt.NewTokenForUser(
 			h.config.Jwt.PrivateKey,
 			h.config.Jwt.PublicKey,
-			principal.User.Email,
+			cc.Principal.User.Email,
 		)
 		r.Header.Add("Authorization", "Bearer "+token)
 	}
 
-	proxy.ServeHTTP(w, r)
+	proxy.ServeHTTP(c.Response(), c.Request())
+	return nil
 }

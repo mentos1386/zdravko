@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 )
 
@@ -79,64 +81,60 @@ func (h *BaseHandler) RefreshToken(w http.ResponseWriter, r *http.Request, user 
 	return refreshedUser, nil
 }
 
-func (h *BaseHandler) OAuth2LoginGET(w http.ResponseWriter, r *http.Request) {
+func (h *BaseHandler) OAuth2LoginGET(c echo.Context) error {
 	conf := newOAuth2(h.config)
 
 	state := newRandomState()
 	result := h.db.Create(&models.OAuth2State{State: state, Expiry: time.Now().Add(5 * time.Minute)})
 	if result.Error != nil {
-		http.Error(w, result.Error.Error(), http.StatusInternalServerError)
+		return result.Error
 	}
 
 	url := conf.AuthCodeURL(state, oauth2.AccessTypeOffline)
 
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	return c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
-func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) {
+func (h *BaseHandler) OAuth2CallbackGET(c echo.Context) error {
 	ctx := context.Background()
 	conf := newOAuth2(h.config)
 
-	state := r.URL.Query().Get("state")
+	state := c.QueryParam("state")
+	code := c.QueryParam("code")
 
 	result, err := h.query.OAuth2State.WithContext(ctx).Where(
 		h.query.OAuth2State.State.Eq(state),
 		h.query.OAuth2State.Expiry.Gt(time.Now()),
 	).Delete()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	if result.RowsAffected != 1 {
-		http.Error(w, "Invalid state", http.StatusUnauthorized)
-		return
+		return errors.New("invalid state")
 	}
 
 	// Exchange the code for a new token.
-	tok, err := conf.Exchange(r.Context(), r.URL.Query().Get("code"))
+	tok, err := conf.Exchange(ctx, code)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	// Ge the user information.
 	client := oauth2.NewClient(ctx, oauth2.StaticTokenSource(tok))
 	resp, err := client.Get(h.config.OAuth2.EndpointUserInfoURL)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 
 	var userInfo UserInfo
 	err = json.Unmarshal(body, &userInfo)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	userId := userInfo.Sub
@@ -144,7 +142,7 @@ func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) 
 		userId = strconv.Itoa(userInfo.Id)
 	}
 
-	err = h.SetAuthenticatedUserForRequest(w, r, &AuthenticatedUser{
+	err = h.SetAuthenticatedUserForRequest(c.Response(), c.Request(), &AuthenticatedUser{
 		ID:                 userId,
 		Email:              userInfo.Email,
 		OAuth2AccessToken:  tok.AccessToken,
@@ -153,27 +151,28 @@ func (h *BaseHandler) OAuth2CallbackGET(w http.ResponseWriter, r *http.Request) 
 		OAuth2Expiry:       tok.Expiry,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
-	http.Redirect(w, r, "/settings", http.StatusTemporaryRedirect)
+	return c.Redirect(http.StatusTemporaryRedirect, "/settings")
 }
 
-func (h *BaseHandler) OAuth2LogoutGET(w http.ResponseWriter, r *http.Request, principal *AuthenticatedPrincipal) {
+func (h *BaseHandler) OAuth2LogoutGET(c echo.Context) error {
+	cc := c.(AuthenticatedContext)
+
 	if h.config.OAuth2.EndpointLogoutURL != "" {
-		tok := h.AuthenticatedUserToOAuth2Token(principal.User)
+		tok := h.AuthenticatedUserToOAuth2Token(cc.Principal.User)
 		client := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(tok))
 		_, err := client.Get(h.config.OAuth2.EndpointLogoutURL)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			return err
 		}
 	}
 
-	err := h.ClearAuthenticatedUserForRequest(w, r)
+	err := h.ClearAuthenticatedUserForRequest(c.Response(), c.Request())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+
+	return c.Redirect(http.StatusTemporaryRedirect, "/")
 }

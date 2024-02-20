@@ -36,6 +36,19 @@ func newHealthcheckHttpHistory(db *gorm.DB, opts ...gen.DOOption) healthcheckHtt
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("HealthcheckHTTP", "models.HealthcheckHttp"),
+		History: struct {
+			field.RelationField
+			HealthcheckHTTP struct {
+				field.RelationField
+			}
+		}{
+			RelationField: field.NewRelation("HealthcheckHTTP.History", "models.HealthcheckHttpHistory"),
+			HealthcheckHTTP: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("HealthcheckHTTP.History.HealthcheckHTTP", "models.HealthcheckHttp"),
+			},
+		},
 	}
 
 	_healthcheckHttpHistory.fillFieldMap()
@@ -125,6 +138,13 @@ type healthcheckHttpHistoryHasOneHealthcheckHTTP struct {
 	db *gorm.DB
 
 	field.RelationField
+
+	History struct {
+		field.RelationField
+		HealthcheckHTTP struct {
+			field.RelationField
+		}
+	}
 }
 
 func (a healthcheckHttpHistoryHasOneHealthcheckHTTP) Where(conds ...field.Expr) *healthcheckHttpHistoryHasOneHealthcheckHTTP {

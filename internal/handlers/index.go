@@ -3,10 +3,9 @@ package handlers
 import (
 	"math/rand"
 	"net/http"
-	"text/template"
 
-	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
+	"github.com/labstack/echo/v4"
 )
 
 type IndexData struct {
@@ -39,17 +38,8 @@ func newMockHealthCheck(domain string) *HealthCheck {
 	}
 }
 
-func (h *BaseHandler) Index(w http.ResponseWriter, r *http.Request) {
-	ts, err := template.ParseFS(templates.Templates,
-		"components/base.tmpl",
-		"pages/index.tmpl",
-	)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = ts.ExecuteTemplate(w, "base", &IndexData{
+func (h *BaseHandler) Index(c echo.Context) error {
+	return c.Render(http.StatusOK, "index.tmpl", &IndexData{
 		Base: &components.Base{
 			NavbarActive: GetPageByTitle(Pages, "Status"),
 			Navbar:       Pages,
@@ -61,7 +51,4 @@ func (h *BaseHandler) Index(w http.ResponseWriter, r *http.Request) {
 			newMockHealthCheck("foo.example.net"),
 		},
 	})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }

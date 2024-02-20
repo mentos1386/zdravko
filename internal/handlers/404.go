@@ -1,33 +1,15 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
-	"text/template"
 
-	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
+	"github.com/labstack/echo/v4"
 )
 
-func (h *BaseHandler) Error404(w http.ResponseWriter, r *http.Request) {
-	ts, err := template.ParseFS(templates.Templates,
-		"components/base.tmpl",
-		"pages/404.tmpl",
-	)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusNotFound)
-
-	err = ts.ExecuteTemplate(w, "base", &components.Base{
+func (h *BaseHandler) Error404(c echo.Context) error {
+	return c.Render(http.StatusNotFound, "404.tmpl", &components.Base{
 		NavbarActive: nil,
 		Navbar:       Pages,
 	})
-	if err != nil {
-		fmt.Println("Error", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 }
