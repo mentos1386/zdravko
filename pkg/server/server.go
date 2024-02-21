@@ -16,13 +16,14 @@ import (
 )
 
 type Server struct {
-	server *http.Server
-	cfg    *config.ServerConfig
+	echo *echo.Echo
+	cfg  *config.ServerConfig
 }
 
 func NewServer(cfg *config.ServerConfig) (*Server, error) {
 	return &Server{
-		cfg: cfg,
+		cfg:  cfg,
+		echo: echo.New(),
 	}, nil
 }
 
@@ -31,10 +32,9 @@ func (s *Server) Name() string {
 }
 
 func (s *Server) Start() error {
-	e := echo.New()
-	e.Renderer = templates.NewTemplates()
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	s.echo.Renderer = templates.NewTemplates()
+	s.echo.Use(middleware.Logger())
+	s.echo.Use(middleware.Recover())
 
 	db, query, err := internal.ConnectToDatabase(s.cfg.DatabasePath)
 	if err != nil {
@@ -51,7 +51,7 @@ func (s *Server) Start() error {
 	h := handlers.NewBaseHandler(db, query, temporalClient, s.cfg)
 
 	// Health
-	e.GET("/health", func(c echo.Context) error {
+	s.echo.GET("/health", func(c echo.Context) error {
 		d, err := db.DB()
 		if err != nil {
 			return err
@@ -65,16 +65,16 @@ func (s *Server) Start() error {
 	})
 
 	// Server static files
-	stat := e.Group("/static")
+	stat := s.echo.Group("/static")
 	stat.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Filesystem: http.FS(static.Static),
 	}))
 
 	// Public
-	e.GET("", h.Index)
+	s.echo.GET("", h.Index)
 
 	// Settings
-	settings := e.Group("/settings")
+	settings := s.echo.Group("/settings")
 	settings.Use(h.Authenticated)
 	settings.GET("", h.SettingsOverviewGET)
 	settings.GET("/healthchecks", h.SettingsHealthchecksGET)
@@ -89,19 +89,19 @@ func (s *Server) Start() error {
 	settings.Match([]string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"}, "/temporal*", h.Temporal)
 
 	// OAuth2
-	oauth2 := e.Group("/oauth2")
+	oauth2 := s.echo.Group("/oauth2")
 	oauth2.GET("/login", h.OAuth2LoginGET)
 	oauth2.GET("/callback", h.OAuth2CallbackGET)
 	oauth2.GET("/logout", h.OAuth2LogoutGET, h.Authenticated)
 
 	// API
-	apiv1 := e.Group("/api/v1")
+	apiv1 := s.echo.Group("/api/v1")
 	apiv1.Use(h.Authenticated)
 	apiv1.GET("/workers/connect", h.ApiV1WorkersConnectGET)
 	apiv1.POST("/healthcheck/:slug/history", h.ApiV1HealthchecksHistoryPOST)
 
 	// Error handler
-	e.HTTPErrorHandler = func(err error, c echo.Context) {
+	s.echo.HTTPErrorHandler = func(err error, c echo.Context) {
 		code := http.StatusInternalServerError
 		if he, ok := err.(*echo.HTTPError); ok {
 			code = he.Code
@@ -114,10 +114,10 @@ func (s *Server) Start() error {
 		_ = c.String(code, err.Error())
 	}
 
-	return e.Start(":" + s.cfg.Port)
+	return s.echo.Start(":" + s.cfg.Port)
 }
 
 func (s *Server) Stop() error {
 	ctx := context.Background()
-	return s.server.Shutdown(ctx)
+	return s.echo.Shutdown(ctx)
 }

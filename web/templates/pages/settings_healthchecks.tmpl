@@ -1,6 +1,6 @@
 {{define "settings"}}
 
-{{ $description := "Healthchecks represent periodic checks of some HTTP or TCP service, to see if it's responding correctly to deterime if it's healthy or not." }}
+{{ $description := "Healthchecks represent periodicly the k6 script, to see if the monitored service is healthy." }}
 
 {{ if eq .HealthchecksLength 0 }}
 <section>
@@ -24,7 +24,7 @@
     <table class="w-full text-sm text-left rtl:text-right text-gray-500">
         <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
           List of Healthchecks
-          <div class="mt-1 flex">
+          <div class="mt-1 gap-4 flex justify-between">
             <p class="mt-1 text-sm font-normal text-gray-500">
               {{ $description }}
             </p>
@@ -41,9 +41,6 @@
                 </th>
                 <th scope="col" class="px-6 py-3">
                     Worker Groups
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Type
                 </th>
                 <th scope="col" class="px-6 py-3">
                     Status
@@ -66,9 +63,6 @@
                     {{range .WorkerGroups}}
                       {{ . }}
                     {{end}}
-                </td>
-                  <td class="px-6 py-4">
-                    HTTP
                 </td>
                 <td class="px-6 py-4">
                     OK

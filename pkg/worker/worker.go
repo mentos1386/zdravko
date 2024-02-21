@@ -5,11 +5,13 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"code.tjo.space/mentos1386/zdravko/internal/activities"
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/temporal"
 	"code.tjo.space/mentos1386/zdravko/internal/workflows"
+	"code.tjo.space/mentos1386/zdravko/pkg/retry"
 	"github.com/pkg/errors"
 	"go.temporal.io/sdk/worker"
 )
@@ -29,23 +31,25 @@ func getConnectionConfig(token string, apiUrl string) (*ConnectionConfig, error)
 	}
 	req.Header.Add("Authorization", "Bearer "+token)
 
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to connect to API")
-	}
+	return retry.Retry(10, 3*time.Second, func() (*ConnectionConfig, error) {
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to connect to API")
+		}
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to read response body")
-	}
+		body, err := io.ReadAll(res.Body)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to read response body")
+		}
 
-	config := ConnectionConfig{}
-	err = json.Unmarshal(body, &config)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal connection config")
-	}
+		config := ConnectionConfig{}
+		err = json.Unmarshal(body, &config)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to unmarshal connection config")
+		}
 
-	return &config, nil
+		return &config, nil
+	})
 }
 
 type Worker struct {
