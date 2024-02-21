@@ -82,10 +82,10 @@ func (w *Worker) Start() error {
 	w.worker = worker.New(temporalClient, config.Group, worker.Options{})
 
 	// Register Workflows
-	w.worker.RegisterWorkflow(workflows.HealthcheckHttpWorkflowDefinition)
+	w.worker.RegisterWorkflow(workflows.HealthcheckWorkflowDefinition)
 
 	// Register Activities
-	w.worker.RegisterActivity(activities.HealthcheckHttp)
+	w.worker.RegisterActivity(activities.Healthcheck)
 
 	return w.worker.Run(worker.InterruptCh())
 }

@@ -2,55 +2,45 @@ package activities
 
 import (
 	"context"
-	"log"
 	"net/http"
+
+	"code.tjo.space/mentos1386/zdravko/pkg/k6"
+	"go.k6.io/k6/cmd/state"
 )
 
-type HealtcheckHttpParam struct {
-	Url    string
-	Method string
+type HealtcheckParam struct {
+	Script string
 }
 
-type HealthcheckHttpResult struct {
+type HealthcheckResult struct {
 	StatusCode int
 }
 
-func HealthcheckHttp(ctx context.Context, param HealtcheckHttpParam) (*HealthcheckHttpResult, error) {
-	if param.Method == "" {
-		param.Method = "GET"
-	}
+func Healthcheck(ctx context.Context, param HealtcheckParam) (*HealthcheckResult, error) {
 
-	var (
-		response *http.Response
-		err      error
-	)
+	statusCode := http.StatusOK // FIXME
 
-	switch param.Method {
-	case "GET":
-		response, err = http.Get(param.Url)
-	case "POST":
-		response, err = http.Post(param.Url, "application/json", nil)
-	}
+	state := state.NewGlobalState(ctx)
+	execution := k6.NewExecution(state, param.Script)
 
+	err := execution.Start(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Printf("HealthcheckHttpActivityDefinition produced statuscode %d for url %s", response.StatusCode, param.Url)
-
-	return &HealthcheckHttpResult{StatusCode: response.StatusCode}, nil
+	return &HealthcheckResult{StatusCode: statusCode}, nil
 }
 
-type HealtcheckHttpAddToHistoryParam struct {
+type HealtcheckAddToHistoryParam struct {
 	Id         string
 	Success    bool
 	StatusCode int
 }
 
-type HealthcheckHttpAddToHistoryResult struct {
+type HealthcheckAddToHistoryResult struct {
 }
 
-func HealthcheckHttpAddToHistory(ctx context.Context, param HealtcheckHttpAddToHistoryParam) (*HealthcheckHttpAddToHistoryResult, error) {
+func HealthcheckAddToHistory(ctx context.Context, param HealtcheckAddToHistoryParam) (*HealthcheckAddToHistoryResult, error) {
 
-	return &HealthcheckHttpAddToHistoryResult{}, nil
+	return &HealthcheckAddToHistoryResult{}, nil
 }

@@ -17,16 +17,19 @@
       <input type="text" name="schedule" id="schedule" placeholder="* * * * *" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"/>
     </div>
     <div class="mb-5">
-      <label for="url" class="block mb-2 text-sm font-medium text-gray-900">Url</label>
-      <input type="url" name="url" id="url" placeholder="https://github.com" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"/>
-    </div>
-    <div class="mb-5">
-      <label for="method" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">HTTP Method</label>
-      <select id="method" name="method" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        <option>GET</option>
-        <option>POST</option>
-        <option>PUT</option>
-      </select>
+      <label for="script" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your message</label>
+      <textarea id="script" name="script" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="import http from 'k6/http';
+import { sleep } from 'k6';
+
+export const options = {
+  vus: 10, // not working atm
+  duration: '30s', // not working atm
+};
+
+export default function () {
+  http.get('https://test.k6.io');
+  sleep(1);
+}"></textarea>
     </div>
     <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Create</button>
   </form>

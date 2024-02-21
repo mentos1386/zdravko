@@ -35,13 +35,13 @@ func (h *BaseHandler) ApiV1HealthchecksHistoryPOST(c echo.Context) error {
 
 	slug := c.Param("slug")
 
-	healthcheck, err := services.GetHealthcheckHttp(ctx, h.query, slug)
+	healthcheck, err := services.GetHealthcheck(ctx, h.query, slug)
 	if err != nil {
 		return err
 	}
 
-	err = h.query.HealthcheckHttp.History.Model(healthcheck).Append(
-		&models.HealthcheckHttpHistory{
+	err = h.query.Healthcheck.History.Model(healthcheck).Append(
+		&models.HealthcheckHistory{
 			Status: "UP",
 		})
 	if err != nil {

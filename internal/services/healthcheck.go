@@ -12,34 +12,34 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateHealthcheckHttp(ctx context.Context, db *gorm.DB, healthcheck *models.HealthcheckHttp) error {
+func CreateHealthcheck(ctx context.Context, db *gorm.DB, healthcheck *models.Healthcheck) error {
 	return db.WithContext(ctx).Create(healthcheck).Error
 }
 
-func GetHealthcheckHttp(ctx context.Context, q *query.Query, slug string) (*models.HealthcheckHttp, error) {
-	log.Println("GetHealthcheckHttp")
-	return q.HealthcheckHttp.WithContext(ctx).Where(
-		q.HealthcheckHttp.Slug.Eq(slug),
+func GetHealthcheck(ctx context.Context, q *query.Query, slug string) (*models.Healthcheck, error) {
+	log.Println("GetHealthcheck")
+	return q.Healthcheck.WithContext(ctx).Where(
+		q.Healthcheck.Slug.Eq(slug),
 	).First()
 }
 
-func StartHealthcheckHttp(ctx context.Context, t client.Client, healthcheckHttp *models.HealthcheckHttp) error {
-	log.Println("Starting HealthcheckHttp Workflow")
+func StartHealthcheck(ctx context.Context, t client.Client, healthcheck *models.Healthcheck) error {
+	log.Println("Starting Healthcheck Workflow")
 
 	args := make([]interface{}, 0)
-	args = append(args, workflows.HealthcheckHttpWorkflowParam{Url: healthcheckHttp.Url, Method: healthcheckHttp.Method})
+	args = append(args, workflows.HealthcheckWorkflowParam{Script: healthcheck.Script})
 
-	id := "healthcheck-http-" + healthcheckHttp.Slug
+	id := "healthcheck-" + healthcheck.Slug
 
-	for _, group := range healthcheckHttp.WorkerGroups {
+	for _, group := range healthcheck.WorkerGroups {
 		_, err := t.ScheduleClient().Create(ctx, client.ScheduleOptions{
 			ID: id + "-" + group,
 			Spec: client.ScheduleSpec{
-				CronExpressions: []string{healthcheckHttp.Schedule},
+				CronExpressions: []string{healthcheck.Schedule},
 			},
 			Action: &client.ScheduleWorkflowAction{
 				ID:        id + "-" + group,
-				Workflow:  workflows.HealthcheckHttpWorkflowDefinition,
+				Workflow:  workflows.HealthcheckWorkflowDefinition,
 				Args:      args,
 				TaskQueue: group,
 				RetryPolicy: &temporal.RetryPolicy{
@@ -55,6 +55,6 @@ func StartHealthcheckHttp(ctx context.Context, t client.Client, healthcheckHttp 
 	return nil
 }
 
-func CreateHealthcheckHistory(ctx context.Context, db *gorm.DB, healthcheckHistory *models.HealthcheckHttpHistory) error {
+func CreateHealthcheckHistory(ctx context.Context, db *gorm.DB, healthcheckHistory *models.HealthcheckHistory) error {
 	return db.WithContext(ctx).Create(healthcheckHistory).Error
 }

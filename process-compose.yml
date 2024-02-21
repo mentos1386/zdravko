@@ -1,11 +1,15 @@
 version: "0.5"
 
 processes:
-  tailwind:
-    command: watchexec -r -e go,tmpl,css just _tailwindcss-build
+  server:
+    command: watchexec -r -e go,tmpl,css just run-server
     availability:
       restart: "always"
-  zdravko:
-    command: watchexec -r -e go,tmpl,css just run-server
+  temporal:
+    command: watchexec -r -e go,tmpl,css just run-temporal
+    availability:
+      restart: "always"
+  tailwind:
+    command: watchexec -r -e go,tmpl,css just _tailwindcss-build
     availability:
       restart: "always"

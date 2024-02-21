@@ -22,28 +22,15 @@ type Worker struct {
 
 type Healthcheck struct {
 	gorm.Model
-	Slug             string `gorm:"unique"`
-	Name             string `gorm:"unique" validate:"required"`
-	Status           string // UP, DOWN
-	UptimePercentage float64
-	Schedule         string         `validate:"required,cron"`
-	WorkerGroups     pq.StringArray `gorm:"type:text[]"`
-}
+	Slug string `gorm:"unique"`
+	Name string `gorm:"unique" validate:"required"`
 
-type HealthcheckHttp struct {
-	gorm.Model
-	Healthcheck
-	Url    string `validate:"required,url"`
-	Method string `validate:"required,oneof=GET POST"`
+	Schedule     string         `validate:"required,cron"`
+	WorkerGroups pq.StringArray `gorm:"type:text[]"`
 
-	History []HealthcheckHttpHistory `gorm:"foreignKey:ID"`
-}
+	Script string `validate:"required"`
 
-type HealthcheckTcp struct {
-	gorm.Model
-	Healthcheck
-	Hostname string `validate:"required,hostname"`
-	Port     int    `validate:"required,gte=1,lte=65535"`
+	History []HealthcheckHistory `gorm:"foreignKey:ID"`
 }
 
 type Cronjob struct {
@@ -54,16 +41,10 @@ type Cronjob struct {
 	Buffer   int
 }
 
-type HealthcheckHttpHistory struct {
+type HealthcheckHistory struct {
 	gorm.Model
-	HealthcheckHTTP HealthcheckHttp `gorm:"foreignkey:ID"`
-	Status          string
-}
-
-type HealthcheckTcpHistory struct {
-	gorm.Model
-	HealthcheckTCP HealthcheckTcp `gorm:"foreignkey:ID"`
-	Status         string
+	Healthcheck Healthcheck `gorm:"foreignkey:ID"`
+	Status      string
 }
 
 type CronjobHistory struct {

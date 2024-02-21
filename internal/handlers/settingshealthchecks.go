@@ -16,19 +16,19 @@ import (
 
 type SettingsHealthchecks struct {
 	*Settings
-	Healthchecks       []*models.HealthcheckHttp
+	Healthchecks       []*models.Healthcheck
 	HealthchecksLength int
 }
 
 type SettingsHealthcheck struct {
 	*Settings
-	Healthcheck *models.HealthcheckHttp
+	Healthcheck *models.Healthcheck
 }
 
 func (h *BaseHandler) SettingsHealthchecksGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
-	healthchecks, err := h.query.HealthcheckHttp.WithContext(context.Background()).Find()
+	healthchecks, err := h.query.Healthcheck.WithContext(context.Background()).Find()
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (h *BaseHandler) SettingsHealthchecksDescribeGET(c echo.Context) error {
 
 	slug := c.Param("slug")
 
-	healthcheck, err := services.GetHealthcheckHttp(context.Background(), h.query, slug)
+	healthcheck, err := services.GetHealthcheck(context.Background(), h.query, slug)
 	if err != nil {
 		return err
 	}
@@ -86,15 +86,12 @@ func (h *BaseHandler) SettingsHealthchecksCreateGET(c echo.Context) error {
 func (h *BaseHandler) SettingsHealthchecksCreatePOST(c echo.Context) error {
 	ctx := context.Background()
 
-	healthcheckHttp := &models.HealthcheckHttp{
-		Healthcheck: models.Healthcheck{
-			Name:         c.FormValue("name"),
-			Slug:         slug.Make(c.FormValue("name")),
-			Schedule:     c.FormValue("schedule"),
-			WorkerGroups: strings.Split(c.FormValue("workergroups"), ","),
-		},
-		Url:    c.FormValue("url"),
-		Method: c.FormValue("method"),
+	healthcheckHttp := &models.Healthcheck{
+		Name:         c.FormValue("name"),
+		Slug:         slug.Make(c.FormValue("name")),
+		Schedule:     c.FormValue("schedule"),
+		WorkerGroups: strings.Split(c.FormValue("workergroups"), ","),
+		Script:       c.FormValue("script"),
 	}
 
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(healthcheckHttp)
@@ -102,7 +99,7 @@ func (h *BaseHandler) SettingsHealthchecksCreatePOST(c echo.Context) error {
 		return err
 	}
 
-	err = services.CreateHealthcheckHttp(
+	err = services.CreateHealthcheck(
 		ctx,
 		h.db,
 		healthcheckHttp,
@@ -111,7 +108,7 @@ func (h *BaseHandler) SettingsHealthchecksCreatePOST(c echo.Context) error {
 		return err
 	}
 
-	err = services.StartHealthcheckHttp(ctx, h.temporal, healthcheckHttp)
+	err = services.StartHealthcheck(ctx, h.temporal, healthcheckHttp)
 	if err != nil {
 		return err
 	}

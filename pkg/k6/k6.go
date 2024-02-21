@@ -150,7 +150,9 @@ func (lt *loadedTest) consolidateDeriveAndValidateConfig(
 	gs *state.GlobalState,
 ) (*loadedAndConfiguredTest, error) {
 	gs.Logger.Debug("Consolidating config layers...")
+
 	config := lib.Options{}
+
 	config.Apply(lt.initRunner.GetOptions())
 	if config.SystemTags == nil {
 		config.SystemTags = &metrics.DefaultSystemTagSet
@@ -252,7 +254,7 @@ func (lct *loadedAndConfiguredTest) buildTestRunState(
 	return &lib.TestRunState{
 		TestPreInitState: lct.preInitState,
 		Runner:           lct.initRunner,
-		Options:          lct.config, // we will always run with the derived options
+		Options:          lct.config,
 		RunTags:          lct.preInitState.Registry.RootTagSet().WithTagsFromMap(configToReinject.RunTags),
 	}, nil
 }
