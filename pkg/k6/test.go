@@ -52,8 +52,8 @@ func (lt *loadedTest) consolidateDeriveAndValidateConfig() (*loadedAndConfigured
 	lt.logger.Debug("Consolidating config layers...")
 
 	config := lib.Options{}
+	config = config.Apply(lt.initRunner.GetOptions())
 
-	config.Apply(lt.initRunner.GetOptions())
 	if config.SystemTags == nil {
 		config.SystemTags = &metrics.DefaultSystemTagSet
 	}

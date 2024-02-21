@@ -136,7 +136,7 @@ func (e *Execution) setupTracerProvider(ctx context.Context, test *loadedAndConf
 	return nil
 }
 
-func (e *Execution) Start(ctx context.Context) error {
+func (e *Execution) Run(ctx context.Context) error {
 	var err error
 	var logger logrus.FieldLogger = logrus.StandardLogger()
 

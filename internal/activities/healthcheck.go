@@ -22,7 +22,7 @@ func Healthcheck(ctx context.Context, param HealtcheckParam) (*HealthcheckResult
 
 	execution := k6.NewExecution(slog.Default(), param.Script)
 
-	err := execution.Start(ctx)
+	err := execution.Run(ctx)
 	if err != nil {
 		return nil, err
 	}
