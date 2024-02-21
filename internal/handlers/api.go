@@ -6,6 +6,7 @@ import (
 
 	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
+	"code.tjo.space/mentos1386/zdravko/pkg/api"
 	"github.com/labstack/echo/v4"
 )
 
@@ -35,6 +36,12 @@ func (h *BaseHandler) ApiV1HealthchecksHistoryPOST(c echo.Context) error {
 
 	slug := c.Param("slug")
 
+	var body api.ApiV1HealthchecksHistoryPOSTBody
+	err := (&echo.DefaultBinder{}).BindBody(c, &body)
+	if err != nil {
+		return err
+	}
+
 	healthcheck, err := services.GetHealthcheck(ctx, h.query, slug)
 	if err != nil {
 		return err
@@ -42,7 +49,8 @@ func (h *BaseHandler) ApiV1HealthchecksHistoryPOST(c echo.Context) error {
 
 	err = h.query.Healthcheck.History.Model(healthcheck).Append(
 		&models.HealthcheckHistory{
-			Status: "UP",
+			Status: body.Status,
+			Note:   body.Note,
 		})
 	if err != nil {
 		return err

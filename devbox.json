@@ -5,6 +5,7 @@
     "watchexec@latest",
     "tailwindcss@latest",
     "flyctl@latest",
-    "just@latest"
+    "just@latest",
+    "nodePackages.npm@latest"
   ]
 }

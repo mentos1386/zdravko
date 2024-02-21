@@ -27,9 +27,11 @@ func StartHealthcheck(ctx context.Context, t client.Client, healthcheck *models.
 	log.Println("Starting Healthcheck Workflow")
 
 	args := make([]interface{}, 0)
-	args = append(args, workflows.HealthcheckWorkflowParam{Script: healthcheck.Script})
+	args = append(args, workflows.HealthcheckWorkflowParam{Script: healthcheck.Script, Slug: healthcheck.Slug})
 
 	id := "healthcheck-" + healthcheck.Slug
+
+	fakeWorkflows := workflows.NewWorkflows(nil)
 
 	for _, group := range healthcheck.WorkerGroups {
 		_, err := t.ScheduleClient().Create(ctx, client.ScheduleOptions{
@@ -39,7 +41,7 @@ func StartHealthcheck(ctx context.Context, t client.Client, healthcheck *models.
 			},
 			Action: &client.ScheduleWorkflowAction{
 				ID:        id + "-" + group,
-				Workflow:  workflows.HealthcheckWorkflowDefinition,
+				Workflow:  fakeWorkflows.HealthcheckWorkflowDefinition,
 				Args:      args,
 				TaskQueue: group,
 				RetryPolicy: &temporal.RetryPolicy{

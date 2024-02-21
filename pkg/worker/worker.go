@@ -11,6 +11,7 @@ import (
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/temporal"
 	"code.tjo.space/mentos1386/zdravko/internal/workflows"
+	"code.tjo.space/mentos1386/zdravko/pkg/api"
 	"code.tjo.space/mentos1386/zdravko/pkg/retry"
 	"github.com/pkg/errors"
 	"go.temporal.io/sdk/worker"
@@ -23,13 +24,10 @@ type ConnectionConfig struct {
 }
 
 func getConnectionConfig(token string, apiUrl string) (*ConnectionConfig, error) {
-	url := apiUrl + "/api/v1/workers/connect"
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := api.NewRequest(http.MethodGet, apiUrl+"/api/v1/workers/connect", token, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", "Bearer "+token)
 
 	return retry.Retry(10, 3*time.Second, func() (*ConnectionConfig, error) {
 		res, err := http.DefaultClient.Do(req)
@@ -82,14 +80,17 @@ func (w *Worker) Start() error {
 	}
 
 	// Create a new Worker
-	// TODO: Maybe identify by region or something?
 	w.worker = worker.New(temporalClient, config.Group, worker.Options{})
 
+	workerActivities := activities.NewActivities(w.cfg)
+	workerWorkflows := workflows.NewWorkflows(workerActivities)
+
 	// Register Workflows
-	w.worker.RegisterWorkflow(workflows.HealthcheckWorkflowDefinition)
+	w.worker.RegisterWorkflow(workerWorkflows.HealthcheckWorkflowDefinition)
 
 	// Register Activities
-	w.worker.RegisterActivity(activities.Healthcheck)
+	w.worker.RegisterActivity(workerActivities.Healthcheck)
+	w.worker.RegisterActivity(workerActivities.HealthcheckAddToHistory)
 
 	return w.worker.Run(worker.InterruptCh())
 }

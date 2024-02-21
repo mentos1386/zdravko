@@ -12,8 +12,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"go.k6.io/k6/errext"
-	"go.k6.io/k6/errext/exitcodes"
 	"go.k6.io/k6/event"
 	"go.k6.io/k6/execution"
 	"go.k6.io/k6/execution/local"
@@ -39,6 +37,11 @@ const (
 	waitForTracerProviderStopTimeout = 3 * time.Minute
 )
 
+type ExecutionResult struct {
+	Note    string
+	Success bool
+}
+
 type Execution struct {
 	FS     fsext.Fs
 	Env    map[string]string
@@ -53,6 +56,7 @@ type Execution struct {
 
 func NewExecution(logger *slog.Logger, script string) *Execution {
 	loggerCompat := logrus.StandardLogger()
+	loggerCompat.SetLevel(logrus.DebugLevel)
 
 	return &Execution{
 		FS:           fsext.NewOsFs(),
@@ -136,10 +140,7 @@ func (e *Execution) setupTracerProvider(ctx context.Context, test *loadedAndConf
 	return nil
 }
 
-func (e *Execution) Run(ctx context.Context) error {
-	var err error
-	var logger logrus.FieldLogger = logrus.StandardLogger()
-
+func (e *Execution) Run(ctx context.Context) (result *ExecutionResult, err error) {
 	globalCtx, globalCancel := context.WithCancel(ctx)
 	defer globalCancel()
 
@@ -151,7 +152,7 @@ func (e *Execution) Run(ctx context.Context) error {
 	// runCtx is used for the test run execution and is created with the special
 	// execution.NewTestRunContext() function so that it can be aborted even
 	// from sub-contexts while also attaching a reason for the abort.
-	runCtx, runAbort := execution.NewTestRunContext(lingerCtx, logger)
+	runCtx, runAbort := execution.NewTestRunContext(lingerCtx, e.LoggerCompat)
 
 	emitEvent := func(evt *event.Event) func() {
 		waitDone := e.Events.Emit(evt)
@@ -159,7 +160,7 @@ func (e *Execution) Run(ctx context.Context) error {
 			waitCtx, waitCancel := context.WithTimeout(globalCtx, waitEventDoneTimeout)
 			defer waitCancel()
 			if werr := waitDone(waitCtx); werr != nil {
-				logger.WithError(werr).Warn()
+				e.Logger.With(werr).Warn("")
 			}
 		}
 	}
@@ -175,17 +176,17 @@ func (e *Execution) Run(ctx context.Context) error {
 
 	configuredTest, controller, err := e.loadLocalTest()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if err = e.setupTracerProvider(globalCtx, configuredTest); err != nil {
-		return err
+		return nil, err
 	}
 	waitTracesFlushed := func() {
 		ctx, cancel := context.WithTimeout(globalCtx, waitForTracerProviderStopTimeout)
 		defer cancel()
 		if tpErr := configuredTest.preInitState.TracerProvider.Shutdown(ctx); tpErr != nil {
-			logger.Errorf("The tracer provider didn't stop gracefully: %v", tpErr)
+			e.Logger.Error("The tracer provider didn't stop gracefully", tpErr)
 		}
 	}
 
@@ -193,14 +194,14 @@ func (e *Execution) Run(ctx context.Context) error {
 	conf := configuredTest.config
 	testRunState, err := configuredTest.buildTestRunState(conf)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Create a local execution scheduler wrapping the runner.
-	logger.Debug("Initializing the execution scheduler...")
+	e.Logger.Debug("Initializing the execution scheduler...")
 	execScheduler, err := execution.NewScheduler(testRunState, controller)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	backgroundProcesses := &sync.WaitGroup{}
@@ -210,9 +211,9 @@ func (e *Execution) Run(ctx context.Context) error {
 	// executionPlan := execScheduler.GetExecutionPlan()
 	outputs := []output.Output{}
 
-	metricsEngine, err := engine.NewMetricsEngine(testRunState.Registry, logger)
+	metricsEngine, err := engine.NewMetricsEngine(testRunState.Registry, e.LoggerCompat)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// We'll need to pipe metrics to the MetricsEngine and process them if any
@@ -223,7 +224,7 @@ func (e *Execution) Run(ctx context.Context) error {
 	if shouldProcessMetrics {
 		err = metricsEngine.InitSubMetricsAndThresholds(conf, testRunState.RuntimeOptions.NoThresholds.Bool)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		// We'll need to pipe metrics to the MetricsEngine if either the
 		// thresholds or the end-of-test summary are enabled.
@@ -234,7 +235,7 @@ func (e *Execution) Run(ctx context.Context) error {
 	executionState := execScheduler.GetState()
 	if !testRunState.RuntimeOptions.NoSummary.Bool {
 		defer func() {
-			logger.Debug("Generating the end-of-test summary...")
+			e.Logger.Debug("Generating the end-of-test summary...")
 			summaryResult, hsErr := configuredTest.initRunner.HandleSummary(globalCtx, &lib.Summary{
 				Metrics:         metricsEngine.ObservedMetrics,
 				RootGroup:       testRunState.Runner.GetDefaultGroup(),
@@ -249,21 +250,21 @@ func (e *Execution) Run(ctx context.Context) error {
 				for _, o := range summaryResult {
 					_, err := io.Copy(os.Stdout, o)
 					if err != nil {
-						logger.WithError(err).Error("failed to write summary output")
+						e.Logger.With(err).Error("failed to write summary output")
 					}
 				}
 			}
 			if hsErr != nil {
-				logger.WithError(hsErr).Error("failed to handle the end-of-test summary")
+				e.Logger.With(hsErr).Error("failed to handle the end-of-test summary")
 			}
 		}()
 	}
 
 	waitInitDone := emitEvent(&event.Event{Type: event.Init})
 
-	outputManager := output.NewManager(outputs, logger, func(err error) {
+	outputManager := output.NewManager(outputs, e.LoggerCompat, func(err error) {
 		if err != nil {
-			logger.WithError(err).Error("Received error to stop from output")
+			e.Logger.With(err).Error("Received error to stop from output")
 		}
 		// TODO: attach run status and exit code?
 		runAbort(err)
@@ -271,10 +272,10 @@ func (e *Execution) Run(ctx context.Context) error {
 	samples := make(chan metrics.SampleContainer, configuredTest.config.MetricSamplesBufferSize.Int64)
 	waitOutputsFlushed, stopOutputs, err := outputManager.Start(samples)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer func() {
-		logger.Debug("Stopping outputs...")
+		e.Logger.Debug("Stopping outputs...")
 		// We call waitOutputsFlushed() below because the threshold calculations
 		// need all of the metrics to be sent to the MetricsEngine before we can
 		// calculate them one last time. We need the threshold calculated here,
@@ -286,35 +287,29 @@ func (e *Execution) Run(ctx context.Context) error {
 		finalizeThresholds := metricsEngine.StartThresholdCalculations(
 			metricsIngester, runAbort, executionState.GetCurrentTestRunDuration,
 		)
-		handleFinalThresholdCalculation := func() {
-			// This gets called after the Samples channel has been closed and
-			// the OutputManager has flushed all of the cached samples to
-			// outputs (including MetricsEngine's ingester). So we are sure
-			// there won't be any more metrics being sent.
-			logger.Debug("Finalizing thresholds...")
-			breachedThresholds := finalizeThresholds()
-			if len(breachedThresholds) == 0 {
-				return
-			}
-			tErr := errext.WithAbortReasonIfNone(
-				errext.WithExitCodeIfNone(
-					fmt.Errorf("thresholds on metrics '%s' have been crossed", strings.Join(breachedThresholds, ", ")),
-					exitcodes.ThresholdsHaveFailed,
-				), errext.AbortedByThresholdsAfterTestEnd)
-
-			if err == nil {
-				err = tErr
-			} else {
-				logger.WithError(tErr).Debug("Crossed thresholds, but test already exited with another error")
-			}
-		}
 		if finalizeThresholds != nil {
-			defer handleFinalThresholdCalculation()
+			defer func() {
+				// This gets called after the Samples channel has been closed and
+				// the OutputManager has flushed all of the cached samples to
+				// outputs (including MetricsEngine's ingester). So we are sure
+				// there won't be any more metrics being sent.
+				e.Logger.Debug("Finalizing thresholds...")
+				breachedThresholds := finalizeThresholds()
+				if len(breachedThresholds) == 0 {
+					return
+				}
+				if err == nil {
+					result = &ExecutionResult{
+						Success: false,
+						Note:    fmt.Sprintf("thresholds on metrics '%s' have been crossed", strings.Join(breachedThresholds, ", ")),
+					}
+				}
+			}()
 		}
 	}
 
 	defer func() {
-		logger.Debug("Waiting for metrics and traces processing to finish...")
+		e.Logger.Debug("Waiting for metrics and traces processing to finish...")
 		close(samples)
 
 		ww := [...]func(){
@@ -332,13 +327,13 @@ func (e *Execution) Run(ctx context.Context) error {
 		}
 		wg.Wait()
 
-		logger.Debug("Metrics and traces processing finished!")
+		e.Logger.Debug("Metrics and traces processing finished!")
 	}()
 
 	// Initialize the VUs and executors
 	stopVUEmission, err := execScheduler.Init(runCtx, samples)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer stopVUEmission()
 
@@ -357,16 +352,16 @@ func (e *Execution) Run(ctx context.Context) error {
 	// Check what the execScheduler.Run() error is.
 	if err != nil {
 		err = common.UnwrapGojaInterruptedError(err)
-		logger.WithError(err).Debug("Test finished with an error")
-		return err
+		e.Logger.With(err).Debug("Test finished with an error")
+		return nil, err
 	}
 
 	// Warn if no iterations could be completed.
 	if executionState.GetFullIterationCount() == 0 {
-		logger.Warn("No script iterations fully finished, consider making the test duration longer")
+		e.Logger.Warn("No script iterations fully finished, consider making the test duration longer")
 	}
 
-	logger.Debug("Test finished cleanly")
+	e.Logger.Debug("Test finished cleanly")
 
-	return nil
+	return &ExecutionResult{Success: true, Note: ""}, nil
 }

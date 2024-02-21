@@ -98,7 +98,7 @@ func (s *Server) Start() error {
 	apiv1 := s.echo.Group("/api/v1")
 	apiv1.Use(h.Authenticated)
 	apiv1.GET("/workers/connect", h.ApiV1WorkersConnectGET)
-	apiv1.POST("/healthcheck/:slug/history", h.ApiV1HealthchecksHistoryPOST)
+	apiv1.POST("/healthchecks/:slug/history", h.ApiV1HealthchecksHistoryPOST)
 
 	// Error handler
 	s.echo.HTTPErrorHandler = func(err error, c echo.Context) {

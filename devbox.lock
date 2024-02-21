@@ -61,6 +61,20 @@
         }
       }
     },
+    "nodePackages.npm@latest": {
+      "last_modified": "2024-02-15T12:53:33Z",
+      "resolved": "github:NixOS/nixpkgs/085589047343aad800c4d305cf7b98e8a3d51ae2#nodePackages.npm",
+      "source": "devbox-search",
+      "version": "10.4.0",
+      "systems": {
+        "aarch64-linux": {
+          "store_path": "/nix/store/06ywqfygg4xc4rwvp40ksrrvsspnpxyl-npm-10.4.0"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/p5hi9rp2qhhfw2ih4wgb1waplmwrkjqc-npm-10.4.0"
+        }
+      }
+    },
     "tailwindcss@latest": {
       "last_modified": "2024-01-27T14:55:31Z",
       "resolved": "github:NixOS/nixpkgs/160b762eda6d139ac10ae081f8f78d640dd523eb#tailwindcss",

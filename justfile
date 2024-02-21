@@ -35,7 +35,7 @@ run-temporal:
 
 # Test
 test:
-  go test -v -cover ./...
+  go test -v ./...
 
 # Generates new jwt key pair
 generate-jwt-key:
@@ -94,6 +94,20 @@ _tailwindcss-build:
 _htmx-download:
   mkdir -p  {{STATIC_DIR}}/js
   curl -sLo {{STATIC_DIR}}/js/htmx.min.js https://unpkg.com/htmx.org/dist/htmx.min.js
+
+_monaco-download:
+  rm -rf {{STATIC_DIR}}/monaco
+  npm install monaco-editor@0.46.0
+  mv node_modules/monaco-editor/min {{STATIC_DIR}}/monaco
+  rm -rf node_modules
+
+  # We onlt care about javascript language
+  find {{STATIC_DIR}}/monaco/vs/basic-languages/ \
+    -type d \
+    -not -name 'javascript' \
+    -not -name 'typescript' \
+    -not -name 'basic-languages' \
+    -prune -exec rm -rf {} \;
 
 _feather-icons-download:
   mkdir -p {{STATIC_DIR}}/icons

@@ -3,12 +3,23 @@ package k6
 import (
 	"context"
 	"log/slog"
+	"os"
 	"testing"
 )
 
+func getLogger() *slog.Logger {
+	opts := &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}
+
+	handler := slog.NewTextHandler(os.Stdout, opts)
+
+	return slog.New(handler)
+}
+
 func TestK6Success(t *testing.T) {
 	ctx := context.Background()
-	logger := slog.Default()
+	logger := getLogger()
 
 	script := `
 import http from 'k6/http';
@@ -27,15 +38,18 @@ export default function () {
 
 	execution := NewExecution(logger, script)
 
-	err := execution.Run(ctx)
+	result, err := execution.Run(ctx)
 	if err != nil {
 		t.Errorf("Error starting execution: %v", err)
+	}
+	if result != nil {
+		t.Logf("Result: %v", result)
 	}
 }
 
 func TestK6Fail(t *testing.T) {
 	ctx := context.Background()
-	logger := slog.Default()
+	logger := getLogger()
 
 	script := `
 import http from 'k6/http';
@@ -55,8 +69,11 @@ export default function () {
 
 	execution := NewExecution(logger, script)
 
-	err := execution.Run(ctx)
+	result, err := execution.Run(ctx)
 	if err != nil {
 		t.Errorf("Error starting execution: %v", err)
+	}
+	if result != nil {
+		t.Logf("Result: %v", result)
 	}
 }

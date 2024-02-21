@@ -9,20 +9,38 @@ import (
 
 type HealthcheckWorkflowParam struct {
 	Script string
+	Slug   string
 }
 
-func HealthcheckWorkflowDefinition(ctx workflow.Context, param HealthcheckWorkflowParam) error {
+func (w *Workflows) HealthcheckWorkflowDefinition(ctx workflow.Context, param HealthcheckWorkflowParam) error {
 	options := workflow.ActivityOptions{
 		StartToCloseTimeout: 10 * time.Second,
 	}
 	ctx = workflow.WithActivityOptions(ctx, options)
 
-	activityParam := activities.HealtcheckParam{
+	heatlcheckParam := activities.HealtcheckParam{
 		Script: param.Script,
 	}
 
-	var result *activities.HealthcheckResult
-	err := workflow.ExecuteActivity(ctx, activities.Healthcheck, activityParam).Get(ctx, &result)
+	var healthcheckResult *activities.HealthcheckResult
+	err := workflow.ExecuteActivity(ctx, w.activities.Healthcheck, heatlcheckParam).Get(ctx, &healthcheckResult)
+	if err != nil {
+		return err
+	}
+
+	status := "failure"
+	if healthcheckResult.Success {
+		status = "success"
+	}
+
+	historyParam := activities.HealtcheckAddToHistoryParam{
+		Slug:   param.Slug,
+		Status: status,
+		Note:   healthcheckResult.Note,
+	}
+
+	var historyResult *activities.HealthcheckAddToHistoryResult
+	err = workflow.ExecuteActivity(ctx, w.activities.HealthcheckAddToHistory, historyParam).Get(ctx, &historyResult)
 	if err != nil {
 		return err
 	}

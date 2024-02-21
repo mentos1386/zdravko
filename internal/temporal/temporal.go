@@ -31,7 +31,7 @@ func ConnectServerToTemporal(cfg *config.ServerConfig) (client.Client, error) {
 	provider := &AuthHeadersProvider{token}
 
 	// Try to connect to the Temporal Server
-	return retry.Retry(5, 6*time.Second, func() (client.Client, error) {
+	return retry.Retry(10, 3*time.Second, func() (client.Client, error) {
 		return client.Dial(client.Options{
 			HostPort:        cfg.Temporal.ServerHost,
 			HeadersProvider: provider,

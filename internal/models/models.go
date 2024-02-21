@@ -44,7 +44,8 @@ type Cronjob struct {
 type HealthcheckHistory struct {
 	gorm.Model
 	Healthcheck Healthcheck `gorm:"foreignkey:ID"`
-	Status      string
+	Status      string      // SUCCESS, FAIL, ERROR
+	Note        string
 }
 
 type CronjobHistory struct {
