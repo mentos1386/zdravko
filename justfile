@@ -33,6 +33,10 @@ run-temporal:
   go build -o dist/zdravko cmd/zdravko/main.go
   ./dist/zdravko --temporal
 
+# Test
+test:
+  go test -v -cover ./...
+
 # Generates new jwt key pair
 generate-jwt-key:
   openssl genrsa -out jwt.private.pem 2048

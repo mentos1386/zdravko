@@ -10,10 +10,9 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
     - This means for main app db as well as temporal db.
  - [x] Single binary.
     - One binary to run worker, server and temporal all together.
- - [ ] Abbility for multiple workers.
+ - [x] Abbility for multiple workers.
     - Spread workers across regions to monitor latency from different locations.
- - [ ] HTTP Healthchecks.
- - [ ] TCP Healthchecks.
+ - [ ] Use [k6](https://github.com/grafana/k6) for checks, so that they can be written in javascript.
  - [ ] CronJob Healthchecks (via webhooks).
 
 ![Screenshot](docs/screenshot.png)
