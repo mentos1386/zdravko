@@ -12,7 +12,9 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
     - One binary to run worker, server and temporal all together.
  - [x] Abbility for multiple workers.
     - Spread workers across regions to monitor latency from different locations.
- - [ ] Use [k6](https://github.com/grafana/k6) for checks, so that they can be written in javascript.
+ - [x] Use [k6](https://github.com/grafana/k6) for checks, so that they can be written in javascript.
+ - [ ] History and working home page.
+ - [ ] Edit/Delete operations for healthchecks and workers.
  - [ ] CronJob Healthchecks (via webhooks).
 
 ![Screenshot](docs/screenshot.png)
