@@ -2,10 +2,10 @@ package activities
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"code.tjo.space/mentos1386/zdravko/pkg/k6"
-	"go.k6.io/k6/cmd/state"
 )
 
 type HealtcheckParam struct {
@@ -20,8 +20,7 @@ func Healthcheck(ctx context.Context, param HealtcheckParam) (*HealthcheckResult
 
 	statusCode := http.StatusOK // FIXME
 
-	state := state.NewGlobalState(ctx)
-	execution := k6.NewExecution(state, param.Script)
+	execution := k6.NewExecution(slog.Default(), param.Script)
 
 	err := execution.Start(ctx)
 	if err != nil {

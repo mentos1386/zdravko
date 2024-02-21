@@ -2,15 +2,13 @@ package k6
 
 import (
 	"context"
+	"log/slog"
 	"testing"
-
-	"go.k6.io/k6/cmd/state"
 )
 
 func TestK6(t *testing.T) {
 	ctx := context.Background()
-
-	state := state.NewGlobalState(ctx)
+	logger := slog.Default()
 
 	script := `
 import http from 'k6/http';
@@ -27,7 +25,7 @@ export default function () {
 }
 `
 
-	execution := NewExecution(state, script)
+	execution := NewExecution(logger, script)
 
 	err := execution.Start(ctx)
 	if err != nil {

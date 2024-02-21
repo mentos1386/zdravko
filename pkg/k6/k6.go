@@ -2,37 +2,29 @@ package k6
 
 import (
 	"context"
-	"crypto/x509"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/url"
+	"os"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"go.k6.io/k6/cmd/state"
 	"go.k6.io/k6/errext"
 	"go.k6.io/k6/errext/exitcodes"
 	"go.k6.io/k6/event"
 	"go.k6.io/k6/execution"
 	"go.k6.io/k6/execution/local"
-	"go.k6.io/k6/js"
 	"go.k6.io/k6/js/common"
-	"go.k6.io/k6/js/modules"
 	"go.k6.io/k6/lib"
-	"go.k6.io/k6/lib/executor"
 	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/lib/trace"
-	"go.k6.io/k6/lib/types"
 	"go.k6.io/k6/loader"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/metrics/engine"
 	"go.k6.io/k6/output"
-)
-
-const (
-	testTypeJS = "js"
 )
 
 const (
@@ -47,223 +39,85 @@ const (
 	waitForTracerProviderStopTimeout = 3 * time.Minute
 )
 
-// loadedTest contains all of data, details and dependencies of a loaded
-// k6 test, but without any config consolidation.
-type loadedTest struct {
-	sourceRootPath string // contains the raw string the user supplied
-	pwd            string
-	source         *loader.SourceData
-	fs             fsext.Fs
-	fileSystems    map[string]fsext.Fs
-	preInitState   *lib.TestPreInitState
-	initRunner     lib.Runner // TODO: rename to something more appropriate
-	keyLogger      io.Closer
-	moduleResolver *modules.ModuleResolver
+type Execution struct {
+	FS     fsext.Fs
+	Env    map[string]string
+	Events *event.System
+
+	LoggerCompat *logrus.Logger
+
+	Script string
+
+	Logger *slog.Logger
 }
 
-func loadLocalTest(gs *state.GlobalState, script string) (*loadedTest, error) {
-	src, fileSystems, pwd, err := readSource(gs, script)
-	if err != nil {
-		return nil, err
+func NewExecution(logger *slog.Logger, script string) *Execution {
+	loggerCompat := logrus.StandardLogger()
+
+	return &Execution{
+		FS:           fsext.NewOsFs(),
+		Env:          BuildEnvMap(os.Environ()),
+		Events:       event.NewEventSystem(100, loggerCompat),
+		LoggerCompat: loggerCompat,
+		Logger:       logger,
+		Script:       script,
 	}
-	resolvedPath := src.URL.String()
-	gs.Logger.Debugf(
-		"successfully loaded %d bytes!",
-		len(src.Data),
+}
+
+func (e *Execution) loadLocalTest() (*loadedAndConfiguredTest, *local.Controller, error) {
+	data := []byte(e.Script)
+
+	fileSystems := loader.CreateFilesystems(e.FS)
+
+	err := fsext.WriteFile(fileSystems["file"].(fsext.CacheLayerGetter).GetCachingFs(), "/-", data, 0o644)
+	if err != nil {
+		return nil, nil, fmt.Errorf("caching data read from -: %w", err)
+	}
+
+	src := &loader.SourceData{URL: &url.URL{Path: "/-", Scheme: "file"}, Data: data}
+	e.Logger.Debug(
+		"successfully loaded bytes!",
+		"bytes", len(src.Data),
 	)
 
-	gs.Logger.Debugf("Gathering k6 runtime options...")
+	e.Logger.Debug("Gathering k6 runtime options...")
 	runtimeOptions := lib.RuntimeOptions{}
 
 	registry := metrics.NewRegistry()
 	state := &lib.TestPreInitState{
-		Logger:         gs.Logger,
+		Logger:         e.LoggerCompat,
 		RuntimeOptions: runtimeOptions,
 		Registry:       registry,
 		BuiltinMetrics: metrics.RegisterBuiltinMetrics(registry),
-		Events:         gs.Events,
+		Events:         e.Events,
 		LookupEnv: func(key string) (string, bool) {
-			val, ok := gs.Env[key]
+			val, ok := e.Env[key]
 			return val, ok
 		},
 	}
 
 	test := &loadedTest{
-		pwd:            pwd,
-		sourceRootPath: "-",
-		source:         src,
-		fs:             gs.FS,
-		fileSystems:    fileSystems,
-		preInitState:   state,
+		source:       src,
+		fs:           e.FS,
+		fileSystems:  fileSystems,
+		preInitState: state,
+		logger:       e.Logger,
+		loggerCompat: e.LoggerCompat,
 	}
 
-	gs.Logger.Debugf("Initializing k6 runner for (%s)...", resolvedPath)
-	if err := test.initializeFirstRunner(gs); err != nil {
-		return nil, fmt.Errorf("could not initialize: %w", err)
+	e.Logger.Debug("Initializing k6 runner...")
+	if err := test.initializeFirstRunner(); err != nil {
+		return nil, nil, fmt.Errorf("could not initialize: %w", err)
 	}
-	gs.Logger.Debug("Runner successfully initialized!")
-	return test, nil
-}
+	e.Logger.Debug("Runner successfully initialized!")
 
-func (lt *loadedTest) initializeFirstRunner(gs *state.GlobalState) error {
-	testPath := lt.source.URL.String()
-	logger := gs.Logger.WithField("test_path", testPath)
-
-	testType := lt.preInitState.RuntimeOptions.TestType.String
-	if testType == "" {
-		testType = testTypeJS
-	}
-
-	// TODO: k6-cli also has TAR support which might be nice to have.
-	switch testType {
-	case testTypeJS:
-		logger.Debug("Trying to load as a JS test...")
-		runner, err := js.New(lt.preInitState, lt.source, lt.fileSystems)
-		// TODO: should we use common.UnwrapGojaInterruptedError() here?
-		if err != nil {
-			return fmt.Errorf("could not load JS test '%s': %w", testPath, err)
-		}
-		lt.initRunner = runner
-		lt.moduleResolver = runner.Bundle.ModuleResolver
-		return nil
-	default:
-		return fmt.Errorf("unknown or unspecified test type '%s' for '%s'", testType, testPath)
-	}
-}
-
-// readSource is a small wrapper around loader.ReadSource returning
-// result of the load and filesystems map
-func readSource(gs *state.GlobalState, script string) (*loader.SourceData, map[string]fsext.Fs, string, error) {
-	data := []byte(script)
-
-	filesystems := loader.CreateFilesystems(gs.FS)
-
-	err := fsext.WriteFile(filesystems["file"].(fsext.CacheLayerGetter).GetCachingFs(), "/-", data, 0o644)
+	configuredTest, err := test.consolidateDeriveAndValidateConfig()
 	if err != nil {
-		return nil, nil, "", fmt.Errorf("caching data read from -: %w", err)
+		return nil, nil, err
 	}
 
-	return &loader.SourceData{URL: &url.URL{Path: "/-", Scheme: "file"}, Data: data}, filesystems, "/", err
-}
-
-func (lt *loadedTest) consolidateDeriveAndValidateConfig(
-	gs *state.GlobalState,
-) (*loadedAndConfiguredTest, error) {
-	gs.Logger.Debug("Consolidating config layers...")
-
-	config := lib.Options{}
-
-	config.Apply(lt.initRunner.GetOptions())
-	if config.SystemTags == nil {
-		config.SystemTags = &metrics.DefaultSystemTagSet
-	}
-	if config.SummaryTrendStats == nil {
-		config.SummaryTrendStats = lib.DefaultSummaryTrendStats
-	}
-	defDNS := types.DefaultDNSConfig()
-	if !config.DNS.TTL.Valid {
-		config.DNS.TTL = defDNS.TTL
-	}
-	if !config.DNS.Select.Valid {
-		config.DNS.Select = defDNS.Select
-	}
-	if !config.DNS.Policy.Valid {
-		config.DNS.Policy = defDNS.Policy
-	}
-	if !config.SetupTimeout.Valid {
-		config.SetupTimeout.Duration = types.Duration(60 * time.Second)
-	}
-	if !config.TeardownTimeout.Valid {
-		config.TeardownTimeout.Duration = types.Duration(60 * time.Second)
-	}
-
-	gs.Logger.Debug("Parsing thresholds and validating config...")
-	// Parse the thresholds, only if the --no-threshold flag is not set.
-	// If parsing the threshold expressions failed, consider it as an
-	// invalid configuration error.
-	if !lt.preInitState.RuntimeOptions.NoThresholds.Bool {
-		for metricName, thresholdsDefinition := range config.Thresholds {
-			err := thresholdsDefinition.Parse()
-			if err != nil {
-				return nil, errext.WithExitCodeIfNone(err, exitcodes.InvalidConfig)
-			}
-
-			err = thresholdsDefinition.Validate(metricName, lt.preInitState.Registry)
-			if err != nil {
-				return nil, errext.WithExitCodeIfNone(err, exitcodes.InvalidConfig)
-			}
-		}
-	}
-
-	config, err := executor.DeriveScenariosFromShortcuts(config, gs.Logger)
-	if err == nil {
-		errors := config.Validate()
-		// FIXME: should show them all.
-		if len(errors) > 0 {
-			err = errors[0]
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	return &loadedAndConfiguredTest{
-		loadedTest: lt,
-		config:     config,
-	}, nil
-}
-
-// loadedAndConfiguredTest contains the whole loadedTest, as well as the
-// consolidated test config and the full test run state.
-type loadedAndConfiguredTest struct {
-	*loadedTest
-	config lib.Options
-}
-
-func loadAndConfigureLocalTest(
-	gs *state.GlobalState,
-	script string,
-) (*loadedAndConfiguredTest, error) {
-	test, err := loadLocalTest(gs, script)
-	if err != nil {
-		return nil, err
-	}
-
-	return test.consolidateDeriveAndValidateConfig(gs)
-}
-
-// loadSystemCertPool attempts to load system certificates.
-func loadSystemCertPool(logger logrus.FieldLogger) {
-	if _, err := x509.SystemCertPool(); err != nil {
-		logger.WithError(err).Warning("Unable to load system cert pool")
-	}
-}
-
-func (lct *loadedAndConfiguredTest) buildTestRunState(
-	configToReinject lib.Options,
-) (*lib.TestRunState, error) {
-	// This might be the full derived or just the consodlidated options
-	if err := lct.initRunner.SetOptions(configToReinject); err != nil {
-		return nil, err
-	}
-
-	// it pre-loads system certificates to avoid doing it on the first TLS request.
-	// This is done async to avoid blocking the rest of the loading process as it will not stop if it fails.
-	go loadSystemCertPool(lct.preInitState.Logger)
-
-	return &lib.TestRunState{
-		TestPreInitState: lct.preInitState,
-		Runner:           lct.initRunner,
-		Options:          lct.config,
-		RunTags:          lct.preInitState.Registry.RootTagSet().WithTagsFromMap(configToReinject.RunTags),
-	}, nil
-}
-
-type Execution struct {
-	gs *state.GlobalState
-
-	// TODO: figure out something more elegant?
-	loadConfiguredTest func() (*loadedAndConfiguredTest, execution.Controller, error)
+	controller := local.NewController()
+	return configuredTest, controller, nil
 }
 
 func (e *Execution) setupTracerProvider(ctx context.Context, test *loadedAndConfiguredTest) error {
@@ -280,16 +134,6 @@ func (e *Execution) setupTracerProvider(ctx context.Context, test *loadedAndConf
 	test.preInitState.TracerProvider = tp
 
 	return nil
-}
-
-func NewExecution(gs *state.GlobalState, script string) *Execution {
-	return &Execution{
-		gs: gs,
-		loadConfiguredTest: func() (*loadedAndConfiguredTest, execution.Controller, error) {
-			test, err := loadAndConfigureLocalTest(gs, script)
-			return test, local.NewController(), err
-		},
-	}
 }
 
 func (e *Execution) Start(ctx context.Context) error {
@@ -310,7 +154,7 @@ func (e *Execution) Start(ctx context.Context) error {
 	runCtx, runAbort := execution.NewTestRunContext(lingerCtx, logger)
 
 	emitEvent := func(evt *event.Event) func() {
-		waitDone := e.gs.Events.Emit(evt)
+		waitDone := e.Events.Emit(evt)
 		return func() {
 			waitCtx, waitCancel := context.WithTimeout(globalCtx, waitEventDoneTimeout)
 			defer waitCancel()
@@ -326,35 +170,28 @@ func (e *Execution) Start(ctx context.Context) error {
 			Data: &event.ExitData{Error: err},
 		})
 		waitExitDone()
-		e.gs.Events.UnsubscribeAll()
+		e.Events.UnsubscribeAll()
 	}()
 
-	test, controller, err := e.loadConfiguredTest()
+	configuredTest, controller, err := e.loadLocalTest()
 	if err != nil {
 		return err
 	}
-	if test.keyLogger != nil {
-		defer func() {
-			if klErr := test.keyLogger.Close(); klErr != nil {
-				logger.WithError(klErr).Warn("Error while closing the SSLKEYLOGFILE")
-			}
-		}()
-	}
 
-	if err = e.setupTracerProvider(globalCtx, test); err != nil {
+	if err = e.setupTracerProvider(globalCtx, configuredTest); err != nil {
 		return err
 	}
 	waitTracesFlushed := func() {
 		ctx, cancel := context.WithTimeout(globalCtx, waitForTracerProviderStopTimeout)
 		defer cancel()
-		if tpErr := test.preInitState.TracerProvider.Shutdown(ctx); tpErr != nil {
+		if tpErr := configuredTest.preInitState.TracerProvider.Shutdown(ctx); tpErr != nil {
 			logger.Errorf("The tracer provider didn't stop gracefully: %v", tpErr)
 		}
 	}
 
 	// Write the full consolidated *and derived* options back to the Runner.
-	conf := test.config
-	testRunState, err := test.buildTestRunState(conf)
+	conf := configuredTest.config
+	testRunState, err := configuredTest.buildTestRunState(conf)
 	if err != nil {
 		return err
 	}
@@ -398,19 +235,19 @@ func (e *Execution) Start(ctx context.Context) error {
 	if !testRunState.RuntimeOptions.NoSummary.Bool {
 		defer func() {
 			logger.Debug("Generating the end-of-test summary...")
-			summaryResult, hsErr := test.initRunner.HandleSummary(globalCtx, &lib.Summary{
+			summaryResult, hsErr := configuredTest.initRunner.HandleSummary(globalCtx, &lib.Summary{
 				Metrics:         metricsEngine.ObservedMetrics,
 				RootGroup:       testRunState.Runner.GetDefaultGroup(),
 				TestRunDuration: executionState.GetCurrentTestRunDuration(),
-				NoColor:         e.gs.Flags.NoColor,
+				NoColor:         true,
 				UIState: lib.UIState{
-					IsStdOutTTY: e.gs.Stdout.IsTTY,
-					IsStdErrTTY: e.gs.Stderr.IsTTY,
+					IsStdOutTTY: false,
+					IsStdErrTTY: false,
 				},
 			})
 			if hsErr == nil {
 				for _, o := range summaryResult {
-					_, err := io.Copy(e.gs.Stdout, o)
+					_, err := io.Copy(os.Stdout, o)
 					if err != nil {
 						logger.WithError(err).Error("failed to write summary output")
 					}
@@ -431,7 +268,7 @@ func (e *Execution) Start(ctx context.Context) error {
 		// TODO: attach run status and exit code?
 		runAbort(err)
 	})
-	samples := make(chan metrics.SampleContainer, test.config.MetricSamplesBufferSize.Int64)
+	samples := make(chan metrics.SampleContainer, configuredTest.config.MetricSamplesBufferSize.Int64)
 	waitOutputsFlushed, stopOutputs, err := outputManager.Start(samples)
 	if err != nil {
 		return err

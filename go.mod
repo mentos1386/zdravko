@@ -7,8 +7,6 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/gorilla/sessions v1.2.2
 	github.com/gosimple/slug v1.13.1
-	github.com/grafana/xk6-dashboard v0.7.2
-	github.com/grafana/xk6-output-prometheus-remote v0.3.1
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/lib/pq v1.10.9
 	github.com/pkg/errors v0.9.1
@@ -28,15 +26,12 @@ require (
 replace go.temporal.io/server => github.com/temporalio/temporal v1.23.0-rc2.0.20240207154935-68882596be5d
 
 require (
-	buf.build/gen/go/gogo/protobuf/protocolbuffers/go v1.31.0-20210810001428-4df00b267f94.1 // indirect
-	buf.build/gen/go/prometheus/prometheus/protocolbuffers/go v1.31.0-20230627135113-9a12bc2590d2.1 // indirect
 	cloud.google.com/go v0.112.0 // indirect
 	cloud.google.com/go/compute v1.23.3 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.5 // indirect
 	cloud.google.com/go/storage v1.36.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
-	github.com/DataDog/datadog-go v0.0.0-20180330214955-e67964b4021a // indirect
 	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/Soontao/goHttpDigestClient v0.0.0-20170320082612-6d28bb1415c5 // indirect
 	github.com/andybalholm/brotli v1.0.6 // indirect
@@ -98,8 +93,6 @@ require (
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/influxdata/influxdb1-client v0.0.0-20190402204710-8ff2fc3824fc // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.4.3 // indirect
@@ -122,7 +115,6 @@ require (
 	github.com/mccutchen/go-httpbin v1.1.2-0.20190116014521-c5cb2f4802fa // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mstoykov/atlas v0.0.0-20220811071828-388f114305dd // indirect
-	github.com/mstoykov/envconfig v1.4.1-0.20220114105314-765c6d8c76f1 // indirect
 	github.com/mstoykov/k6-taskqueue-lib v0.1.0 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
@@ -130,13 +122,11 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pborman/uuid v1.2.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
-	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.16.0 // indirect
 	github.com/prometheus/client_model v0.4.0 // indirect
 	github.com/prometheus/common v0.44.0 // indirect
 	github.com/prometheus/procfs v0.11.0 // indirect
-	github.com/r3labs/sse/v2 v2.10.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/redis/go-redis/v9 v9.0.5 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
@@ -148,7 +138,6 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
-	github.com/spf13/cobra v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
@@ -203,7 +192,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240125205218-1f4bbc51befe // indirect
 	google.golang.org/grpc v1.61.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
-	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
 	gopkg.in/guregu/null.v3 v3.3.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
