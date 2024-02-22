@@ -21,10 +21,12 @@ func GetHealthcheck(ctx context.Context, q *query.Query, slug string) (*models.H
 	return q.Healthcheck.WithContext(ctx).Where(
 		q.Healthcheck.Slug.Eq(slug),
 		q.Healthcheck.DeletedAt.IsNull(),
+	).Preload(
+		q.Healthcheck.History,
 	).First()
 }
 
-func GetHealthchecksWithHistory(ctx context.Context, q *query.Query) ([]*models.Healthcheck, error) {
+func GetHealthchecks(ctx context.Context, q *query.Query) ([]*models.Healthcheck, error) {
 	return q.Healthcheck.WithContext(ctx).Preload(
 		q.Healthcheck.History,
 	).Where(

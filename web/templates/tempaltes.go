@@ -4,6 +4,7 @@ import (
 	"embed"
 	"io"
 	"log"
+	"strings"
 	"text/template"
 
 	"github.com/labstack/echo/v4"
@@ -20,7 +21,13 @@ type Templates struct {
 
 func load(files ...string) *template.Template {
 	files = append(files, base)
-	return template.Must(template.ParseFS(templates, files...))
+
+	t := template.New("default").Funcs(
+		template.FuncMap{
+			"StringsJoin": strings.Join,
+		})
+
+	return template.Must(t.ParseFS(templates, files...))
 }
 
 func loadSettings(files ...string) *template.Template {

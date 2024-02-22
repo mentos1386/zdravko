@@ -1,14 +1,85 @@
 {{define "settings"}}
 <section class="relative overflow-x-auto shadow-md sm:rounded-lg p-5 text-gray-500 bg-white">
-  <h1 class="text-lg font-semibold text-gray-900">
-  {{ .Healthcheck.Name }}
-  </h1>
-  {{ .Healthcheck.ID }}
-  {{ .Healthcheck.Slug }}
-  {{ .Healthcheck.Schedule }}
-  {{ .Healthcheck.WorkerGroups }}
-  <pre class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-  {{ .Healthcheck.Script }}
-  </pre>
+  <form action="/settings/healthchecks/{{ .Healthcheck.Slug }}" method="post">
+    <div class="grid md:grid-cols-2">
+      <h1 class="text-2xl font-semibold text-gray-900">
+        {{ .Healthcheck.Name }}
+      </h1>
+      <button type="submit" onclick="save()" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center inline-flex justify-self-end">Save</button>
+    </div>
+    <div class="mb-5">
+      <label for="workergroups" class="block mb-2 text-sm font-medium text-gray-900">Worker Groups</label>
+      <input type="text" name="workergroups" id="workergroups" value="{{ StringsJoin .Healthcheck.WorkerGroups " " }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"/>
+    </div>
+    <div class="mb-5">
+      <label for="schedule" class="block mb-2 text-sm font-medium text-gray-900">Schedule</label>
+      <input type="text" name="schedule" id="schedule" value="{{ .Healthcheck.Schedule }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"/>
+    </div>
+    <div class="mb-5">
+      <label for="script" class="block mb-2 text-sm font-medium text-gray-900">Script</label>
+      <input required type="hidden" id="script" name="script">
+      <div id="editor" class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"></div>
+    </div>
+  </form>
+  <div>
+    <h2 class="text-lg font-semibold text-gray-900">History</h2>
+    <table class="min-w-full">
+      <thead>
+      <tr>
+        <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created At</th>
+        <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Duration</th>
+        <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Note</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{range .Healthcheck.History}}
+      <tr>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{if eq .Status "SUCCESS"}}bg-green-100 text-green-800{{else}}bg-red-100 text-red-800{{end}}">
+            {{ .Status }}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          {{ .CreatedAt.Format "2006-01-02 15:04:05" }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          { .Duration }
+        </td>
+        <td class="px-6 py-4">
+          {{ .Note }}
+        </td>
+      </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
 </section>
+
+<script src="/static/monaco/vs/loader.js"></script>
+<script>
+  function save() {
+    const script = window.editor.getValue();
+    document.getElementById('script').value = script;
+  }
+
+  script = `{{ .Healthcheck.Script }}`
+
+  require.config({ paths: { vs: '/static/monaco/vs' } });
+  require(['vs/editor/editor.main'], function () {
+    window.editor = monaco.editor.create(document.getElementById('editor'), {
+      value: script,
+      language: 'javascript',
+      minimap: { enabled: false },
+      codeLens: false,
+      contextmenu: false,
+    });
+
+    const divElem = document.getElementById('editor');
+    const resizeObserver = new ResizeObserver(entries => {
+        window.editor.layout();
+    });
+    resizeObserver.observe(divElem);
+  });
+</script>
 {{end}}

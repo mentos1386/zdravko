@@ -43,7 +43,7 @@ func getDailyHistory(history []models.HealthcheckHistory) *History {
 	numDays := 90
 	historyDailyMap := map[string]string{}
 	numOfSuccess := 0
-	numTotal := 1
+	numTotal := 0
 
 	for i := 0; i < numDays; i++ {
 		day := getDay(time.Now().AddDate(0, 0, -i).Truncate(time.Hour * 24))
@@ -77,9 +77,14 @@ func getDailyHistory(history []models.HealthcheckHistory) *History {
 		historyDaily[i] = historyDailyMap[day]
 	}
 
+	uptime := 0
+	if numTotal > 0 {
+		uptime = 100 * numOfSuccess / numTotal
+	}
+
 	return &History{
 		History: historyDaily,
-		Uptime:  100 * numOfSuccess / numTotal,
+		Uptime:  uptime,
 	}
 }
 
@@ -87,7 +92,7 @@ func getHourlyHistory(history []models.HealthcheckHistory) *History {
 	numHours := 48
 	historyHourlyMap := map[string]string{}
 	numOfSuccess := 0
-	numTotal := 1
+	numTotal := 0
 
 	for i := 0; i < numHours; i++ {
 		hour := getHour(time.Now().Add(time.Hour * time.Duration(-i)).Truncate(time.Hour))
@@ -121,15 +126,20 @@ func getHourlyHistory(history []models.HealthcheckHistory) *History {
 		historyHourly[i] = historyHourlyMap[hour]
 	}
 
+	uptime := 0
+	if numTotal > 0 {
+		uptime = 100 * numOfSuccess / numTotal
+	}
+
 	return &History{
 		History: historyHourly,
-		Uptime:  100 * numOfSuccess / numTotal,
+		Uptime:  uptime,
 	}
 }
 
 func (h *BaseHandler) Index(c echo.Context) error {
 	ctx := context.Background()
-	healthchecks, err := services.GetHealthchecksWithHistory(ctx, h.query)
+	healthchecks, err := services.GetHealthchecks(ctx, h.query)
 	if err != nil {
 		return err
 	}
