@@ -13,6 +13,7 @@ primary_region = 'waw'
   OAUTH2_ENDPOINT_AUTH_URL = 'https://github.com/login/oauth/authorize'
   OAUTH2_ENDPOINT_TOKEN_URL = 'https://github.com/login/oauth/access_token'
   OAUTH2_ENDPOINT_USER_INFO_URL = 'https://api.github.com/user'
+  WORKER_API_URL = 'https://zdravko.mnts.dev'
   ROOT_URL = 'https://zdravko.mnts.dev'
   TEMPORAL_SERVER_HOST = 'server.process.zdravko.internal:7233'
 
