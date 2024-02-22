@@ -57,3 +57,16 @@
 .healthchecks > div:not(:last-child) {
   @apply mb-3;
 }
+.healthchecks .time-range > a {
+  @apply font-medium text-sm px-2.5 py-1;
+  @apply text-black bg-gray-100 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300;
+}
+.healthchecks .time-range > a.active {
+  @apply text-white bg-blue-700 hover:bg-blue-800;
+}
+.healthchecks .time-range > a:first-child {
+  @apply rounded-s-lg;
+}
+.healthchecks .time-range > a:last-child {
+  @apply rounded-e-lg;
+}

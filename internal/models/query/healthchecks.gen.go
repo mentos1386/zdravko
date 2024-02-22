@@ -40,19 +40,6 @@ func newHealthcheck(db *gorm.DB, opts ...gen.DOOption) healthcheck {
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("History", "models.HealthcheckHistory"),
-		Healthcheck: struct {
-			field.RelationField
-			History struct {
-				field.RelationField
-			}
-		}{
-			RelationField: field.NewRelation("History.Healthcheck", "models.Healthcheck"),
-			History: struct {
-				field.RelationField
-			}{
-				RelationField: field.NewRelation("History.Healthcheck.History", "models.HealthcheckHistory"),
-			},
-		},
 	}
 
 	_healthcheck.fillFieldMap()
@@ -152,13 +139,6 @@ type healthcheckHasManyHistory struct {
 	db *gorm.DB
 
 	field.RelationField
-
-	Healthcheck struct {
-		field.RelationField
-		History struct {
-			field.RelationField
-		}
-	}
 }
 
 func (a healthcheckHasManyHistory) Where(conds ...field.Expr) *healthcheckHasManyHistory {

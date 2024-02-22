@@ -31,25 +31,9 @@ func newHealthcheckHistory(db *gorm.DB, opts ...gen.DOOption) healthcheckHistory
 	_healthcheckHistory.CreatedAt = field.NewTime(tableName, "created_at")
 	_healthcheckHistory.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_healthcheckHistory.DeletedAt = field.NewField(tableName, "deleted_at")
+	_healthcheckHistory.Healthcheck = field.NewUint(tableName, "healthcheck")
 	_healthcheckHistory.Status = field.NewString(tableName, "status")
-	_healthcheckHistory.Healthcheck = healthcheckHistoryHasOneHealthcheck{
-		db: db.Session(&gorm.Session{}),
-
-		RelationField: field.NewRelation("Healthcheck", "models.Healthcheck"),
-		History: struct {
-			field.RelationField
-			Healthcheck struct {
-				field.RelationField
-			}
-		}{
-			RelationField: field.NewRelation("Healthcheck.History", "models.HealthcheckHistory"),
-			Healthcheck: struct {
-				field.RelationField
-			}{
-				RelationField: field.NewRelation("Healthcheck.History.Healthcheck", "models.Healthcheck"),
-			},
-		},
-	}
+	_healthcheckHistory.Note = field.NewString(tableName, "note")
 
 	_healthcheckHistory.fillFieldMap()
 
@@ -64,8 +48,9 @@ type healthcheckHistory struct {
 	CreatedAt   field.Time
 	UpdatedAt   field.Time
 	DeletedAt   field.Field
+	Healthcheck field.Uint
 	Status      field.String
-	Healthcheck healthcheckHistoryHasOneHealthcheck
+	Note        field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -86,7 +71,9 @@ func (h *healthcheckHistory) updateTableName(table string) *healthcheckHistory {
 	h.CreatedAt = field.NewTime(table, "created_at")
 	h.UpdatedAt = field.NewTime(table, "updated_at")
 	h.DeletedAt = field.NewField(table, "deleted_at")
+	h.Healthcheck = field.NewUint(table, "healthcheck")
 	h.Status = field.NewString(table, "status")
+	h.Note = field.NewString(table, "note")
 
 	h.fillFieldMap()
 
@@ -115,13 +102,14 @@ func (h *healthcheckHistory) GetFieldByName(fieldName string) (field.OrderExpr, 
 }
 
 func (h *healthcheckHistory) fillFieldMap() {
-	h.fieldMap = make(map[string]field.Expr, 6)
+	h.fieldMap = make(map[string]field.Expr, 7)
 	h.fieldMap["id"] = h.ID
 	h.fieldMap["created_at"] = h.CreatedAt
 	h.fieldMap["updated_at"] = h.UpdatedAt
 	h.fieldMap["deleted_at"] = h.DeletedAt
+	h.fieldMap["healthcheck"] = h.Healthcheck
 	h.fieldMap["status"] = h.Status
-
+	h.fieldMap["note"] = h.Note
 }
 
 func (h healthcheckHistory) clone(db *gorm.DB) healthcheckHistory {
@@ -132,84 +120,6 @@ func (h healthcheckHistory) clone(db *gorm.DB) healthcheckHistory {
 func (h healthcheckHistory) replaceDB(db *gorm.DB) healthcheckHistory {
 	h.healthcheckHistoryDo.ReplaceDB(db)
 	return h
-}
-
-type healthcheckHistoryHasOneHealthcheck struct {
-	db *gorm.DB
-
-	field.RelationField
-
-	History struct {
-		field.RelationField
-		Healthcheck struct {
-			field.RelationField
-		}
-	}
-}
-
-func (a healthcheckHistoryHasOneHealthcheck) Where(conds ...field.Expr) *healthcheckHistoryHasOneHealthcheck {
-	if len(conds) == 0 {
-		return &a
-	}
-
-	exprs := make([]clause.Expression, 0, len(conds))
-	for _, cond := range conds {
-		exprs = append(exprs, cond.BeCond().(clause.Expression))
-	}
-	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
-	return &a
-}
-
-func (a healthcheckHistoryHasOneHealthcheck) WithContext(ctx context.Context) *healthcheckHistoryHasOneHealthcheck {
-	a.db = a.db.WithContext(ctx)
-	return &a
-}
-
-func (a healthcheckHistoryHasOneHealthcheck) Session(session *gorm.Session) *healthcheckHistoryHasOneHealthcheck {
-	a.db = a.db.Session(session)
-	return &a
-}
-
-func (a healthcheckHistoryHasOneHealthcheck) Model(m *models.HealthcheckHistory) *healthcheckHistoryHasOneHealthcheckTx {
-	return &healthcheckHistoryHasOneHealthcheckTx{a.db.Model(m).Association(a.Name())}
-}
-
-type healthcheckHistoryHasOneHealthcheckTx struct{ tx *gorm.Association }
-
-func (a healthcheckHistoryHasOneHealthcheckTx) Find() (result *models.Healthcheck, err error) {
-	return result, a.tx.Find(&result)
-}
-
-func (a healthcheckHistoryHasOneHealthcheckTx) Append(values ...*models.Healthcheck) (err error) {
-	targetValues := make([]interface{}, len(values))
-	for i, v := range values {
-		targetValues[i] = v
-	}
-	return a.tx.Append(targetValues...)
-}
-
-func (a healthcheckHistoryHasOneHealthcheckTx) Replace(values ...*models.Healthcheck) (err error) {
-	targetValues := make([]interface{}, len(values))
-	for i, v := range values {
-		targetValues[i] = v
-	}
-	return a.tx.Replace(targetValues...)
-}
-
-func (a healthcheckHistoryHasOneHealthcheckTx) Delete(values ...*models.Healthcheck) (err error) {
-	targetValues := make([]interface{}, len(values))
-	for i, v := range values {
-		targetValues[i] = v
-	}
-	return a.tx.Delete(targetValues...)
-}
-
-func (a healthcheckHistoryHasOneHealthcheckTx) Clear() error {
-	return a.tx.Clear()
-}
-
-func (a healthcheckHistoryHasOneHealthcheckTx) Count() int64 {
-	return a.tx.Count()
 }
 
 type healthcheckHistoryDo struct{ gen.DO }

@@ -16,6 +16,7 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
  - [ ] History and working home page.
  - [ ] Edit/Delete operations for healthchecks and workers.
  - [ ] CronJob Healthchecks (via webhooks).
+ - [ ] Notifications (webhooks, slack, etc).
 
 ![Screenshot](docs/screenshot.png)
 Demo is available at https://zdravko.mnts.dev.

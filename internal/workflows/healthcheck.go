@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"code.tjo.space/mentos1386/zdravko/internal/activities"
+	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"go.temporal.io/sdk/workflow"
 )
 
@@ -28,9 +29,9 @@ func (w *Workflows) HealthcheckWorkflowDefinition(ctx workflow.Context, param He
 		return err
 	}
 
-	status := "failure"
+	status := models.HealthcheckFailure
 	if healthcheckResult.Success {
-		status = "success"
+		status = models.HealthcheckSuccess
 	}
 
 	historyParam := activities.HealtcheckAddToHistoryParam{

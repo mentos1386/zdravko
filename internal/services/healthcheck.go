@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"log"
+	"time"
 
 	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"code.tjo.space/mentos1386/zdravko/internal/models/query"
@@ -17,10 +18,18 @@ func CreateHealthcheck(ctx context.Context, db *gorm.DB, healthcheck *models.Hea
 }
 
 func GetHealthcheck(ctx context.Context, q *query.Query, slug string) (*models.Healthcheck, error) {
-	log.Println("GetHealthcheck")
 	return q.Healthcheck.WithContext(ctx).Where(
 		q.Healthcheck.Slug.Eq(slug),
+		q.Healthcheck.DeletedAt.IsNull(),
 	).First()
+}
+
+func GetHealthchecksWithHistory(ctx context.Context, q *query.Query) ([]*models.Healthcheck, error) {
+	return q.Healthcheck.WithContext(ctx).Preload(
+		q.Healthcheck.History,
+	).Where(
+		q.Healthcheck.DeletedAt.IsNull(),
+	).Find()
 }
 
 func StartHealthcheck(ctx context.Context, t client.Client, healthcheck *models.Healthcheck) error {
@@ -38,6 +47,7 @@ func StartHealthcheck(ctx context.Context, t client.Client, healthcheck *models.
 			ID: id + "-" + group,
 			Spec: client.ScheduleSpec{
 				CronExpressions: []string{healthcheck.Schedule},
+				Jitter:          time.Second * 10,
 			},
 			Action: &client.ScheduleWorkflowAction{
 				ID:        id + "-" + group,

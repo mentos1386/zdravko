@@ -20,6 +20,13 @@ type Worker struct {
 	Status string
 }
 
+const (
+	HealthcheckSuccess string = "SUCCESS"
+	HealthcheckFailure string = "FAILURE"
+	HealthcheckError   string = "ERROR"
+	HealthcheckUnknown string = "UNKNOWN"
+)
+
 type Healthcheck struct {
 	gorm.Model
 	Slug string `gorm:"unique"`
@@ -30,7 +37,7 @@ type Healthcheck struct {
 
 	Script string `validate:"required"`
 
-	History []HealthcheckHistory `gorm:"foreignKey:ID"`
+	History []HealthcheckHistory `gorm:"foreignKey:Healthcheck"`
 }
 
 type Cronjob struct {
@@ -43,8 +50,8 @@ type Cronjob struct {
 
 type HealthcheckHistory struct {
 	gorm.Model
-	Healthcheck Healthcheck `gorm:"foreignkey:ID"`
-	Status      string      // SUCCESS, FAIL, ERROR
+	Healthcheck uint
+	Status      string
 	Note        string
 }
 

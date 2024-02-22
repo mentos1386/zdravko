@@ -1,38 +1,96 @@
+{{define "daily"}}
+<div class="justify-self-end text-sm">{{ .HistoryDaily.Uptime }}% uptime</div>
+<div class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden">
+  {{ range .HistoryDaily.History }}
+  {{ if eq . "SUCCESS" }}
+  <div class="bg-green-400 hover:bg-green-500 flex-auto"></div>
+  {{ else if eq . "FAILURE" }}
+  <div class="bg-red-400 hover:bg-red-500 flex-auto"></div>
+  {{ else }}
+  <div class="bg-gray-400 hover:bg-gray-500 flex-auto"></div>
+  {{ end }}
+  {{ end }}
+</div>
+<div class="text-slate-500 justify-self-start text-sm">90 days ago</div>
+<div class="text-slate-500 justify-self-end text-sm">Today</div>
+{{end}}
+
+{{define "hourly"}}
+<div class="justify-self-end text-sm">{{ .HistoryHourly.Uptime }}% uptime</div>
+<div class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden">
+  {{ range .HistoryHourly.History }}
+  {{ if eq . "SUCCESS" }}
+  <div class="bg-green-400 hover:bg-green-500 flex-auto"></div>
+  {{ else if eq . "FAILURE" }}
+  <div class="bg-red-400 hover:bg-red-500 flex-auto"></div>
+  {{ else }}
+  <div class="bg-gray-400 hover:bg-gray-500 flex-auto"></div>
+  {{ end }}
+  {{ end }}
+</div>
+<div class="text-slate-500 justify-self-start text-sm">48 hours ago</div>
+<div class="text-slate-500 justify-self-end text-sm">Now</div>
+{{end}}
+
 {{define "main"}}
+  {{ if eq .HealthchecksLength 0 }}
+  <section>
+      <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
+          <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
+          There are no healthchecks yet.
+          </h1>
+          <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40">
+          Create a healthcheck to monitor your services and get notified when they are down.
+          </p>
+          <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
+              <a href="/settings/healthchecks/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+                Create First Healthcheck
+                <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
+              </a>
+          </div>
+      </div>
+  </section>
+  {{ else }}
+  {{ if eq .Status "SUCCESS" }}
   <div class="flex flex-col items-center">
     <svg class="feather h-20 w-20 rounded-full bg-green-300 p-4 overflow-visible"><use href="/static/icons/feather-sprite.svg#check" /></svg>
-    <h1 class="text-slate-500">All services are online</h1>
+    <h1 class="text-slate-500 mt-4">All services are online</h1>
     <p class="text-slate-500 text-sm">Last updated on Feb 10 at 10:55am UTC</p>
   </div>
-  <div class="flex flex-col items-center mt-20">
+  {{ else }}
+  <div class="flex flex-col items-center">
     <svg class="feather h-20 w-20 rounded-full bg-red-300 p-4 overflow-visible"><use href="/static/icons/feather-sprite.svg#alert-triangle" /></svg>
-    <h3 class="text-slate-500">Degraded performance</h3>
+    <h3 class="text-slate-500 mt-4">Degraded performance</h3>
     <p class="text-slate-500 text-sm">Last updated on Feb 10 at 10:55am UTC</p>
   </div>
+  {{ end }}
   <div class="healthchecks">
+    <div class="grid grid-cols-2 gap-2">
+      <p class="text-l font-normal text-gray-500">Healthchecks</p>
+      <div class="inline-flex rounded-md shadow-sm justify-self-end time-range" role="group">
+        <a href="/?time-range=90days" class="{{ if eq .TimeRange "90days" }}active{{end}}" type="button">90 Days</a>
+        <a href="/?time-range=48hours" class="{{ if eq .TimeRange "48hours" }}active{{end}}" type="button">48 Hours</a>
+      </div>
+    </div>
     {{ range .HealthChecks }}
     <div class="grid grid-cols-2 gap-2">
       <div class="flex items-center">
-        {{ if .Healthy }}
+        {{ if eq .Status "SUCCESS" }}
         <span class="flex w-3 h-3 me-2 bg-green-400 rounded-full"></span>
-        {{ else }}
+        {{ else if eq .Status "FAILURE" }}
         <span class="flex w-3 h-3 me-2 bg-red-400 rounded-full"></span>
-        {{ end }}
-        <p>{{ .Domain }}</p>
-      </div>
-      <div class="justify-self-end text-sm">{{ .Uptime }}% uptime</div>
-      <div class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden">
-        {{ range .History }}
-        {{ if . }}
-        <div class="bg-green-400 hover:bg-green-500 flex-auto"></div>
         {{ else }}
-        <div class="bg-red-400 hover:bg-red-500 flex-auto"></div>
+        <span class="flex w-3 h-3 me-2 bg-gray-400 rounded-full"></span>
         {{ end }}
-        {{ end }}
-     </div>
-      <div class="text-slate-500 justify-self-start text-sm">90 days ago</div>
-      <div class="text-slate-500 justify-self-end text-sm">Today</div>
+        <p>{{ .Name }}</p>
+      </div>
+      {{ if eq $.TimeRange "90days" }}
+      {{ template "daily" . }}
+      {{ else }}
+      {{ template "hourly" . }}
+      {{ end }}
     </div>
     {{ end }}
   </div>
+  {{ end }}
 {{end}}
