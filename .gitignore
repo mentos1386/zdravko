@@ -1,5 +1,9 @@
 dist/
 
+# NPM
+package-lock.json
+package.json
+
 # Database
 zdravko.db
 temporal.db
