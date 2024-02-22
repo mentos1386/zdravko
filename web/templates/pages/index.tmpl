@@ -51,7 +51,7 @@
       </div>
   </section>
   {{ else }}
-  {{ if eq .Status "SUCCESS" }}
+  {{ if or (eq .Status "UNKNOWN") (eq .Status "SUCCESS") }}
   <div class="flex flex-col items-center">
     <svg class="feather h-20 w-20 rounded-full bg-green-300 p-4 overflow-visible"><use href="/static/icons/feather-sprite.svg#check" /></svg>
     <h1 class="text-slate-500 mt-4">All services are online</h1>
