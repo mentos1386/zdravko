@@ -90,7 +90,7 @@ func (h *BaseHandler) SettingsHealthchecksCreatePOST(c echo.Context) error {
 		Name:         c.FormValue("name"),
 		Slug:         slug.Make(c.FormValue("name")),
 		Schedule:     c.FormValue("schedule"),
-		WorkerGroups: strings.Split(c.FormValue("workergroups"), ","),
+		WorkerGroups: strings.Split(c.FormValue("workergroups"), " "),
 		Script:       c.FormValue("script"),
 	}
 

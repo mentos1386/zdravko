@@ -12,6 +12,11 @@
 @tailwind components;
 @tailwind utilities;
 
+.link,
+p > a {
+  @apply font-medium text-blue-700 hover:underline;
+}
+
 .navbar {
   @apply justify-center flex flex-wrap space-x-2 gap-2 mt-10;
 }

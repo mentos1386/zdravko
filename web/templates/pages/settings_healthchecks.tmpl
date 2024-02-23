@@ -59,17 +59,27 @@
                 </th>
                 <td class="px-6 py-4">
                     {{range .WorkerGroups}}
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                       {{ . }}
+                      </span>
                     {{end}}
                 </td>
                 <td class="px-6 py-4">
-                    OK
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    SUCCESS
+                  </span>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                    FAILURE
+                  </span>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                    UNKNOWN
+                  </span>
                 </td>
                 <td class="px-6 py-4">
                     {{.Schedule}}
                 </td>
                 <td class="px-6 py-4">
-                    <a href="/settings/healthchecks/{{.Slug}}" class="font-medium text-blue-600 hover:underline">Details</a>
+                    <a href="/settings/healthchecks/{{.Slug}}" class="link">Details</a>
                 </td>
             </tr>
         </tbody>
