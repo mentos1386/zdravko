@@ -6,10 +6,15 @@
     </h2>
     <label for="workergroups">Worker Groups</label>
     <input type="text" name="workergroups" id="workergroups" value="{{ StringsJoin .Healthcheck.WorkerGroups " " }}"/>
-    <p> Worker groups are used to distribute the healthcheck to specific workers.</p>
+    <p>Worker groups are used to distribute the healthcheck to specific workers.</p>
     <label for="schedule">Schedule</label>
     <input type="text" name="schedule" id="schedule" value="{{ .Healthcheck.Schedule }}"/>
-    <p> Schedule is a cron expression that defines when the healthcheck should be executed.</p>
+    <p>
+    Schedule is a cron expression that defines when the healthcheck should be executed.
+    </br>
+    You can also use <code>@every [interval]</code> where interval is a duration like 5m, 1h, 60s.
+    Or use <code>@hourly</code>, <code>@daily</code>, <code>@weekly</code>, <code>@monthly</code>, <code>@yearly</code>.
+    </p>
     <label for="script">Script</label>
     <input required type="hidden" id="script" name="script">
     <div id="editor" class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"></div>
