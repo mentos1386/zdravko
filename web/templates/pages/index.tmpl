@@ -66,15 +66,15 @@
   </div>
   {{ end }}
   <div class="healthchecks">
-    <div class="grid grid-cols-2 gap-2">
-      <p class="text-l font-normal text-gray-500">Healthchecks</p>
-      <div class="inline-flex rounded-md shadow-sm justify-self-end time-range" role="group">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <p class="text-l font-normal text-gray-800 text-center sm:text-left">Healthchecks</p>
+      <div class="inline-flex rounded-md shadow-sm justify-self-center sm:justify-self-end time-range" role="group">
         <a href="/?time-range=90days" class="{{ if eq .TimeRange "90days" }}active{{end}}" type="button">90 Days</a>
         <a href="/?time-range=48hours" class="{{ if eq .TimeRange "48hours" }}active{{end}}" type="button">48 Hours</a>
       </div>
     </div>
     {{ range .HealthChecks }}
-    <div class="grid grid-cols-2 gap-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
       <div class="flex items-center">
         {{ if eq .Status "SUCCESS" }}
         <span class="flex w-3 h-3 me-2 bg-green-400 rounded-full"></span>

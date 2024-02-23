@@ -6,7 +6,7 @@
   {{ $path = .SettingsSidebarActive.Path }}
 {{ end }}
 
-<div class="container max-w-screen-lg mt-20 grid grid-cols-1 lg:grid-cols-[min-content_minmax(0,1fr)] gap-8">
+<div class="container max-w-screen-lg mt-8 lg:mt-20 grid grid-cols-1 lg:grid-cols-[min-content_minmax(0,1fr)] gap-8">
   <ul class="sidebar">
     {{range .SettingsSidebar}}
     <li>
@@ -21,7 +21,7 @@
     {{end}}
   </ul>
   <div class="settings">
-    <nav aria-label="Breadcrumb">
+    <nav aria-label="Breadcrumb" class="mx-8 lg:mx-0 grid justify-center lg:justify-start">
       <ol class="inline-flex items-center">
         {{ range .SettingsBreadcrumbs }}
         <li class="inline-flex items-center">
