@@ -102,8 +102,7 @@ func (h *BaseHandler) AuthenticateRequestWithToken(r *http.Request) (*Authentica
 		user = &AuthenticatedUser{}
 	} else if splitSubject[0] == "worker" {
 		worker = &AuthenticatedWorker{
-			Slug:  splitSubject[1],
-			Group: claims.WorkerGroup,
+			Slug: splitSubject[1],
 		}
 	}
 

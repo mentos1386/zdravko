@@ -86,7 +86,6 @@ func (s *Server) Start() error {
 	settings.GET("/workers/create", h.SettingsWorkersCreateGET)
 	settings.POST("/workers/create", h.SettingsWorkersCreatePOST)
 	settings.GET("/workers/:slug", h.SettingsWorkersDescribeGET)
-	settings.GET("/workers/:slug/token", h.SettingsWorkersTokenGET)
 	settings.Match([]string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"}, "/temporal*", h.Temporal)
 
 	// OAuth2

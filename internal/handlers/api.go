@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/pkg/api"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 type ApiV1WorkersConnectGETResponse struct {
@@ -17,12 +19,21 @@ type ApiV1WorkersConnectGETResponse struct {
 }
 
 func (h *BaseHandler) ApiV1WorkersConnectGET(c echo.Context) error {
+	ctx := context.Background()
 	cc := c.(AuthenticatedContext)
+
+	worker, err := services.GetWorker(ctx, h.query, cc.Principal.Worker.Slug)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return echo.NewHTTPError(http.StatusUnauthorized, "Token invalid")
+		}
+		return err
+	}
 
 	response := ApiV1WorkersConnectGETResponse{
 		Endpoint: h.config.Temporal.ServerHost,
-		Group:    cc.Principal.Worker.Group,
-		Slug:     cc.Principal.Worker.Slug,
+		Group:    worker.Group,
+		Slug:     worker.Slug,
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -36,8 +47,16 @@ func (h *BaseHandler) ApiV1HealthchecksHistoryPOST(c echo.Context) error {
 
 	slug := c.Param("slug")
 
+	worker, err := services.GetWorker(ctx, h.query, slug)
+	if err != nil {
+		return err
+	}
+	if worker == nil {
+		return echo.NewHTTPError(http.StatusNotFound, "Worker not found")
+	}
+
 	var body api.ApiV1HealthchecksHistoryPOSTBody
-	err := (&echo.DefaultBinder{}).BindBody(c, &body)
+	err = (&echo.DefaultBinder{}).BindBody(c, &body)
 	if err != nil {
 		return err
 	}

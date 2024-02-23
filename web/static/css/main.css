@@ -47,10 +47,6 @@
   @apply bg-blue-700 text-white;
 }
 
-.breadcrumb {
-  @apply flex mb-4;
-}
-
 .healthchecks {
   @apply grid justify-items-stretch justify-stretch items-center mt-20 bg-white shadow-md p-5 rounded-lg;
 }
@@ -69,4 +65,29 @@
 }
 .healthchecks .time-range > a:last-child {
   @apply rounded-e-lg;
+}
+
+.settings {
+  @apply grid grid-cols-1 gap-5 grid-rows-[min-content] h-fit;
+}
+.settings section {
+  @apply relative overflow-x-auto shadow-md sm:rounded-lg text-gray-500 bg-white;
+}
+.settings section h2 {
+  @apply flex flex-col mb-5 text-lg font-semibold text-gray-900;
+}
+.settings section h2 span {
+  @apply text-sm font-medium text-gray-500;
+}
+.settings section form {
+  @apply grid gap-4 md:grid-cols-[2fr_1fr];
+}
+.settings section form input {
+  @apply h-min bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5;
+}
+.settings section form label {
+  @apply col-span-2 block text-sm font-medium text-gray-900;
+}
+.settings section form p {
+  @apply text-sm font-normal text-gray-500;
 }

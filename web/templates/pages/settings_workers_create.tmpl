@@ -1,18 +1,17 @@
 {{define "settings"}}
-<section class="relative overflow-x-auto shadow-md sm:rounded-lg p-5 text-gray-500 bg-white">
-  <h1 class="text-lg font-semibold text-gray-900">
-  Creating new worker.
-  </h1>
-  <form class="max-w-sm mt-4" action="/settings/workers/create" method="post">
-    <div class="mb-5">
-      <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
-      <input type="text" name="name" id="name" placeholder="FooBar" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"/>
-    </div>
-    <div class="mb-5">
-      <label for="group" class="block mb-2 text-sm font-medium text-gray-900">Group</label>
-      <input type="text" name="group" id="group" placeholder="Europe" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"/>
-    </div>
-    <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Create</button>
+<section class="p-5">
+  <form action="/settings/workers/create" method="post">
+    <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
+    <input type="text" name="name" id="name" placeholder="aws-eu-central-1"/>
+    <p>Worker name can be anything.</p>
+    <label for="group" class="block mb-2 text-sm font-medium text-gray-900">Group</label>
+    <input type="text" name="group" id="group" placeholder="EU"/>
+    <p>
+      Group is used to distinguish between different workers.
+      For example, you can have a group for different regions,
+      different datacenters or different environments.
+    </p>
+    <button type="submit" class="col-span-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Create</button>
   </form>
 </section>
 {{end}}

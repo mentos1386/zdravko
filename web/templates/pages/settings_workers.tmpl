@@ -3,72 +3,70 @@
 {{ $description := "Workers are executing healthchecks. You can deploy multiple of thems to multiple regions for wider coverage." }}
 
 {{ if eq .WorkersLength 0 }}
-<section>
-    <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
-        <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
-        There are no workers yet.
-        </h1>
-        <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40">
-        {{ $description }}
-        </p>
-        <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-            <a href="/settings/workers/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
-              Create First Worker
-              <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
-            </a>
-        </div>
+<div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
+    <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
+    There are no workers yet.
+    </h1>
+    <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40">
+    {{ $description }}
+    </p>
+    <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
+        <a href="/settings/workers/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+          Create First Worker
+          <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
+        </a>
     </div>
-</section>
-{{ else }}
-<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-    <table class="w-full text-sm text-left rtl:text-right text-gray-500">
-        <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
-          List of Workers
-          <div class="mt-1 gap-4 flex justify-between">
-            <p class="mt-1 text-sm font-normal text-gray-500">
-              {{ $description }}
-            </p>
-            <a href="/settings/workers/create" class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
-              Create New
-              <svg class="feather h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
-            </a>
-          </div>
-        </caption>
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-            <tr>
-                <th scope="col" class="px-6 py-3">
-                    Name
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Group
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Status
-                </th>
-                <th scope="col" class="px-6 py-3">
-                    Action
-                </th>
-            </tr>
-        </thead>
-        {{range .Workers}}
-        <tbody>
-            <tr class="odd:bg-white even:bg-gray-50">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                    {{.Name}}
-                </th>
-                <td class="px-6 py-4">
-                    {{.Group}}
-                </td>
-                <td class="px-6 py-4">
-                    OK
-                </td>
-                <td class="px-6 py-4">
-                    <a href="/settings/workers/{{.Slug}}" class="font-medium text-blue-600 hover:underline">Details</a>
-                </td>
-            </tr>
-        </tbody>
-        {{end}}
-    </table>
 </div>
+{{ else }}
+<section>
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+      <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
+        List of Workers
+        <div class="mt-1 gap-4 flex justify-between">
+          <p class="mt-1 text-sm font-normal text-gray-500">
+            {{ $description }}
+          </p>
+          <a href="/settings/workers/create" class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+            Create New
+            <svg class="feather h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
+          </a>
+        </div>
+      </caption>
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+          <tr>
+              <th scope="col" class="px-6 py-3">
+                  Name
+              </th>
+              <th scope="col" class="px-6 py-3">
+                  Group
+              </th>
+              <th scope="col" class="px-6 py-3">
+                  Status
+              </th>
+              <th scope="col" class="px-6 py-3">
+                  Action
+              </th>
+          </tr>
+      </thead>
+      {{range .Workers}}
+      <tbody>
+          <tr class="odd:bg-white even:bg-gray-50">
+              <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                  {{.Name}}
+              </th>
+              <td class="px-6 py-4">
+                  {{.Group}}
+              </td>
+              <td class="px-6 py-4">
+                  OK
+              </td>
+              <td class="px-6 py-4">
+                  <a href="/settings/workers/{{.Slug}}" class="font-medium text-blue-600 hover:underline">Details</a>
+              </td>
+          </tr>
+      </tbody>
+      {{end}}
+  </table>
+</section>
 {{end}}
 {{end}}

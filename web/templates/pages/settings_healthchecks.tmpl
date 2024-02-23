@@ -3,24 +3,22 @@
 {{ $description := "Healthchecks represent periodicly the k6 script, to see if the monitored service is healthy." }}
 
 {{ if eq .HealthchecksLength 0 }}
-<section>
-    <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
-        <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
-        There are no healthchecks yet.
-        </h1>
-        <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40">
-        {{ $description }}
-        </p>
-        <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-            <a href="/settings/healthchecks/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
-              Create First Healthcheck
-              <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
-            </a>
-        </div>
+<div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
+    <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
+    There are no healthchecks yet.
+    </h1>
+    <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40">
+    {{ $description }}
+    </p>
+    <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
+        <a href="/settings/healthchecks/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+          Create First Healthcheck
+          <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
+        </a>
     </div>
-</section>
+</div>
 {{ else }}
-<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+<section>
     <table class="w-full text-sm text-left rtl:text-right text-gray-500">
         <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
           List of Healthchecks
@@ -77,6 +75,6 @@
         </tbody>
         {{end}}
     </table>
-</div>
+</section>
 {{end}}
 {{end}}

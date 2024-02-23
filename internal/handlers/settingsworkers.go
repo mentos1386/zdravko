@@ -14,6 +14,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type WorkerWithToken struct {
+	*models.Worker
+	Token string
+}
+
 type SettingsWorkers struct {
 	*Settings
 	Workers       []*models.Worker
@@ -22,7 +27,7 @@ type SettingsWorkers struct {
 
 type SettingsWorker struct {
 	*Settings
-	Worker *models.Worker
+	Worker *WorkerWithToken
 }
 
 func (h *BaseHandler) SettingsWorkersGET(c echo.Context) error {
@@ -54,7 +59,13 @@ func (h *BaseHandler) SettingsWorkersDescribeGET(c echo.Context) error {
 		return err
 	}
 
-	return c.Render(http.StatusOK, "setting_workers_describe.tmpl", &SettingsWorker{
+	// Allow write access to default namespace
+	token, err := jwt.NewTokenForWorker(h.config.Jwt.PrivateKey, h.config.Jwt.PublicKey, worker)
+	if err != nil {
+		return err
+	}
+
+	return c.Render(http.StatusOK, "settings_workers_describe.tmpl", &SettingsWorker{
 		Settings: NewSettings(
 			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Workers"),
@@ -66,7 +77,10 @@ func (h *BaseHandler) SettingsWorkersDescribeGET(c echo.Context) error {
 					Breadcrumb: worker.Name,
 				},
 			}),
-		Worker: worker,
+		Worker: &WorkerWithToken{
+			Worker: worker,
+			Token:  token,
+		},
 	})
 }
 
@@ -107,21 +121,4 @@ func (h *BaseHandler) SettingsWorkersCreatePOST(c echo.Context) error {
 	}
 
 	return c.Redirect(http.StatusSeeOther, "/settings/workers")
-}
-
-func (h *BaseHandler) SettingsWorkersTokenGET(c echo.Context) error {
-	slug := c.Param("slug")
-
-	worker, err := services.GetWorker(context.Background(), h.query, slug)
-	if err != nil {
-		return err
-	}
-
-	// Allow write access to default namespace
-	token, err := jwt.NewTokenForWorker(h.config.Jwt.PrivateKey, h.config.Jwt.PublicKey, worker)
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, map[string]string{"token": token})
 }

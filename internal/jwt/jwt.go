@@ -35,7 +35,6 @@ func JwtPublicKey(publicKey string) (*rsa.PublicKey, error) {
 type Claims struct {
 	jwt.RegisteredClaims
 	Permissions []string `json:"permissions"`
-	WorkerGroup string   `json:"group"`
 }
 
 func NewTokenForUser(privateKey string, publicKey string, email string) (string, error) {
@@ -50,7 +49,6 @@ func NewTokenForUser(privateKey string, publicKey string, email string) (string,
 		},
 		// Ref: https://docs.temporal.io/self-hosted-guide/security#authorization
 		[]string{"temporal-system:admin", "default:admin"},
-		"",
 	}
 
 	return NewToken(privateKey, publicKey, claims)
@@ -68,7 +66,6 @@ func NewTokenForServer(privateKey string, publicKey string) (string, error) {
 		},
 		// Ref: https://docs.temporal.io/self-hosted-guide/security#authorization
 		[]string{"temporal-system:admin", "default:admin"},
-		"",
 	}
 
 	return NewToken(privateKey, publicKey, claims)
@@ -86,7 +83,6 @@ func NewTokenForWorker(privateKey string, publicKey string, worker *models.Worke
 		},
 		// Ref: https://docs.temporal.io/self-hosted-guide/security#authorization
 		[]string{"default:read", "default:write", "default:worker"},
-		worker.Group,
 	}
 
 	return NewToken(privateKey, publicKey, claims)

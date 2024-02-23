@@ -35,6 +35,7 @@ var SettingsPages = []*components.Page{
 	{Path: "/settings/cronjobs", Title: "Cronjobs", Breadcrumb: "Cronjobs"},
 	{Path: "/settings/workers", Title: "Workers", Breadcrumb: "Workers"},
 	{Path: "/settings/workers/create", Title: "Workers Create", Breadcrumb: "Create"},
+	{Path: "/settings/notifications", Title: "Notifications", Breadcrumb: "Notifications"},
 	{Path: "/settings/temporal", Title: "Temporal", Breadcrumb: "Temporal"},
 	{Path: "/oauth2/logout", Title: "Logout", Breadcrumb: "Logout"},
 }
@@ -44,6 +45,7 @@ var SettingsNavbar = []*components.Page{
 	GetPageByTitle(SettingsPages, "Healthchecks"),
 	GetPageByTitle(SettingsPages, "Cronjobs"),
 	GetPageByTitle(SettingsPages, "Workers"),
+	GetPageByTitle(SettingsPages, "Notifications"),
 	GetPageByTitle(SettingsPages, "Temporal"),
 	GetPageByTitle(SettingsPages, "Logout"),
 }

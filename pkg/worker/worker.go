@@ -35,6 +35,14 @@ func getConnectionConfig(token string, apiUrl string) (*ConnectionConfig, error)
 			return nil, errors.Wrap(err, "failed to connect to API")
 		}
 
+		if res.StatusCode == http.StatusUnauthorized {
+			panic("WORKER_TOKEN is invalid. Either it expired or the worker was removed!")
+		}
+
+		if res.StatusCode != http.StatusOK {
+			return nil, errors.Errorf("unexpected status code: %d", res.StatusCode)
+		}
+
 		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to read response body")
