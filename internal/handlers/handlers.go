@@ -6,7 +6,6 @@ import (
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/gorilla/sessions"
 	"go.temporal.io/sdk/client"
-	"gorm.io/gorm"
 )
 
 var Pages = []*components.Page{
@@ -25,7 +24,6 @@ func GetPageByTitle(pages []*components.Page, title string) *components.Page {
 }
 
 type BaseHandler struct {
-	db     *gorm.DB
 	query  *query.Query
 	config *config.ServerConfig
 
@@ -34,8 +32,8 @@ type BaseHandler struct {
 	store *sessions.CookieStore
 }
 
-func NewBaseHandler(db *gorm.DB, q *query.Query, temporal client.Client, config *config.ServerConfig) *BaseHandler {
+func NewBaseHandler(q *query.Query, temporal client.Client, config *config.ServerConfig) *BaseHandler {
 	store := sessions.NewCookieStore([]byte(config.SessionSecret))
 
-	return &BaseHandler{db, q, config, temporal, store}
+	return &BaseHandler{q, config, temporal, store}
 }

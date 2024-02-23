@@ -14,6 +14,7 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
     - Spread workers across regions to monitor latency from different locations.
  - [x] Use [k6](https://github.com/grafana/k6) for checks, so that they can be written in javascript.
  - [ ] History and working home page.
+    - Kinda working atm. But look if all the data could be stored/fetched from temporal.
  - [ ] Edit/Delete operations for healthchecks and workers.
  - [ ] CronJob Healthchecks (via webhooks).
  - [ ] Notifications (webhooks, slack, etc).

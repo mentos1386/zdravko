@@ -6,11 +6,10 @@ import (
 
 	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"code.tjo.space/mentos1386/zdravko/internal/models/query"
-	"gorm.io/gorm"
 )
 
-func CreateWorker(ctx context.Context, db *gorm.DB, worker *models.Worker) error {
-	return db.WithContext(ctx).Create(worker).Error
+func CreateWorker(ctx context.Context, q *query.Query, worker *models.Worker) error {
+	return q.Worker.WithContext(ctx).Create(worker)
 }
 
 func GetWorker(ctx context.Context, q *query.Query, slug string) (*models.Worker, error) {

@@ -82,12 +82,13 @@ func (h *BaseHandler) RefreshToken(w http.ResponseWriter, r *http.Request, user 
 }
 
 func (h *BaseHandler) OAuth2LoginGET(c echo.Context) error {
+	ctx := context.Background()
 	conf := newOAuth2(h.config)
 
 	state := newRandomState()
-	result := h.db.Create(&models.OAuth2State{State: state, Expiry: time.Now().Add(5 * time.Minute)})
-	if result.Error != nil {
-		return result.Error
+	err := h.query.OAuth2State.WithContext(ctx).Create(&models.OAuth2State{State: state, Expiry: time.Now().Add(5 * time.Minute)})
+	if err != nil {
+		return err
 	}
 
 	url := conf.AuthCodeURL(state, oauth2.AccessTypeOffline)

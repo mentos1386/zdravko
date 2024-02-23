@@ -113,7 +113,7 @@ func (h *BaseHandler) SettingsWorkersCreatePOST(c echo.Context) error {
 
 	err = services.CreateWorker(
 		ctx,
-		h.db,
+		h.query,
 		worker,
 	)
 	if err != nil {

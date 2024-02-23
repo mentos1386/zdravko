@@ -48,7 +48,7 @@ func (s *Server) Start() error {
 	}
 	log.Println("Connected to Temporal")
 
-	h := handlers.NewBaseHandler(db, query, temporalClient, s.cfg)
+	h := handlers.NewBaseHandler(query, temporalClient, s.cfg)
 
 	// Health
 	s.echo.GET("/health", func(c echo.Context) error {
@@ -82,6 +82,7 @@ func (s *Server) Start() error {
 	settings.GET("/healthchecks/create", h.SettingsHealthchecksCreateGET)
 	settings.POST("/healthchecks/create", h.SettingsHealthchecksCreatePOST)
 	settings.GET("/healthchecks/:slug", h.SettingsHealthchecksDescribeGET)
+	settings.POST("/healthchecks/:slug", h.SettingsHealthchecksDescribePOST)
 	settings.GET("/workers", h.SettingsWorkersGET)
 	settings.GET("/workers/create", h.SettingsWorkersCreateGET)
 	settings.POST("/workers/create", h.SettingsWorkersCreatePOST)

@@ -70,6 +70,46 @@ func (h *BaseHandler) SettingsHealthchecksDescribeGET(c echo.Context) error {
 	})
 }
 
+func (h *BaseHandler) SettingsHealthchecksDescribePOST(c echo.Context) error {
+	ctx := context.Background()
+
+	slug := c.Param("slug")
+
+	healthcheck, err := services.GetHealthcheck(ctx, h.query, slug)
+	if err != nil {
+		return err
+	}
+
+	update := &models.Healthcheck{
+		Slug:         healthcheck.Slug,
+		Name:         healthcheck.Name,
+		Schedule:     c.FormValue("schedule"),
+		WorkerGroups: strings.Split(c.FormValue("workergroups"), " "),
+		Script:       c.FormValue("script"),
+	}
+
+	err = validator.New(validator.WithRequiredStructEnabled()).Struct(update)
+	if err != nil {
+		return err
+	}
+
+	err = services.UpdateHealthcheck(
+		ctx,
+		h.query,
+		update,
+	)
+	if err != nil {
+		return err
+	}
+
+	err = services.CreateOrUpdateHealthcheckSchedule(ctx, h.temporal, healthcheck)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/healthchecks/%s", slug))
+}
+
 func (h *BaseHandler) SettingsHealthchecksCreateGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
@@ -101,14 +141,14 @@ func (h *BaseHandler) SettingsHealthchecksCreatePOST(c echo.Context) error {
 
 	err = services.CreateHealthcheck(
 		ctx,
-		h.db,
+		h.query,
 		healthcheckHttp,
 	)
 	if err != nil {
 		return err
 	}
 
-	err = services.StartHealthcheck(ctx, h.temporal, healthcheckHttp)
+	err = services.CreateOrUpdateHealthcheckSchedule(ctx, h.temporal, healthcheckHttp)
 	if err != nil {
 		return err
 	}
