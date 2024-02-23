@@ -33,6 +33,7 @@
 {{end}}
 
 {{define "main"}}
+<div class="container max-w-screen-md flex flex-col mt-20">
   {{ if eq .HealthchecksLength 0 }}
   <section>
       <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
@@ -93,4 +94,5 @@
     {{ end }}
   </div>
   {{ end }}
+</div>
 {{end}}

@@ -6,7 +6,7 @@
   {{ $path = .SettingsSidebarActive.Path }}
 {{ end }}
 
-<div class="grid grid-cols-1 lg:grid-cols-[1fr_100%] gap-8">
+<div class="container max-w-screen-lg mt-20 grid grid-cols-1 lg:grid-cols-[min-content_auto] gap-8">
   <ul class="sidebar">
     {{range .SettingsSidebar}}
     <li>

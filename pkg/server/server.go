@@ -72,6 +72,7 @@ func (s *Server) Start() error {
 
 	// Public
 	s.echo.GET("", h.Index)
+	s.echo.GET("/incidents", h.Incidents)
 
 	// Settings
 	settings := s.echo.Group("/settings")

@@ -40,6 +40,7 @@ func NewTemplates() *Templates {
 		templates: map[string]*template.Template{
 			"404.tmpl":                            load("pages/404.tmpl"),
 			"index.tmpl":                          load("pages/index.tmpl"),
+			"incidents.tmpl":                      load("pages/incidents.tmpl"),
 			"settings_overview.tmpl":              loadSettings("pages/settings_overview.tmpl"),
 			"settings_workers.tmpl":               loadSettings("pages/settings_workers.tmpl"),
 			"settings_workers_create.tmpl":        loadSettings("pages/settings_workers_create.tmpl"),

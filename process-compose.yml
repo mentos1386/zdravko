@@ -6,7 +6,7 @@ processes:
     availability:
       restart: "always"
   temporal:
-    command: watchexec -r -e go,tmpl,css just run-temporal
+    command: just run-temporal
     availability:
       restart: "always"
   tailwind:

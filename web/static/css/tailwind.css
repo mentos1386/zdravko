@@ -720,6 +720,10 @@ video {
   min-width: 100%;
 }
 
+.max-w-screen-lg {
+  max-width: 1024px;
+}
+
 .max-w-screen-md {
   max-width: 768px;
 }
@@ -1410,8 +1414,8 @@ video {
 }
 
 @media (min-width: 1024px) {
-  .lg\:grid-cols-\[1fr_100\%\] {
-    grid-template-columns: 1fr 100%;
+  .lg\:grid-cols-\[min-content_auto\] {
+    grid-template-columns: min-content auto;
   }
 
   .lg\:px-40 {
