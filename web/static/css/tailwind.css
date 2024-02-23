@@ -1157,6 +1157,16 @@ p > a:hover {
   text-decoration-line: underline;
 }
 
+code {
+  border-radius: 0.5rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+  padding: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
 .navbar {
   margin-top: 2.5rem;
   display: flex;

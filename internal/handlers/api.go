@@ -47,16 +47,8 @@ func (h *BaseHandler) ApiV1HealthchecksHistoryPOST(c echo.Context) error {
 
 	slug := c.Param("slug")
 
-	worker, err := services.GetWorker(ctx, h.query, slug)
-	if err != nil {
-		return err
-	}
-	if worker == nil {
-		return echo.NewHTTPError(http.StatusNotFound, "Worker not found")
-	}
-
 	var body api.ApiV1HealthchecksHistoryPOSTBody
-	err = (&echo.DefaultBinder{}).BindBody(c, &body)
+	err := (&echo.DefaultBinder{}).BindBody(c, &body)
 	if err != nil {
 		return err
 	}

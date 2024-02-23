@@ -17,6 +17,10 @@ p > a {
   @apply font-medium text-blue-700 hover:underline;
 }
 
+code {
+  @apply font-mono text-sm bg-gray-100 rounded-lg p-1;
+}
+
 .navbar {
   @apply justify-center flex flex-wrap space-x-2 gap-2 mt-10;
 }
