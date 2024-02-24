@@ -16,12 +16,12 @@ type HealtcheckParam struct {
 	Script string
 }
 
-type HealthcheckResult struct {
+type MonitorResult struct {
 	Success bool
 	Note    string
 }
 
-func (a *Activities) Healthcheck(ctx context.Context, param HealtcheckParam) (*HealthcheckResult, error) {
+func (a *Activities) Monitor(ctx context.Context, param HealtcheckParam) (*MonitorResult, error) {
 	execution := k6.NewExecution(slog.Default(), param.Script)
 
 	result, err := execution.Run(ctx)
@@ -29,7 +29,7 @@ func (a *Activities) Healthcheck(ctx context.Context, param HealtcheckParam) (*H
 		return nil, err
 	}
 
-	return &HealthcheckResult{Success: result.Success, Note: result.Note}, nil
+	return &MonitorResult{Success: result.Success, Note: result.Note}, nil
 }
 
 type HealtcheckAddToHistoryParam struct {
@@ -38,13 +38,13 @@ type HealtcheckAddToHistoryParam struct {
 	Note   string
 }
 
-type HealthcheckAddToHistoryResult struct {
+type MonitorAddToHistoryResult struct {
 }
 
-func (a *Activities) HealthcheckAddToHistory(ctx context.Context, param HealtcheckAddToHistoryParam) (*HealthcheckAddToHistoryResult, error) {
-	url := fmt.Sprintf("%s/api/v1/healthchecks/%s/history", a.config.ApiUrl, param.Slug)
+func (a *Activities) MonitorAddToHistory(ctx context.Context, param HealtcheckAddToHistoryParam) (*MonitorAddToHistoryResult, error) {
+	url := fmt.Sprintf("%s/api/v1/monitors/%s/history", a.config.ApiUrl, param.Slug)
 
-	body := api.ApiV1HealthchecksHistoryPOSTBody{
+	body := api.ApiV1MonitorsHistoryPOSTBody{
 		Status: param.Status,
 		Note:   param.Note,
 	}
@@ -69,5 +69,5 @@ func (a *Activities) HealthcheckAddToHistory(ctx context.Context, param Healtche
 		return nil, fmt.Errorf("unexpected status code: %d", response.StatusCode)
 	}
 
-	return &HealthcheckAddToHistoryResult{}, nil
+	return &MonitorAddToHistoryResult{}, nil
 }

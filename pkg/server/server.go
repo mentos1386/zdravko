@@ -78,11 +78,11 @@ func (s *Server) Start() error {
 	settings := s.echo.Group("/settings")
 	settings.Use(h.Authenticated)
 	settings.GET("", h.SettingsOverviewGET)
-	settings.GET("/healthchecks", h.SettingsHealthchecksGET)
-	settings.GET("/healthchecks/create", h.SettingsHealthchecksCreateGET)
-	settings.POST("/healthchecks/create", h.SettingsHealthchecksCreatePOST)
-	settings.GET("/healthchecks/:slug", h.SettingsHealthchecksDescribeGET)
-	settings.POST("/healthchecks/:slug", h.SettingsHealthchecksDescribePOST)
+	settings.GET("/monitors", h.SettingsMonitorsGET)
+	settings.GET("/monitors/create", h.SettingsMonitorsCreateGET)
+	settings.POST("/monitors/create", h.SettingsMonitorsCreatePOST)
+	settings.GET("/monitors/:slug", h.SettingsMonitorsDescribeGET)
+	settings.POST("/monitors/:slug", h.SettingsMonitorsDescribePOST)
 	settings.GET("/workers", h.SettingsWorkersGET)
 	settings.GET("/workers/create", h.SettingsWorkersCreateGET)
 	settings.POST("/workers/create", h.SettingsWorkersCreatePOST)
@@ -99,7 +99,7 @@ func (s *Server) Start() error {
 	apiv1 := s.echo.Group("/api/v1")
 	apiv1.Use(h.Authenticated)
 	apiv1.GET("/workers/connect", h.ApiV1WorkersConnectGET)
-	apiv1.POST("/healthchecks/:slug/history", h.ApiV1HealthchecksHistoryPOST)
+	apiv1.POST("/monitors/:slug/history", h.ApiV1MonitorsHistoryPOST)
 
 	// Error handler
 	s.echo.HTTPErrorHandler = func(err error, c echo.Context) {

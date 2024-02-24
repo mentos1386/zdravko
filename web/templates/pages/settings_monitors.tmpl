@@ -1,18 +1,18 @@
 {{define "settings"}}
 
-{{ $description := "Healthchecks represent periodicly the k6 script, to see if the monitored service is healthy." }}
+{{ $description := "Monitors represent periodicly the k6 script, to see if the monitored service is healthy." }}
 
-{{ if eq .HealthchecksLength 0 }}
+{{ if eq .MonitorsLength 0 }}
 <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
     <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
-    There are no healthchecks yet.
+    There are no monitors yet.
     </h1>
     <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40">
     {{ $description }}
     </p>
     <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-        <a href="/settings/healthchecks/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
-          Create First Healthcheck
+        <a href="/settings/monitors/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+          Create First Monitor
           <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
         </a>
     </div>
@@ -21,12 +21,12 @@
 <section>
     <table class="w-full text-sm text-left rtl:text-right text-gray-500">
         <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
-          List of Healthchecks
+          List of Monitors
           <div class="mt-1 gap-4 flex justify-between">
             <p class="mt-1 text-sm font-normal text-gray-500">
               {{ $description }}
             </p>
-            <a href="/settings/healthchecks/create" class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+            <a href="/settings/monitors/create" class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
               Create New
               <svg class="feather h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
             </a>
@@ -51,7 +51,7 @@
                 </th>
             </tr>
         </thead>
-        {{range .Healthchecks}}
+        {{range .Monitors}}
         <tbody>
             <tr class="odd:bg-white even:bg-gray-50">
                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -76,7 +76,7 @@
                     {{.Schedule}}
                 </td>
                 <td class="px-6 py-4">
-                    <a href="/settings/healthchecks/{{.Slug}}" class="link">Details</a>
+                    <a href="/settings/monitors/{{.Slug}}" class="link">Details</a>
                 </td>
             </tr>
         </tbody>

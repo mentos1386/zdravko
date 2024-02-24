@@ -1,16 +1,16 @@
 {{define "settings"}}
 <section class="p-5">
-  <form action="/settings/healthchecks/{{ .Healthcheck.Slug }}" method="post">
+  <form action="/settings/monitors/{{ .Monitor.Slug }}" method="post">
     <h2>
       Configuration
     </h2>
     <label for="workergroups">Worker Groups</label>
-    <input type="text" name="workergroups" id="workergroups" value="{{ StringsJoin .Healthcheck.WorkerGroups " " }}"/>
-    <p>Worker groups are used to distribute the healthcheck to specific workers.</p>
+    <input type="text" name="workergroups" id="workergroups" value="{{ StringsJoin .Monitor.WorkerGroups " " }}"/>
+    <p>Worker groups are used to distribute the monitor to specific workers.</p>
     <label for="schedule">Schedule</label>
-    <input type="text" name="schedule" id="schedule" value="{{ .Healthcheck.Schedule }}"/>
+    <input type="text" name="schedule" id="schedule" value="{{ .Monitor.Schedule }}"/>
     <p>
-    Schedule is a cron expression that defines when the healthcheck should be executed.
+    Schedule is a cron expression that defines when the monitor should be executed.
     </br>
     You can also use <code>@every [interval]</code> where interval is a duration like 5m, 1h, 60s.
     Or use <code>@hourly</code>, <code>@daily</code>, <code>@weekly</code>, <code>@monthly</code>, <code>@yearly</code>.
@@ -31,7 +31,7 @@
     <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
       History
       <p class="mt-1 text-sm font-normal text-gray-500">
-        Last executions of healthcheck script.
+        Last executions of monitor script.
       </p>
     </caption>
     <thead>
@@ -43,7 +43,7 @@
     </tr>
     </thead>
     <tbody>
-    {{range .Healthcheck.History}}
+    {{range .Monitor.History}}
     <tr>
       <td class="px-6 py-4 whitespace-nowrap">
         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{if eq .Status "SUCCESS"}}bg-green-100 text-green-800{{else}}bg-red-100 text-red-800{{end}}">
@@ -72,7 +72,7 @@
     document.getElementById('script').value = script;
   }
 
-  script = `{{ .Healthcheck.Script }}`
+  script = `{{ .Monitor.Script }}`
 
   require.config({ paths: { vs: '/static/monaco/vs' } });
   require(['vs/editor/editor.main'], function () {

@@ -30,8 +30,8 @@ func main() {
 	// Generate default DAO interface for those specified structs
 	g.ApplyBasic(
 		models.Worker{},
-		models.Healthcheck{},
-		models.HealthcheckHistory{},
+		models.Monitor{},
+		models.MonitorHistory{},
 		models.Cronjob{},
 		models.CronjobHistory{},
 		models.OAuth2State{},

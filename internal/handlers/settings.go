@@ -30,9 +30,8 @@ func NewSettings(user *AuthenticatedUser, page *components.Page, breadCrumbs []*
 
 var SettingsPages = []*components.Page{
 	{Path: "/settings", Title: "Overview", Breadcrumb: "Overview"},
-	{Path: "/settings/healthchecks", Title: "Healthchecks", Breadcrumb: "Healthchecks"},
-	{Path: "/settings/healthchecks/create", Title: "Healthchecks Create", Breadcrumb: "Create"},
-	{Path: "/settings/cronjobs", Title: "Cronjobs", Breadcrumb: "Cronjobs"},
+	{Path: "/settings/monitors", Title: "Monitors", Breadcrumb: "Monitors"},
+	{Path: "/settings/monitors/create", Title: "Monitors Create", Breadcrumb: "Create"},
 	{Path: "/settings/workers", Title: "Workers", Breadcrumb: "Workers"},
 	{Path: "/settings/workers/create", Title: "Workers Create", Breadcrumb: "Create"},
 	{Path: "/settings/notifications", Title: "Notifications", Breadcrumb: "Notifications"},
@@ -42,8 +41,7 @@ var SettingsPages = []*components.Page{
 
 var SettingsNavbar = []*components.Page{
 	GetPageByTitle(SettingsPages, "Overview"),
-	GetPageByTitle(SettingsPages, "Healthchecks"),
-	GetPageByTitle(SettingsPages, "Cronjobs"),
+	GetPageByTitle(SettingsPages, "Monitors"),
 	GetPageByTitle(SettingsPages, "Workers"),
 	GetPageByTitle(SettingsPages, "Notifications"),
 	GetPageByTitle(SettingsPages, "Temporal"),

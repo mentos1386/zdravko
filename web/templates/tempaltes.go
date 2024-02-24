@@ -45,9 +45,9 @@ func NewTemplates() *Templates {
 			"settings_workers.tmpl":               loadSettings("pages/settings_workers.tmpl"),
 			"settings_workers_create.tmpl":        loadSettings("pages/settings_workers_create.tmpl"),
 			"settings_workers_describe.tmpl":      loadSettings("pages/settings_workers_describe.tmpl"),
-			"settings_healthchecks.tmpl":          loadSettings("pages/settings_healthchecks.tmpl"),
-			"settings_healthchecks_create.tmpl":   loadSettings("pages/settings_healthchecks_create.tmpl"),
-			"settings_healthchecks_describe.tmpl": loadSettings("pages/settings_healthchecks_describe.tmpl"),
+			"settings_monitors.tmpl":          loadSettings("pages/settings_monitors.tmpl"),
+			"settings_monitors_create.tmpl":   loadSettings("pages/settings_monitors_create.tmpl"),
+			"settings_monitors_describe.tmpl": loadSettings("pages/settings_monitors_describe.tmpl"),
 		},
 	}
 }

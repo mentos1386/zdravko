@@ -21,13 +21,13 @@ type Worker struct {
 }
 
 const (
-	HealthcheckSuccess string = "SUCCESS"
-	HealthcheckFailure string = "FAILURE"
-	HealthcheckError   string = "ERROR"
-	HealthcheckUnknown string = "UNKNOWN"
+	MonitorSuccess string = "SUCCESS"
+	MonitorFailure string = "FAILURE"
+	MonitorError   string = "ERROR"
+	MonitorUnknown string = "UNKNOWN"
 )
 
-type Healthcheck struct {
+type Monitor struct {
 	gorm.Model
 	Slug string `gorm:"unique"`
 	Name string `gorm:"unique" validate:"required"`
@@ -37,7 +37,7 @@ type Healthcheck struct {
 
 	Script string `validate:"required"`
 
-	History []HealthcheckHistory `gorm:"foreignKey:Healthcheck"`
+	History []MonitorHistory `gorm:"foreignKey:Monitor"`
 }
 
 type Cronjob struct {
@@ -48,9 +48,9 @@ type Cronjob struct {
 	Buffer   int
 }
 
-type HealthcheckHistory struct {
+type MonitorHistory struct {
 	gorm.Model
-	Healthcheck uint
+	Monitor uint
 	Status      string
 	Note        string
 }

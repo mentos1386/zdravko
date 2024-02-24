@@ -1,16 +1,16 @@
 {{define "settings"}}
 <section class="p-5">
-  <form action="/settings/healthchecks/create" method="post">
+  <form action="/settings/monitors/create" method="post">
     <label for="name">Name</label>
     <input type="name" name="name" id="name" placeholder="Github.com">
-    <p>Name of the healthcheck can be anything.</p>
+    <p>Name of the monitor can be anything.</p>
     <label for="workergroups">Worker Groups</label>
     <input type="text" name="workergroups" id="workergroups" placeholder="NA EU"/>
-    <p>Worker groups are used to distribute the healthcheck to specific workers.</p>
+    <p>Worker groups are used to distribute the monitor to specific workers.</p>
     <label for="schedule">Schedule</label>
     <input type="text" name="schedule" id="schedule" placeholder="@every 1m"/>
     <p>
-    Schedule is a cron expression that defines when the healthcheck should be executed.
+    Schedule is a cron expression that defines when the monitor should be executed.
     </br>
     You can also use <code>@every [interval]</code> where interval is a duration like 5m, 1h, 60s.
     Or use <code>@hourly</code>, <code>@daily</code>, <code>@weekly</code>, <code>@monthly</code>, <code>@yearly</code>.

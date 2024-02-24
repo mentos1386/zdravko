@@ -42,24 +42,24 @@ func (h *BaseHandler) ApiV1WorkersConnectGET(c echo.Context) error {
 // TODO: Can we instead get this from the Workflow outcome?
 //
 //	To somehow listen for the outcomes and then store them automatically.
-func (h *BaseHandler) ApiV1HealthchecksHistoryPOST(c echo.Context) error {
+func (h *BaseHandler) ApiV1MonitorsHistoryPOST(c echo.Context) error {
 	ctx := context.Background()
 
 	slug := c.Param("slug")
 
-	var body api.ApiV1HealthchecksHistoryPOSTBody
+	var body api.ApiV1MonitorsHistoryPOSTBody
 	err := (&echo.DefaultBinder{}).BindBody(c, &body)
 	if err != nil {
 		return err
 	}
 
-	healthcheck, err := services.GetHealthcheck(ctx, h.query, slug)
+	monitor, err := services.GetMonitor(ctx, h.query, slug)
 	if err != nil {
 		return err
 	}
 
-	err = h.query.Healthcheck.History.Model(healthcheck).Append(
-		&models.HealthcheckHistory{
+	err = h.query.Monitor.History.Model(monitor).Append(
+		&models.MonitorHistory{
 			Status: body.Status,
 			Note:   body.Note,
 		})

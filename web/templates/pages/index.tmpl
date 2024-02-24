@@ -34,18 +34,18 @@
 
 {{define "main"}}
 <div class="container max-w-screen-md flex flex-col mt-20">
-  {{ if eq .HealthchecksLength 0 }}
+  {{ if eq .MonitorsLength 0 }}
   <section>
       <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
           <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
-          There are no healthchecks yet.
+          There are no monitors yet.
           </h1>
           <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40">
-          Create a healthcheck to monitor your services and get notified when they are down.
+          Create a monitor to monitor your services and get notified when they are down.
           </p>
           <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-              <a href="/settings/healthchecks/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
-                Create First Healthcheck
+              <a href="/settings/monitors/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+                Create First Monitor
                 <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
               </a>
           </div>
@@ -65,9 +65,9 @@
     <p class="text-slate-500 text-sm">Last updated on Feb 10 at 10:55am UTC</p>
   </div>
   {{ end }}
-  <div class="healthchecks">
+  <div class="monitors">
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-      <p class="text-l font-normal text-gray-800 text-center sm:text-left">Healthchecks</p>
+      <p class="text-l font-normal text-gray-800 text-center sm:text-left">Monitors</p>
       <div class="inline-flex rounded-md shadow-sm justify-self-center sm:justify-self-end time-range" role="group">
         <a href="/?time-range=90days" class="{{ if eq .TimeRange "90days" }}active{{end}}" type="button">90 Days</a>
         <a href="/?time-range=48hours" class="{{ if eq .TimeRange "48hours" }}active{{end}}" type="button">48 Hours</a>

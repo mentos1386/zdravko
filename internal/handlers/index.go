@@ -14,7 +14,7 @@ import (
 type IndexData struct {
 	*components.Base
 	HealthChecks       []*HealthCheck
-	HealthchecksLength int
+	MonitorsLength int
 	TimeRange          string
 	Status             string
 }
@@ -39,7 +39,7 @@ func getHour(date time.Time) string {
 	return date.Format("2006-01-02T15:04")
 }
 
-func getDailyHistory(history []models.HealthcheckHistory) *History {
+func getDailyHistory(history []models.MonitorHistory) *History {
 	numDays := 90
 	historyDailyMap := map[string]string{}
 	numOfSuccess := 0
@@ -47,7 +47,7 @@ func getDailyHistory(history []models.HealthcheckHistory) *History {
 
 	for i := 0; i < numDays; i++ {
 		day := getDay(time.Now().AddDate(0, 0, -i).Truncate(time.Hour * 24))
-		historyDailyMap[day] = models.HealthcheckUnknown
+		historyDailyMap[day] = models.MonitorUnknown
 	}
 
 	for _, _history := range history {
@@ -59,12 +59,12 @@ func getDailyHistory(history []models.HealthcheckHistory) *History {
 		}
 
 		numTotal++
-		if _history.Status == models.HealthcheckSuccess {
+		if _history.Status == models.MonitorSuccess {
 			numOfSuccess++
 		}
 
 		// skip if day is already set to failure
-		if historyDailyMap[day] == models.HealthcheckFailure {
+		if historyDailyMap[day] == models.MonitorFailure {
 			continue
 		}
 
@@ -88,7 +88,7 @@ func getDailyHistory(history []models.HealthcheckHistory) *History {
 	}
 }
 
-func getHourlyHistory(history []models.HealthcheckHistory) *History {
+func getHourlyHistory(history []models.MonitorHistory) *History {
 	numHours := 48
 	historyHourlyMap := map[string]string{}
 	numOfSuccess := 0
@@ -96,7 +96,7 @@ func getHourlyHistory(history []models.HealthcheckHistory) *History {
 
 	for i := 0; i < numHours; i++ {
 		hour := getHour(time.Now().Add(time.Hour * time.Duration(-i)).Truncate(time.Hour))
-		historyHourlyMap[hour] = models.HealthcheckUnknown
+		historyHourlyMap[hour] = models.MonitorUnknown
 	}
 
 	for _, _history := range history {
@@ -108,12 +108,12 @@ func getHourlyHistory(history []models.HealthcheckHistory) *History {
 		}
 
 		numTotal++
-		if _history.Status == models.HealthcheckSuccess {
+		if _history.Status == models.MonitorSuccess {
 			numOfSuccess++
 		}
 
 		// skip if day is already set to failure
-		if historyHourlyMap[hour] == models.HealthcheckFailure {
+		if historyHourlyMap[hour] == models.MonitorFailure {
 			continue
 		}
 
@@ -139,7 +139,7 @@ func getHourlyHistory(history []models.HealthcheckHistory) *History {
 
 func (h *BaseHandler) Index(c echo.Context) error {
 	ctx := context.Background()
-	healthchecks, err := services.GetHealthchecks(ctx, h.query)
+	monitors, err := services.GetMonitors(ctx, h.query)
 	if err != nil {
 		return err
 	}
@@ -151,18 +151,18 @@ func (h *BaseHandler) Index(c echo.Context) error {
 
 	overallStatus := "SUCCESS"
 
-	healthchecksWithHistory := make([]*HealthCheck, len(healthchecks))
-	for i, healthcheck := range healthchecks {
-		historyDaily := getDailyHistory(healthcheck.History)
-		historyHourly := getHourlyHistory(healthcheck.History)
+	monitorsWithHistory := make([]*HealthCheck, len(monitors))
+	for i, monitor := range monitors {
+		historyDaily := getDailyHistory(monitor.History)
+		historyHourly := getHourlyHistory(monitor.History)
 
 		status := historyDaily.History[89]
-		if status != models.HealthcheckSuccess {
+		if status != models.MonitorSuccess {
 			overallStatus = status
 		}
 
-		healthchecksWithHistory[i] = &HealthCheck{
-			Name:          healthcheck.Name,
+		monitorsWithHistory[i] = &HealthCheck{
+			Name:          monitor.Name,
 			Status:        status,
 			HistoryDaily:  historyDaily,
 			HistoryHourly: historyHourly,
@@ -174,8 +174,8 @@ func (h *BaseHandler) Index(c echo.Context) error {
 			NavbarActive: GetPageByTitle(Pages, "Status"),
 			Navbar:       Pages,
 		},
-		HealthChecks:       healthchecksWithHistory,
-		HealthchecksLength: len(healthchecks),
+		HealthChecks:       monitorsWithHistory,
+		MonitorsLength: len(monitors),
 		TimeRange:          timeRange,
 		Status:             overallStatus,
 	})

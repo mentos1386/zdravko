@@ -1,6 +1,6 @@
 package api
 
-type ApiV1HealthchecksHistoryPOSTBody struct {
+type ApiV1MonitorsHistoryPOSTBody struct {
 	Status string `json:"status"`
 	Note   string `json:"note"`
 }

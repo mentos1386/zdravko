@@ -16,59 +16,59 @@ import (
 )
 
 var (
-	Q                  = new(Query)
-	Cronjob            *cronjob
-	CronjobHistory     *cronjobHistory
-	Healthcheck        *healthcheck
-	HealthcheckHistory *healthcheckHistory
-	OAuth2State        *oAuth2State
-	Worker             *worker
+	Q              = new(Query)
+	Cronjob        *cronjob
+	CronjobHistory *cronjobHistory
+	Monitor        *monitor
+	MonitorHistory *monitorHistory
+	OAuth2State    *oAuth2State
+	Worker         *worker
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	Cronjob = &Q.Cronjob
 	CronjobHistory = &Q.CronjobHistory
-	Healthcheck = &Q.Healthcheck
-	HealthcheckHistory = &Q.HealthcheckHistory
+	Monitor = &Q.Monitor
+	MonitorHistory = &Q.MonitorHistory
 	OAuth2State = &Q.OAuth2State
 	Worker = &Q.Worker
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:                 db,
-		Cronjob:            newCronjob(db, opts...),
-		CronjobHistory:     newCronjobHistory(db, opts...),
-		Healthcheck:        newHealthcheck(db, opts...),
-		HealthcheckHistory: newHealthcheckHistory(db, opts...),
-		OAuth2State:        newOAuth2State(db, opts...),
-		Worker:             newWorker(db, opts...),
+		db:             db,
+		Cronjob:        newCronjob(db, opts...),
+		CronjobHistory: newCronjobHistory(db, opts...),
+		Monitor:        newMonitor(db, opts...),
+		MonitorHistory: newMonitorHistory(db, opts...),
+		OAuth2State:    newOAuth2State(db, opts...),
+		Worker:         newWorker(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Cronjob            cronjob
-	CronjobHistory     cronjobHistory
-	Healthcheck        healthcheck
-	HealthcheckHistory healthcheckHistory
-	OAuth2State        oAuth2State
-	Worker             worker
+	Cronjob        cronjob
+	CronjobHistory cronjobHistory
+	Monitor        monitor
+	MonitorHistory monitorHistory
+	OAuth2State    oAuth2State
+	Worker         worker
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:                 db,
-		Cronjob:            q.Cronjob.clone(db),
-		CronjobHistory:     q.CronjobHistory.clone(db),
-		Healthcheck:        q.Healthcheck.clone(db),
-		HealthcheckHistory: q.HealthcheckHistory.clone(db),
-		OAuth2State:        q.OAuth2State.clone(db),
-		Worker:             q.Worker.clone(db),
+		db:             db,
+		Cronjob:        q.Cronjob.clone(db),
+		CronjobHistory: q.CronjobHistory.clone(db),
+		Monitor:        q.Monitor.clone(db),
+		MonitorHistory: q.MonitorHistory.clone(db),
+		OAuth2State:    q.OAuth2State.clone(db),
+		Worker:         q.Worker.clone(db),
 	}
 }
 
@@ -82,33 +82,33 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:                 db,
-		Cronjob:            q.Cronjob.replaceDB(db),
-		CronjobHistory:     q.CronjobHistory.replaceDB(db),
-		Healthcheck:        q.Healthcheck.replaceDB(db),
-		HealthcheckHistory: q.HealthcheckHistory.replaceDB(db),
-		OAuth2State:        q.OAuth2State.replaceDB(db),
-		Worker:             q.Worker.replaceDB(db),
+		db:             db,
+		Cronjob:        q.Cronjob.replaceDB(db),
+		CronjobHistory: q.CronjobHistory.replaceDB(db),
+		Monitor:        q.Monitor.replaceDB(db),
+		MonitorHistory: q.MonitorHistory.replaceDB(db),
+		OAuth2State:    q.OAuth2State.replaceDB(db),
+		Worker:         q.Worker.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Cronjob            ICronjobDo
-	CronjobHistory     ICronjobHistoryDo
-	Healthcheck        IHealthcheckDo
-	HealthcheckHistory IHealthcheckHistoryDo
-	OAuth2State        IOAuth2StateDo
-	Worker             IWorkerDo
+	Cronjob        ICronjobDo
+	CronjobHistory ICronjobHistoryDo
+	Monitor        IMonitorDo
+	MonitorHistory IMonitorHistoryDo
+	OAuth2State    IOAuth2StateDo
+	Worker         IWorkerDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Cronjob:            q.Cronjob.WithContext(ctx),
-		CronjobHistory:     q.CronjobHistory.WithContext(ctx),
-		Healthcheck:        q.Healthcheck.WithContext(ctx),
-		HealthcheckHistory: q.HealthcheckHistory.WithContext(ctx),
-		OAuth2State:        q.OAuth2State.WithContext(ctx),
-		Worker:             q.Worker.WithContext(ctx),
+		Cronjob:        q.Cronjob.WithContext(ctx),
+		CronjobHistory: q.CronjobHistory.WithContext(ctx),
+		Monitor:        q.Monitor.WithContext(ctx),
+		MonitorHistory: q.MonitorHistory.WithContext(ctx),
+		OAuth2State:    q.OAuth2State.WithContext(ctx),
+		Worker:         q.Worker.WithContext(ctx),
 	}
 }
 
