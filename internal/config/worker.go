@@ -17,7 +17,7 @@ func NewWorkerConfig() *WorkerConfig {
 	v := newViper()
 
 	// Set defaults
-	v.SetDefault("token", os.Getenv("WORKER_TOKEN"))
+	v.SetDefault("token", os.Getenv("WORKER_GROUP_TOKEN"))
 	v.SetDefault("apiurl", GetEnvOrDefault("WORKER_API_URL", "http://localhost:8000"))
 
 	err := v.ReadInConfig()

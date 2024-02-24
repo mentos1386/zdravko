@@ -1,18 +1,18 @@
 {{define "settings"}}
 
-{{ $description := "Workers are executing monitors. You can deploy multiple of thems to multiple regions for wider coverage." }}
+{{ $description := "Worker Groups are used to match multiple workers together. They can be used to difirentiate between regions, environments, networks etc." }}
 
-{{ if eq .WorkersLength 0 }}
+{{ if eq .WorkerGroupsLength 0 }}
 <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
     <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
-    There are no workers yet.
+    There are no worker groups yet.
     </h1>
     <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40">
     {{ $description }}
     </p>
     <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-        <a href="/settings/workers/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
-          Create First Worker
+        <a href="/settings/worker-groups/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+          Create First Worker Group
           <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
         </a>
     </div>
@@ -21,12 +21,12 @@
 <section>
   <table class="w-full text-sm text-left rtl:text-right text-gray-500">
       <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
-        List of Workers
+        List of Worker Groups
         <div class="mt-1 gap-4 flex justify-between">
           <p class="mt-1 text-sm font-normal text-gray-500">
             {{ $description }}
           </p>
-          <a href="/settings/workers/create" class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+          <a href="/settings/worker-groups/create" class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
             Create New
             <svg class="feather h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
           </a>
@@ -34,41 +34,39 @@
       </caption>
       <thead class="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-              <th scope="col" class="px-6 py-3">
+              <th>
                   Name
               </th>
-              <th scope="col" class="px-6 py-3">
-                  Group
+              <th>
+                  Workers
               </th>
-              <th scope="col" class="px-6 py-3">
-                  Status
+              <th>
+                  Monitors
               </th>
-              <th scope="col" class="px-6 py-3">
+              <th>
                   Action
               </th>
           </tr>
       </thead>
-      {{range .Workers}}
+      {{range .WorkerGroups}}
       <tbody>
-          <tr class="odd:bg-white even:bg-gray-50">
-              <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+          <tr>
+              <th scope="row">
                   {{.Name}}
               </th>
-              <td class="px-6 py-4">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {{.Group}}
-                  </span>
-              </td>
-              <td class="px-6 py-4">
+              <td>
                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                  ONLINE
+                  10 ONLINE
                 </span>
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                  OFFLINE
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                  NONE
                 </span>
               </td>
-              <td class="px-6 py-4">
-                  <a href="/settings/workers/{{.Slug}}" class="link">Details</a>
+              <td>
+                 {{ len .Monitors }}
+              </td>
+              <td>
+                  <a href="/settings/worker-groups/{{.Slug}}" class="link">Details</a>
               </td>
           </tr>
       </tbody>

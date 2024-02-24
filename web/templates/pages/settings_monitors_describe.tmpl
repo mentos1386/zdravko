@@ -5,7 +5,7 @@
       Configuration
     </h2>
     <label for="workergroups">Worker Groups</label>
-    <input type="text" name="workergroups" id="workergroups" value="{{ StringsJoin .Monitor.WorkerGroups " " }}"/>
+    <input type="text" name="workergroups" id="workergroups" value="{{ range .Monitor.WorkerGroups }}{{.Name}} {{end}}"/>
     <p>Worker groups are used to distribute the monitor to specific workers.</p>
     <label for="schedule">Schedule</label>
     <input type="text" name="schedule" id="schedule" value="{{ .Monitor.Schedule }}"/>

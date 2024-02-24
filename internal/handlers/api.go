@@ -15,14 +15,13 @@ import (
 type ApiV1WorkersConnectGETResponse struct {
 	Endpoint string `json:"endpoint"`
 	Group    string `json:"group"`
-	Slug     string `json:"slug"`
 }
 
 func (h *BaseHandler) ApiV1WorkersConnectGET(c echo.Context) error {
 	ctx := context.Background()
 	cc := c.(AuthenticatedContext)
 
-	worker, err := services.GetWorker(ctx, h.query, cc.Principal.Worker.Slug)
+	workerGroup, err := services.GetWorkerGroup(ctx, h.query, cc.Principal.Worker.Group)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Token invalid")
@@ -32,8 +31,7 @@ func (h *BaseHandler) ApiV1WorkersConnectGET(c echo.Context) error {
 
 	response := ApiV1WorkersConnectGETResponse{
 		Endpoint: h.config.Temporal.ServerHost,
-		Group:    worker.Group,
-		Slug:     worker.Slug,
+		Group:    workerGroup.Slug,
 	}
 
 	return c.JSON(http.StatusOK, response)

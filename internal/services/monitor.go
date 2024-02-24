@@ -25,14 +25,19 @@ func UpdateMonitor(ctx context.Context, q *query.Query, monitor *models.Monitor)
 	_, err := q.Monitor.WithContext(ctx).Where(
 		q.Monitor.Slug.Eq(monitor.Slug),
 	).Updates(monitor)
+
 	return err
+}
+
+func UpdateMonitorWorkerGroups(ctx context.Context, q *query.Query, monitor *models.Monitor, workerGroups []*models.WorkerGroup) error {
+	return q.Monitor.WorkerGroups.Model(monitor).Replace(workerGroups...)
 }
 
 func GetMonitor(ctx context.Context, q *query.Query, slug string) (*models.Monitor, error) {
 	return q.Monitor.WithContext(ctx).Where(
 		q.Monitor.Slug.Eq(slug),
-		q.Monitor.DeletedAt.IsNull(),
 	).Preload(
+		q.Monitor.WorkerGroups,
 		q.Monitor.History,
 	).First()
 }
@@ -40,12 +45,16 @@ func GetMonitor(ctx context.Context, q *query.Query, slug string) (*models.Monit
 func GetMonitors(ctx context.Context, q *query.Query) ([]*models.Monitor, error) {
 	return q.Monitor.WithContext(ctx).Preload(
 		q.Monitor.History,
-	).Where(
-		q.Monitor.DeletedAt.IsNull(),
+	).Preload(
+		q.Monitor.WorkerGroups,
 	).Find()
 }
 
-func CreateOrUpdateMonitorSchedule(ctx context.Context, t client.Client, monitor *models.Monitor) error {
+func CreateOrUpdateMonitorSchedule(
+	ctx context.Context,
+	t client.Client,
+	monitor *models.Monitor,
+) error {
 	log.Println("Creating or Updating Monitor Schedule")
 
 	args := make([]interface{}, 0)
@@ -53,27 +62,23 @@ func CreateOrUpdateMonitorSchedule(ctx context.Context, t client.Client, monitor
 
 	for _, group := range monitor.WorkerGroups {
 		options := client.ScheduleOptions{
-			ID: getScheduleId(monitor, group),
-			//SearchAttributes: map[string]interface{}{
-			//	"worker-group":     group,
-			//	"monitor-slug": monitor.Slug,
-			//},
+			ID: getScheduleId(monitor, group.Slug),
 			Spec: client.ScheduleSpec{
 				CronExpressions: []string{monitor.Schedule},
 				Jitter:          time.Second * 10,
 			},
 			Action: &client.ScheduleWorkflowAction{
-				ID:        getScheduleId(monitor, group),
+				ID:        getScheduleId(monitor, group.Slug),
 				Workflow:  workflows.NewWorkflows(nil).MonitorWorkflowDefinition,
 				Args:      args,
-				TaskQueue: group,
+				TaskQueue: group.Slug,
 				RetryPolicy: &temporal.RetryPolicy{
 					MaximumAttempts: 3,
 				},
 			},
 		}
 
-		schedule := t.ScheduleClient().GetHandle(ctx, getScheduleId(monitor, group))
+		schedule := t.ScheduleClient().GetHandle(ctx, getScheduleId(monitor, group.Slug))
 
 		// If exists, we update
 		_, err := schedule.Describe(ctx)

@@ -29,11 +29,9 @@ func main() {
 
 	// Generate default DAO interface for those specified structs
 	g.ApplyBasic(
-		models.Worker{},
 		models.Monitor{},
+		models.WorkerGroup{},
 		models.MonitorHistory{},
-		models.Cronjob{},
-		models.CronjobHistory{},
 		models.OAuth2State{},
 	)
 

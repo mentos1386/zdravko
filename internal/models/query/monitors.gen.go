@@ -34,12 +34,38 @@ func newMonitor(db *gorm.DB, opts ...gen.DOOption) monitor {
 	_monitor.Slug = field.NewString(tableName, "slug")
 	_monitor.Name = field.NewString(tableName, "name")
 	_monitor.Schedule = field.NewString(tableName, "schedule")
-	_monitor.WorkerGroups = field.NewField(tableName, "worker_groups")
 	_monitor.Script = field.NewString(tableName, "script")
 	_monitor.History = monitorHasManyHistory{
 		db: db.Session(&gorm.Session{}),
 
 		RelationField: field.NewRelation("History", "models.MonitorHistory"),
+	}
+
+	_monitor.WorkerGroups = monitorManyToManyWorkerGroups{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("WorkerGroups", "models.WorkerGroup"),
+		Monitors: struct {
+			field.RelationField
+			History struct {
+				field.RelationField
+			}
+			WorkerGroups struct {
+				field.RelationField
+			}
+		}{
+			RelationField: field.NewRelation("WorkerGroups.Monitors", "models.Monitor"),
+			History: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("WorkerGroups.Monitors.History", "models.MonitorHistory"),
+			},
+			WorkerGroups: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("WorkerGroups.Monitors.WorkerGroups", "models.WorkerGroup"),
+			},
+		},
 	}
 
 	_monitor.fillFieldMap()
@@ -50,17 +76,18 @@ func newMonitor(db *gorm.DB, opts ...gen.DOOption) monitor {
 type monitor struct {
 	monitorDo monitorDo
 
-	ALL          field.Asterisk
-	ID           field.Uint
-	CreatedAt    field.Time
-	UpdatedAt    field.Time
-	DeletedAt    field.Field
-	Slug         field.String
-	Name         field.String
-	Schedule     field.String
-	WorkerGroups field.Field
-	Script       field.String
-	History      monitorHasManyHistory
+	ALL       field.Asterisk
+	ID        field.Uint
+	CreatedAt field.Time
+	UpdatedAt field.Time
+	DeletedAt field.Field
+	Slug      field.String
+	Name      field.String
+	Schedule  field.String
+	Script    field.String
+	History   monitorHasManyHistory
+
+	WorkerGroups monitorManyToManyWorkerGroups
 
 	fieldMap map[string]field.Expr
 }
@@ -84,7 +111,6 @@ func (m *monitor) updateTableName(table string) *monitor {
 	m.Slug = field.NewString(table, "slug")
 	m.Name = field.NewString(table, "name")
 	m.Schedule = field.NewString(table, "schedule")
-	m.WorkerGroups = field.NewField(table, "worker_groups")
 	m.Script = field.NewString(table, "script")
 
 	m.fillFieldMap()
@@ -118,7 +144,6 @@ func (m *monitor) fillFieldMap() {
 	m.fieldMap["slug"] = m.Slug
 	m.fieldMap["name"] = m.Name
 	m.fieldMap["schedule"] = m.Schedule
-	m.fieldMap["worker_groups"] = m.WorkerGroups
 	m.fieldMap["script"] = m.Script
 
 }
@@ -201,6 +226,87 @@ func (a monitorHasManyHistoryTx) Clear() error {
 }
 
 func (a monitorHasManyHistoryTx) Count() int64 {
+	return a.tx.Count()
+}
+
+type monitorManyToManyWorkerGroups struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	Monitors struct {
+		field.RelationField
+		History struct {
+			field.RelationField
+		}
+		WorkerGroups struct {
+			field.RelationField
+		}
+	}
+}
+
+func (a monitorManyToManyWorkerGroups) Where(conds ...field.Expr) *monitorManyToManyWorkerGroups {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a monitorManyToManyWorkerGroups) WithContext(ctx context.Context) *monitorManyToManyWorkerGroups {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a monitorManyToManyWorkerGroups) Session(session *gorm.Session) *monitorManyToManyWorkerGroups {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a monitorManyToManyWorkerGroups) Model(m *models.Monitor) *monitorManyToManyWorkerGroupsTx {
+	return &monitorManyToManyWorkerGroupsTx{a.db.Model(m).Association(a.Name())}
+}
+
+type monitorManyToManyWorkerGroupsTx struct{ tx *gorm.Association }
+
+func (a monitorManyToManyWorkerGroupsTx) Find() (result []*models.WorkerGroup, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a monitorManyToManyWorkerGroupsTx) Append(values ...*models.WorkerGroup) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a monitorManyToManyWorkerGroupsTx) Replace(values ...*models.WorkerGroup) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a monitorManyToManyWorkerGroupsTx) Delete(values ...*models.WorkerGroup) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a monitorManyToManyWorkerGroupsTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a monitorManyToManyWorkerGroupsTx) Count() int64 {
 	return a.tx.Count()
 }
 

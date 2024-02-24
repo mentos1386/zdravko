@@ -39,7 +39,7 @@ func ConnectServerToTemporal(cfg *config.ServerConfig) (client.Client, error) {
 	})
 }
 
-func ConnectWorkerToTemporal(token string, temporalHost string, identity string) (client.Client, error) {
+func ConnectWorkerToTemporal(token string, temporalHost string) (client.Client, error) {
 	provider := &AuthHeadersProvider{token}
 
 	// Try to connect to the Temporal Server
@@ -48,7 +48,6 @@ func ConnectWorkerToTemporal(token string, temporalHost string, identity string)
 			HostPort:        temporalHost,
 			HeadersProvider: provider,
 			Namespace:       "default",
-			Identity:        identity,
 		})
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to connect to Temporal Server: "+temporalHost)

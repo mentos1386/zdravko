@@ -19,7 +19,6 @@ import (
 
 type ConnectionConfig struct {
 	Endpoint string `json:"endpoint"`
-	Slug     string `json:"slug"`
 	Group    string `json:"group"`
 }
 
@@ -36,7 +35,7 @@ func getConnectionConfig(token string, apiUrl string) (*ConnectionConfig, error)
 		}
 
 		if res.StatusCode == http.StatusUnauthorized {
-			panic("WORKER_TOKEN is invalid. Either it expired or the worker was removed!")
+			panic("WORKER_GROUP_TOKEN is invalid. Either it expired or the worker was removed!")
 		}
 
 		if res.StatusCode != http.StatusOK {
@@ -79,10 +78,9 @@ func (w *Worker) Start() error {
 		return err
 	}
 
-	log.Println("Worker slug:", config.Slug)
-	log.Println("Worker group:", config.Group)
+	log.Println("Worker Group:", config.Group)
 
-	temporalClient, err := temporal.ConnectWorkerToTemporal(w.cfg.Token, config.Endpoint, config.Slug)
+	temporalClient, err := temporal.ConnectWorkerToTemporal(w.cfg.Token, config.Endpoint)
 	if err != nil {
 		return err
 	}

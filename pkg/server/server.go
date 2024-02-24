@@ -33,7 +33,7 @@ func (s *Server) Name() string {
 
 func (s *Server) Start() error {
 	s.echo.Renderer = templates.NewTemplates()
-	s.echo.Use(middleware.Logger())
+	//s.echo.Use(middleware.Logger())
 	s.echo.Use(middleware.Recover())
 
 	db, query, err := internal.ConnectToDatabase(s.cfg.DatabasePath)
@@ -83,10 +83,10 @@ func (s *Server) Start() error {
 	settings.POST("/monitors/create", h.SettingsMonitorsCreatePOST)
 	settings.GET("/monitors/:slug", h.SettingsMonitorsDescribeGET)
 	settings.POST("/monitors/:slug", h.SettingsMonitorsDescribePOST)
-	settings.GET("/workers", h.SettingsWorkersGET)
-	settings.GET("/workers/create", h.SettingsWorkersCreateGET)
-	settings.POST("/workers/create", h.SettingsWorkersCreatePOST)
-	settings.GET("/workers/:slug", h.SettingsWorkersDescribeGET)
+	settings.GET("/worker-groups", h.SettingsWorkerGroupsGET)
+	settings.GET("/worker-groups/create", h.SettingsWorkerGroupsCreateGET)
+	settings.POST("/worker-groups/create", h.SettingsWorkerGroupsCreatePOST)
+	settings.GET("/worker-groups/:slug", h.SettingsWorkerGroupsDescribeGET)
 	settings.Match([]string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"}, "/temporal*", h.Temporal)
 
 	// OAuth2

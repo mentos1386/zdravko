@@ -38,16 +38,16 @@ func loadSettings(files ...string) *template.Template {
 func NewTemplates() *Templates {
 	return &Templates{
 		templates: map[string]*template.Template{
-			"404.tmpl":                            load("pages/404.tmpl"),
-			"index.tmpl":                          load("pages/index.tmpl"),
-			"incidents.tmpl":                      load("pages/incidents.tmpl"),
-			"settings_overview.tmpl":              loadSettings("pages/settings_overview.tmpl"),
-			"settings_workers.tmpl":               loadSettings("pages/settings_workers.tmpl"),
-			"settings_workers_create.tmpl":        loadSettings("pages/settings_workers_create.tmpl"),
-			"settings_workers_describe.tmpl":      loadSettings("pages/settings_workers_describe.tmpl"),
-			"settings_monitors.tmpl":          loadSettings("pages/settings_monitors.tmpl"),
-			"settings_monitors_create.tmpl":   loadSettings("pages/settings_monitors_create.tmpl"),
-			"settings_monitors_describe.tmpl": loadSettings("pages/settings_monitors_describe.tmpl"),
+			"404.tmpl":                             load("pages/404.tmpl"),
+			"index.tmpl":                           load("pages/index.tmpl"),
+			"incidents.tmpl":                       load("pages/incidents.tmpl"),
+			"settings_overview.tmpl":               loadSettings("pages/settings_overview.tmpl"),
+			"settings_worker_groups.tmpl":          loadSettings("pages/settings_worker_groups.tmpl"),
+			"settings_worker_groups_create.tmpl":   loadSettings("pages/settings_worker_groups_create.tmpl"),
+			"settings_worker_groups_describe.tmpl": loadSettings("pages/settings_worker_groups_describe.tmpl"),
+			"settings_monitors.tmpl":               loadSettings("pages/settings_monitors.tmpl"),
+			"settings_monitors_create.tmpl":        loadSettings("pages/settings_monitors_create.tmpl"),
+			"settings_monitors_describe.tmpl":      loadSettings("pages/settings_monitors_describe.tmpl"),
 		},
 	}
 }

@@ -1,23 +1,8 @@
 {{define "settings"}}
 <section class="p-5">
-  <form action="/settings/workers/{{ .Worker.Slug }}" method="post">
-    <h2>
-      Configuration
-    </h2>
-    <label for="group">Group</label>
-    <input type="text" name="group" id="group" value="{{ .Worker.Group }}"/>
-    <p>
-      Group is used to distinguish between different workers.
-      For example, you can have a group for different regions,
-      different datacenters or different environments.
-    </p>
-    <button type="submit" onclick="save()">Save</button>
-  </form>
-</section>
-<section class="p-5">
   <h2>
     Token
-    <span>Use it as <code>WORKER_TOKEN</code> configuration option.</span>
+    <span>Use it as <code>WORKER_GROUP_TOKEN</code> configuration option.</span>
   </h2>
   <div class="grid grid-cols-[auto_min-content] gap-2">
     <pre id="token" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 overflow-x-auto">{{ .Worker.Token }}</pre>

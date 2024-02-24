@@ -14,6 +14,19 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type CreateMonitor struct {
+	Name         string `validate:"required"`
+	WorkerGroups string `validate:"required"`
+	Schedule     string `validate:"required,cron"`
+	Script       string `validate:"required"`
+}
+
+type UpdateMonitor struct {
+	WorkerGroups string `validate:"required"`
+	Schedule     string `validate:"required,cron"`
+	Script       string `validate:"required"`
+}
+
 type SettingsMonitors struct {
 	*Settings
 	Monitors       []*models.Monitor
@@ -28,7 +41,7 @@ type SettingsMonitor struct {
 func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
-	monitors, err := h.query.Monitor.WithContext(context.Background()).Find()
+	monitors, err := services.GetMonitors(context.Background(), h.query)
 	if err != nil {
 		return err
 	}
@@ -72,32 +85,46 @@ func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 
 func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 	ctx := context.Background()
+	monitorSlug := c.Param("slug")
 
-	slug := c.Param("slug")
-
-	monitor, err := services.GetMonitor(ctx, h.query, slug)
-	if err != nil {
-		return err
-	}
-
-	update := &models.Monitor{
-		Slug:         monitor.Slug,
-		Name:         monitor.Name,
+	update := UpdateMonitor{
+		WorkerGroups: strings.TrimSpace(c.FormValue("workergroups")),
 		Schedule:     c.FormValue("schedule"),
-		WorkerGroups: strings.Split(c.FormValue("workergroups"), " "),
 		Script:       c.FormValue("script"),
 	}
-
-	err = validator.New(validator.WithRequiredStructEnabled()).Struct(update)
+	err := validator.New(validator.WithRequiredStructEnabled()).Struct(update)
 	if err != nil {
 		return err
 	}
+
+	monitor, err := services.GetMonitor(ctx, h.query, monitorSlug)
+	if err != nil {
+		return err
+	}
+	monitor.Schedule = update.Schedule
+	monitor.Script = update.Script
 
 	err = services.UpdateMonitor(
 		ctx,
 		h.query,
-		update,
+		monitor,
 	)
+	if err != nil {
+		return err
+	}
+
+	workerGroups := []*models.WorkerGroup{}
+	for _, group := range strings.Split(update.WorkerGroups, " ") {
+		if group == "" {
+			continue
+		}
+		workerGroup, err := services.GetOrCreateWorkerGroup(ctx, h.query, models.WorkerGroup{Name: group, Slug: slug.Make(group)})
+		if err != nil {
+			return err
+		}
+		workerGroups = append(workerGroups, workerGroup)
+	}
+	err = services.UpdateMonitorWorkerGroups(ctx, h.query, monitor, workerGroups)
 	if err != nil {
 		return err
 	}
@@ -107,7 +134,7 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", slug))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", monitorSlug))
 }
 
 func (h *BaseHandler) SettingsMonitorsCreateGET(c echo.Context) error {
@@ -125,33 +152,45 @@ func (h *BaseHandler) SettingsMonitorsCreateGET(c echo.Context) error {
 
 func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 	ctx := context.Background()
+	monitorSlug := slug.Make(c.FormValue("name"))
 
-	monitorHttp := &models.Monitor{
+	create := CreateMonitor{
 		Name:         c.FormValue("name"),
-		Slug:         slug.Make(c.FormValue("name")),
 		Schedule:     c.FormValue("schedule"),
-		WorkerGroups: strings.Split(c.FormValue("workergroups"), " "),
+		WorkerGroups: c.FormValue("workergroups"),
 		Script:       c.FormValue("script"),
 	}
-
-	err := validator.New(validator.WithRequiredStructEnabled()).Struct(monitorHttp)
+	err := validator.New(validator.WithRequiredStructEnabled()).Struct(create)
 	if err != nil {
 		return err
+	}
+
+	workerGroups := []models.WorkerGroup{}
+	for _, group := range strings.Split(create.WorkerGroups, " ") {
+		workerGroups = append(workerGroups, models.WorkerGroup{Name: group, Slug: slug.Make(group)})
+	}
+
+	monitor := &models.Monitor{
+		Name:         create.Name,
+		Slug:         monitorSlug,
+		Schedule:     create.Schedule,
+		Script:       create.Script,
+		WorkerGroups: workerGroups,
 	}
 
 	err = services.CreateMonitor(
 		ctx,
 		h.query,
-		monitorHttp,
+		monitor,
 	)
 	if err != nil {
 		return err
 	}
 
-	err = services.CreateOrUpdateMonitorSchedule(ctx, h.temporal, monitorHttp)
+	err = services.CreateOrUpdateMonitorSchedule(ctx, h.temporal, monitor)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, "/settings/monitors")
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", monitorSlug))
 }

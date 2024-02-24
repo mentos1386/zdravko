@@ -16,7 +16,9 @@ _default:
 
 # Run full development environment
 run:
-  devbox services up
+  watchexec -r -e tmpl,css just _tailwindcss-build | sed -e 's/^/tailwind: /;' &
+  just run-temporal | sed -e 's/^/temporal: /;' &
+  watchexec -r -e go,tmpl,css just run-server
 
 # Start worker
 run-worker:

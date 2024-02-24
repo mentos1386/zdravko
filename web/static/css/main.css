@@ -82,12 +82,14 @@ code {
 .settings section {
   @apply relative overflow-x-auto shadow-md sm:rounded-lg text-gray-500 bg-white;
 }
+
 .settings section h2 {
   @apply flex flex-col text-lg font-semibold text-gray-900;
 }
 .settings section h2 span {
   @apply text-sm font-medium text-gray-500;
 }
+
 .settings section form {
   @apply grid gap-4 grid-cols-1 sm:grid-cols-[2fr_1fr];
 }
@@ -103,4 +105,17 @@ code {
 .settings section form button[type="submit"] {
   @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center;
   @apply sm:col-span-2;
+}
+
+.settings section table thead {
+  @apply text-xs text-gray-700 uppercase bg-gray-50;
+}
+.settings section table thead th {
+  @apply px-6 py-3 text-center;
+}
+.settings section table tbody th {
+  @apply px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-center;
+}
+.settings section table tbody tr {
+  @apply px-6 py-4 text-center;
 }

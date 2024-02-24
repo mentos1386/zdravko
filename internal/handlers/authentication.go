@@ -28,7 +28,6 @@ type AuthenticatedUser struct {
 }
 
 type AuthenticatedWorker struct {
-	Slug  string
 	Group string
 }
 
@@ -100,9 +99,9 @@ func (h *BaseHandler) AuthenticateRequestWithToken(r *http.Request) (*Authentica
 
 	if splitSubject[0] == "user" {
 		user = &AuthenticatedUser{}
-	} else if splitSubject[0] == "worker" {
+	} else if splitSubject[0] == "worker-group" {
 		worker = &AuthenticatedWorker{
-			Slug: splitSubject[1],
+			Group: splitSubject[1],
 		}
 	}
 

@@ -17,45 +17,37 @@ import (
 
 var (
 	Q              = new(Query)
-	Cronjob        *cronjob
-	CronjobHistory *cronjobHistory
 	Monitor        *monitor
 	MonitorHistory *monitorHistory
 	OAuth2State    *oAuth2State
-	Worker         *worker
+	WorkerGroup    *workerGroup
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
-	Cronjob = &Q.Cronjob
-	CronjobHistory = &Q.CronjobHistory
 	Monitor = &Q.Monitor
 	MonitorHistory = &Q.MonitorHistory
 	OAuth2State = &Q.OAuth2State
-	Worker = &Q.Worker
+	WorkerGroup = &Q.WorkerGroup
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
 		db:             db,
-		Cronjob:        newCronjob(db, opts...),
-		CronjobHistory: newCronjobHistory(db, opts...),
 		Monitor:        newMonitor(db, opts...),
 		MonitorHistory: newMonitorHistory(db, opts...),
 		OAuth2State:    newOAuth2State(db, opts...),
-		Worker:         newWorker(db, opts...),
+		WorkerGroup:    newWorkerGroup(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Cronjob        cronjob
-	CronjobHistory cronjobHistory
 	Monitor        monitor
 	MonitorHistory monitorHistory
 	OAuth2State    oAuth2State
-	Worker         worker
+	WorkerGroup    workerGroup
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -63,12 +55,10 @@ func (q *Query) Available() bool { return q.db != nil }
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
 		db:             db,
-		Cronjob:        q.Cronjob.clone(db),
-		CronjobHistory: q.CronjobHistory.clone(db),
 		Monitor:        q.Monitor.clone(db),
 		MonitorHistory: q.MonitorHistory.clone(db),
 		OAuth2State:    q.OAuth2State.clone(db),
-		Worker:         q.Worker.clone(db),
+		WorkerGroup:    q.WorkerGroup.clone(db),
 	}
 }
 
@@ -83,32 +73,26 @@ func (q *Query) WriteDB() *Query {
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
 		db:             db,
-		Cronjob:        q.Cronjob.replaceDB(db),
-		CronjobHistory: q.CronjobHistory.replaceDB(db),
 		Monitor:        q.Monitor.replaceDB(db),
 		MonitorHistory: q.MonitorHistory.replaceDB(db),
 		OAuth2State:    q.OAuth2State.replaceDB(db),
-		Worker:         q.Worker.replaceDB(db),
+		WorkerGroup:    q.WorkerGroup.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Cronjob        ICronjobDo
-	CronjobHistory ICronjobHistoryDo
 	Monitor        IMonitorDo
 	MonitorHistory IMonitorHistoryDo
 	OAuth2State    IOAuth2StateDo
-	Worker         IWorkerDo
+	WorkerGroup    IWorkerGroupDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Cronjob:        q.Cronjob.WithContext(ctx),
-		CronjobHistory: q.CronjobHistory.WithContext(ctx),
 		Monitor:        q.Monitor.WithContext(ctx),
 		MonitorHistory: q.MonitorHistory.WithContext(ctx),
 		OAuth2State:    q.OAuth2State.WithContext(ctx),
-		Worker:         q.Worker.WithContext(ctx),
+		WorkerGroup:    q.WorkerGroup.WithContext(ctx),
 	}
 }
 

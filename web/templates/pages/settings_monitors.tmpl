@@ -1,6 +1,6 @@
 {{define "settings"}}
 
-{{ $description := "Monitors represent periodicly the k6 script, to see if the monitored service is healthy." }}
+{{ $description := "Monitors are constantly checking weather a service is online and working correctly." }}
 
 {{ if eq .MonitorsLength 0 }}
 <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
@@ -34,37 +34,37 @@
         </caption>
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col">
                     Name
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col">
                     Worker Groups
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col">
                     Status
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col">
                     Schedule
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col">
                     Action
                 </th>
             </tr>
         </thead>
         {{range .Monitors}}
         <tbody>
-            <tr class="odd:bg-white even:bg-gray-50">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+            <tr>
+                <th scope="row">
                     {{.Name}}
                 </th>
-                <td class="px-6 py-4">
+                <td>
                     {{range .WorkerGroups}}
                       <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {{ . }}
+                      {{ .Name }}
                       </span>
                     {{end}}
                 </td>
-                <td class="px-6 py-4">
+                <td>
                   <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                     ACTIVE
                   </span>
@@ -72,10 +72,10 @@
                     PAUSED
                   </span>
                 </td>
-                <td class="px-6 py-4">
+                <td>
                     {{.Schedule}}
                 </td>
-                <td class="px-6 py-4">
+                <td>
                     <a href="/settings/monitors/{{.Slug}}" class="link">Details</a>
                 </td>
             </tr>

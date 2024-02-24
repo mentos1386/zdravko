@@ -71,7 +71,7 @@ func NewTokenForServer(privateKey string, publicKey string) (string, error) {
 	return NewToken(privateKey, publicKey, claims)
 }
 
-func NewTokenForWorker(privateKey string, publicKey string, worker *models.Worker) (string, error) {
+func NewTokenForWorker(privateKey string, publicKey string, workerGroup *models.WorkerGroup) (string, error) {
 	// Create claims with multiple fields populated
 	claims := Claims{
 		jwt.RegisteredClaims{
@@ -79,7 +79,7 @@ func NewTokenForWorker(privateKey string, publicKey string, worker *models.Worke
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    "zdravko",
-			Subject:   "worker:" + worker.Slug,
+			Subject:   "worker-group:" + workerGroup.Slug,
 		},
 		// Ref: https://docs.temporal.io/self-hosted-guide/security#authorization
 		[]string{"default:read", "default:write", "default:worker"},

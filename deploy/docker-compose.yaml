@@ -37,5 +37,5 @@ services:
     image: ghcr.io/mentos1386/zdravko:main
     command: ["--worker"]
     environment:
-      - WORKER_TOKEN=change-me
+      - WORKER_GROUP_TOKEN=change-me
       - WORKER_API_URL=http://server:8000
