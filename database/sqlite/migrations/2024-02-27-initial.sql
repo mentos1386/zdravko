@@ -1,7 +1,8 @@
 -- +migrate Up
 CREATE TABLE oauth2_states  (
-  state TEXT,
-  expiry DATETIME,
+  state      TEXT,
+  expires_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
   PRIMARY KEY (state)
 );
 
@@ -33,7 +34,8 @@ CREATE TABLE worker_groups  (
 
 CREATE TABLE monitor_worker_groups (
   worker_group_slug TEXT,
-  monitor_slug TEXT,
+  monitor_slug      TEXT,
+
   PRIMARY KEY (worker_group_slug,monitor_slug),
   CONSTRAINT fk_monitor_worker_groups_worker_group FOREIGN KEY (worker_group_slug) REFERENCES worker_groups(slug),
   CONSTRAINT fk_monitor_worker_groups_monitor FOREIGN KEY (monitor_slug) REFERENCES monitors(slug)
@@ -41,8 +43,8 @@ CREATE TABLE monitor_worker_groups (
 
 CREATE TABLE monitor_histories  (
   monitor_slug TEXT,
-  status TEXT,
-  note TEXT,
+  status       TEXT,
+  note         TEXT,
 
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 

@@ -16,7 +16,7 @@ func CreateOAuth2State(ctx context.Context, db *sqlx.DB, oauth2State *models.OAu
 }
 
 func DeleteOAuth2State(ctx context.Context, db *sqlx.DB, state string) (deleted bool, err error) {
-	res, err := db.ExecContext(ctx, "DELETE FROM oauth2_states WHERE state = $1 AND expires_at > NOW()", state)
+	res, err := db.ExecContext(ctx, "DELETE FROM oauth2_states WHERE state = $1 AND expires_at > datetime('now')", state)
 	if err != nil {
 		return false, err
 	}
