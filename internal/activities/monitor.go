@@ -33,9 +33,10 @@ func (a *Activities) Monitor(ctx context.Context, param HealtcheckParam) (*Monit
 }
 
 type HealtcheckAddToHistoryParam struct {
-	Slug   string
-	Status string
-	Note   string
+	Slug        string
+	Status      string
+	Note        string
+	WorkerGroup string
 }
 
 type MonitorAddToHistoryResult struct {
@@ -45,8 +46,9 @@ func (a *Activities) MonitorAddToHistory(ctx context.Context, param HealtcheckAd
 	url := fmt.Sprintf("%s/api/v1/monitors/%s/history", a.config.ApiUrl, param.Slug)
 
 	body := api.ApiV1MonitorsHistoryPOSTBody{
-		Status: param.Status,
-		Note:   param.Note,
+		Status:      param.Status,
+		Note:        param.Note,
+		WorkerGroup: param.WorkerGroup,
 	}
 
 	jsonBody, err := json.Marshal(body)

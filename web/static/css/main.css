@@ -107,15 +107,24 @@ code {
   @apply sm:col-span-2;
 }
 
+.settings section table {
+  @apply w-full text-sm text-left rtl:text-right text-gray-500;
+}
+.settings section table caption {
+  @apply p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white;
+}
+.settings section table caption p {
+  @apply mt-1 text-sm font-normal text-gray-500;
+}
 .settings section table thead {
   @apply text-xs text-gray-700 uppercase bg-gray-50;
 }
 .settings section table thead th {
-  @apply px-6 py-3 text-center;
+  @apply px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider;
 }
-.settings section table tbody th {
+.settings section table tbody tr th {
   @apply px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-center;
 }
-.settings section table tbody tr {
-  @apply px-6 py-4 text-center;
+.settings section table tbody tr td {
+  @apply px-6 py-4 text-center whitespace-nowrap;
 }

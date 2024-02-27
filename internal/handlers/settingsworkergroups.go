@@ -14,20 +14,26 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type WorkerWithToken struct {
+type WorkerWithTokenAndActiveWorkers struct {
 	*models.WorkerGroup
-	Token string
+	Token         string
+	ActiveWorkers []string
+}
+
+type WorkerGroupWithActiveWorkers struct {
+	*models.WorkerGroupWithMonitors
+	ActiveWorkers []string
 }
 
 type SettingsWorkerGroups struct {
 	*Settings
-	WorkerGroups       []*models.WorkerGroupWithMonitors
+	WorkerGroups       []*WorkerGroupWithActiveWorkers
 	WorkerGroupsLength int
 }
 
 type SettingsWorker struct {
 	*Settings
-	Worker *WorkerWithToken
+	Worker *WorkerWithTokenAndActiveWorkers
 }
 
 func (h *BaseHandler) SettingsWorkerGroupsGET(c echo.Context) error {
@@ -38,14 +44,26 @@ func (h *BaseHandler) SettingsWorkerGroupsGET(c echo.Context) error {
 		return err
 	}
 
+	workerGroupsWithActiveWorkers := make([]*WorkerGroupWithActiveWorkers, len(workerGroups))
+	for i, workerGroup := range workerGroups {
+		activeWorkers, err := services.GetActiveWorkers(context.Background(), workerGroup.Slug, h.temporal)
+		if err != nil {
+			return err
+		}
+		workerGroupsWithActiveWorkers[i] = &WorkerGroupWithActiveWorkers{
+			WorkerGroupWithMonitors: workerGroup,
+			ActiveWorkers:           activeWorkers,
+		}
+	}
+
 	return c.Render(http.StatusOK, "settings_worker_groups.tmpl", &SettingsWorkerGroups{
 		Settings: NewSettings(
 			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Worker Groups"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Worker Groups")},
 		),
-		WorkerGroups:       workerGroups,
-		WorkerGroupsLength: len(workerGroups),
+		WorkerGroups:       workerGroupsWithActiveWorkers,
+		WorkerGroupsLength: len(workerGroupsWithActiveWorkers),
 	})
 }
 
@@ -65,6 +83,11 @@ func (h *BaseHandler) SettingsWorkerGroupsDescribeGET(c echo.Context) error {
 		return err
 	}
 
+	activeWorkers, err := services.GetActiveWorkers(context.Background(), worker.Slug, h.temporal)
+	if err != nil {
+		return err
+	}
+
 	return c.Render(http.StatusOK, "settings_worker_groups_describe.tmpl", &SettingsWorker{
 		Settings: NewSettings(
 			cc.Principal.User,
@@ -77,9 +100,10 @@ func (h *BaseHandler) SettingsWorkerGroupsDescribeGET(c echo.Context) error {
 					Breadcrumb: worker.Name,
 				},
 			}),
-		Worker: &WorkerWithToken{
-			WorkerGroup: worker,
-			Token:       token,
+		Worker: &WorkerWithTokenAndActiveWorkers{
+			WorkerGroup:   worker,
+			Token:         token,
+			ActiveWorkers: activeWorkers,
 		},
 	})
 }

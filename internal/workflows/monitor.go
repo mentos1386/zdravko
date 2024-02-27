@@ -1,6 +1,7 @@
 package workflows
 
 import (
+	"sort"
 	"time"
 
 	"code.tjo.space/mentos1386/zdravko/database/models"
@@ -9,41 +10,48 @@ import (
 )
 
 type MonitorWorkflowParam struct {
-	Script string
-	Slug   string
+	Script       string
+	Slug         string
+	WorkerGroups []string
 }
 
 func (w *Workflows) MonitorWorkflowDefinition(ctx workflow.Context, param MonitorWorkflowParam) error {
-	options := workflow.ActivityOptions{
-		StartToCloseTimeout: 10 * time.Second,
-	}
-	ctx = workflow.WithActivityOptions(ctx, options)
+	workerGroups := param.WorkerGroups
+	sort.Strings(workerGroups)
 
-	heatlcheckParam := activities.HealtcheckParam{
-		Script: param.Script,
-	}
+	for _, workerGroup := range workerGroups {
+		ctx = workflow.WithActivityOptions(ctx, workflow.ActivityOptions{
+			StartToCloseTimeout: 60 * time.Second,
+			TaskQueue:           workerGroup,
+		})
 
-	var monitorResult *activities.MonitorResult
-	err := workflow.ExecuteActivity(ctx, w.activities.Monitor, heatlcheckParam).Get(ctx, &monitorResult)
-	if err != nil {
-		return err
-	}
+		heatlcheckParam := activities.HealtcheckParam{
+			Script: param.Script,
+		}
 
-	status := models.MonitorFailure
-	if monitorResult.Success {
-		status = models.MonitorSuccess
-	}
+		var monitorResult *activities.MonitorResult
+		err := workflow.ExecuteActivity(ctx, w.activities.Monitor, heatlcheckParam).Get(ctx, &monitorResult)
+		if err != nil {
+			return err
+		}
 
-	historyParam := activities.HealtcheckAddToHistoryParam{
-		Slug:   param.Slug,
-		Status: status,
-		Note:   monitorResult.Note,
-	}
+		status := models.MonitorFailure
+		if monitorResult.Success {
+			status = models.MonitorSuccess
+		}
 
-	var historyResult *activities.MonitorAddToHistoryResult
-	err = workflow.ExecuteActivity(ctx, w.activities.MonitorAddToHistory, historyParam).Get(ctx, &historyResult)
-	if err != nil {
-		return err
+		historyParam := activities.HealtcheckAddToHistoryParam{
+			Slug:        param.Slug,
+			Status:      status,
+			Note:        monitorResult.Note,
+			WorkerGroup: workerGroup,
+		}
+
+		var historyResult *activities.MonitorAddToHistoryResult
+		err = workflow.ExecuteActivity(ctx, w.activities.MonitorAddToHistory, historyParam).Get(ctx, &historyResult)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

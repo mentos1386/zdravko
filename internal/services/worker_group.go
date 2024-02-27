@@ -5,8 +5,24 @@ import (
 
 	"code.tjo.space/mentos1386/zdravko/database/models"
 	"github.com/jmoiron/sqlx"
+	"go.temporal.io/api/enums/v1"
+	"go.temporal.io/sdk/client"
 	"golang.org/x/exp/maps"
 )
+
+func GetActiveWorkers(ctx context.Context, workerGroupSlug string, temporal client.Client) ([]string, error) {
+	response, err := temporal.DescribeTaskQueue(ctx, workerGroupSlug, enums.TASK_QUEUE_TYPE_ACTIVITY)
+	if err != nil {
+		return make([]string, 0), err
+	}
+
+	workers := make([]string, len(response.Pollers))
+	for i, poller := range response.Pollers {
+		workers[i] = poller.Identity
+	}
+
+	return workers, nil
+}
 
 func CreateWorkerGroup(ctx context.Context, db *sqlx.DB, workerGroup *models.WorkerGroup) error {
 	_, err := db.NamedExecContext(ctx,
@@ -19,7 +35,7 @@ func CreateWorkerGroup(ctx context.Context, db *sqlx.DB, workerGroup *models.Wor
 func GetWorkerGroups(ctx context.Context, db *sqlx.DB) ([]*models.WorkerGroup, error) {
 	var workerGroups []*models.WorkerGroup
 	err := db.SelectContext(ctx, &workerGroups,
-		"SELECT * FROM worker_groups WHERE deleted_at IS NULL",
+		"SELECT * FROM worker_groups WHERE deleted_at IS NULL ORDER BY name",
 	)
 	return workerGroups, err
 }
@@ -38,6 +54,7 @@ FROM worker_groups
 LEFT OUTER JOIN monitor_worker_groups ON worker_groups.slug = monitor_worker_groups.worker_group_slug
 LEFT OUTER JOIN monitors ON monitor_worker_groups.monitor_slug = monitors.slug
 WHERE worker_groups.deleted_at IS NULL AND monitors.deleted_at IS NULL
+ORDER BY worker_groups.name
 `)
 	if err != nil {
 		return nil, err

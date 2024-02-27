@@ -13,8 +13,8 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-func getScheduleId(monitor *models.Monitor, group string) string {
-	return "monitor-" + monitor.Slug + "-" + group
+func getScheduleId(monitor *models.Monitor) string {
+	return "monitor-" + monitor.Slug
 }
 
 func CreateMonitor(ctx context.Context, db *sqlx.DB, monitor *models.Monitor) error {
@@ -121,7 +121,7 @@ WHERE monitors.slug=$1 AND monitors.deleted_at IS NULL
 func GetMonitors(ctx context.Context, db *sqlx.DB) ([]*models.Monitor, error) {
 	monitors := []*models.Monitor{}
 	err := db.SelectContext(ctx, &monitors,
-		"SELECT * FROM monitors WHERE deleted_at IS NULL",
+		"SELECT * FROM monitors WHERE deleted_at IS NULL ORDER BY name",
 	)
 	return monitors, err
 }
@@ -142,6 +142,7 @@ FROM monitors
 LEFT OUTER JOIN monitor_worker_groups ON monitors.slug = monitor_worker_groups.monitor_slug
 LEFT OUTER JOIN worker_groups ON monitor_worker_groups.worker_group_slug = worker_groups.slug
 WHERE monitors.deleted_at IS NULL
+ORDER BY monitors.name
 `)
 	if err != nil {
 		return nil, err
@@ -188,58 +189,65 @@ func CreateOrUpdateMonitorSchedule(
 ) error {
 	log.Println("Creating or Updating Monitor Schedule")
 
-	args := make([]interface{}, 0)
-	args = append(args, workflows.MonitorWorkflowParam{Script: monitor.Script, Slug: monitor.Slug})
+	workerGroupStrings := make([]string, len(workerGroups))
+	for i, group := range workerGroups {
+		workerGroupStrings[i] = group.Slug
+	}
 
-	for _, group := range workerGroups {
-		options := client.ScheduleOptions{
-			ID: getScheduleId(monitor, group.Slug),
-			Spec: client.ScheduleSpec{
-				CronExpressions: []string{monitor.Schedule},
-				Jitter:          time.Second * 10,
+	args := make([]interface{}, 1)
+	args[0] = workflows.MonitorWorkflowParam{
+		Script:       monitor.Script,
+		Slug:         monitor.Slug,
+		WorkerGroups: workerGroupStrings,
+	}
+
+	options := client.ScheduleOptions{
+		ID: getScheduleId(monitor),
+		Spec: client.ScheduleSpec{
+			CronExpressions: []string{monitor.Schedule},
+			Jitter:          time.Second * 10,
+		},
+		Action: &client.ScheduleWorkflowAction{
+			ID:        getScheduleId(monitor),
+			Workflow:  workflows.NewWorkflows(nil).MonitorWorkflowDefinition,
+			Args:      args,
+			TaskQueue: "default",
+			RetryPolicy: &temporal.RetryPolicy{
+				MaximumAttempts: 3,
 			},
-			Action: &client.ScheduleWorkflowAction{
-				ID:        getScheduleId(monitor, group.Slug),
-				Workflow:  workflows.NewWorkflows(nil).MonitorWorkflowDefinition,
-				Args:      args,
-				TaskQueue: group.Slug,
-				RetryPolicy: &temporal.RetryPolicy{
-					MaximumAttempts: 3,
-				},
+		},
+	}
+
+	schedule := t.ScheduleClient().GetHandle(ctx, getScheduleId(monitor))
+
+	// If exists, we update
+	_, err := schedule.Describe(ctx)
+	if err == nil {
+		err = schedule.Update(ctx, client.ScheduleUpdateOptions{
+			DoUpdate: func(input client.ScheduleUpdateInput) (*client.ScheduleUpdate, error) {
+				return &client.ScheduleUpdate{
+					Schedule: &client.Schedule{
+						Spec:   &options.Spec,
+						Action: options.Action,
+						Policy: input.Description.Schedule.Policy,
+						State:  input.Description.Schedule.State,
+					},
+				}, nil
 			},
-		}
-
-		schedule := t.ScheduleClient().GetHandle(ctx, getScheduleId(monitor, group.Slug))
-
-		// If exists, we update
-		_, err := schedule.Describe(ctx)
-		if err == nil {
-			err = schedule.Update(ctx, client.ScheduleUpdateOptions{
-				DoUpdate: func(input client.ScheduleUpdateInput) (*client.ScheduleUpdate, error) {
-					return &client.ScheduleUpdate{
-						Schedule: &client.Schedule{
-							Spec:   &options.Spec,
-							Action: options.Action,
-							Policy: input.Description.Schedule.Policy,
-							State:  input.Description.Schedule.State,
-						},
-					}, nil
-				},
-			})
-			if err != nil {
-				return err
-			}
-		} else {
-			schedule, err = t.ScheduleClient().Create(ctx, options)
-			if err != nil {
-				return err
-			}
-		}
-
-		err = schedule.Trigger(ctx, client.ScheduleTriggerOptions{})
+		})
 		if err != nil {
 			return err
 		}
+	} else {
+		schedule, err = t.ScheduleClient().Create(ctx, options)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = schedule.Trigger(ctx, client.ScheduleTriggerOptions{})
+	if err != nil {
+		return err
 	}
 
 	return nil

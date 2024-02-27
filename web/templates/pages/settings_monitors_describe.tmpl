@@ -27,36 +27,36 @@
 </section>
 
 <section>
-  <table class="min-w-full">
-    <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
+  <table>
+    <caption>
       History
-      <p class="mt-1 text-sm font-normal text-gray-500">
+      <p>
         Last 10 executions of monitor script.
       </p>
     </caption>
     <thead>
     <tr>
-      <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-      <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created At</th>
-      <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Duration</th>
-      <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Note</th>
+      <th>Status</th>
+      <th>Created At</th>
+      <th>Duration</th>
+      <th>Note</th>
     </tr>
     </thead>
     <tbody>
     {{range .History}}
     <tr>
-      <td class="px-6 py-4 whitespace-nowrap">
+      <td>
         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{if eq .Status "SUCCESS"}}bg-green-100 text-green-800{{else}}bg-red-100 text-red-800{{end}}">
           {{ .Status }}
         </span>
       </td>
-      <td class="px-6 py-4 whitespace-nowrap">
+      <td>
         {{ .CreatedAt.Format "2006-01-02 15:04:05" }}
       </td>
-      <td class="px-6 py-4 whitespace-nowrap">
+      <td>
         { .Duration }
       </td>
-      <td class="px-6 py-4">
+      <td class="whitespace-normal">
         {{ .Note }}
       </td>
     </tr>

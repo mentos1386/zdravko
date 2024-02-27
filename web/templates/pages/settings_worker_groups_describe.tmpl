@@ -16,6 +16,31 @@
   </div>
 </section>
 
+<section>
+  <table>
+    <caption>
+      Active Workers
+      <p >
+        Current workers that were online in last minutes.
+      </p>
+    </caption>
+    <thead>
+    <tr>
+      <th>Identity</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{range .Worker.ActiveWorkers }}
+    <tr>
+      <td>
+        {{ . }}
+      </td>
+    </tr>
+    {{end}}
+    </tbody>
+  </table>
+</section>
+
 <script>
 const copyTokenButton = document.getElementById('copy-token');
 

@@ -19,11 +19,11 @@
 </div>
 {{ else }}
 <section>
-  <table class="w-full text-sm text-left rtl:text-right text-gray-500">
-      <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
+  <table>
+      <caption>
         List of Worker Groups
         <div class="mt-1 gap-4 flex justify-between">
-          <p class="mt-1 text-sm font-normal text-gray-500">
+          <p>
             {{ $description }}
           </p>
           <a href="/settings/worker-groups/create" class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
@@ -32,7 +32,7 @@
           </a>
         </div>
       </caption>
-      <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+      <thead>
           <tr>
               <th>
                   Name
@@ -55,12 +55,15 @@
                   {{.Name}}
               </th>
               <td>
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                  10 ONLINE
-                </span>
+                {{ if eq ( len .ActiveWorkers) 0 }}
                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
                   NONE
                 </span>
+                {{ else }}
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  {{ len .ActiveWorkers }} ONLINE
+                </span>
+                {{ end }}
               </td>
               <td>
                  {{ len .Monitors }}
