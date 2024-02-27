@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"time"
 
-	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"code.tjo.space/mentos1386/zdravko/database/models"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/pkg/errors"
 )

@@ -5,7 +5,7 @@
       Configuration
     </h2>
     <label for="workergroups">Worker Groups</label>
-    <input type="text" name="workergroups" id="workergroups" value="{{ range .Monitor.WorkerGroups }}{{.Name}} {{end}}"/>
+    <input type="text" name="workergroups" id="workergroups" value="{{ range .Monitor.WorkerGroups }}{{.}} {{end}}"/>
     <p>Worker groups are used to distribute the monitor to specific workers.</p>
     <label for="schedule">Schedule</label>
     <input type="text" name="schedule" id="schedule" value="{{ .Monitor.Schedule }}"/>
@@ -31,7 +31,7 @@
     <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white">
       History
       <p class="mt-1 text-sm font-normal text-gray-500">
-        Last executions of monitor script.
+        Last 10 executions of monitor script.
       </p>
     </caption>
     <thead>
@@ -43,7 +43,7 @@
     </tr>
     </thead>
     <tbody>
-    {{range .Monitor.History}}
+    {{range .History}}
     <tr>
       <td class="px-6 py-4 whitespace-nowrap">
         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{if eq .Status "SUCCESS"}}bg-green-100 text-green-800{{else}}bg-red-100 text-red-800{{end}}">

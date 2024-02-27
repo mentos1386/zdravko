@@ -12,8 +12,9 @@ import (
 	"strconv"
 	"time"
 
+	"code.tjo.space/mentos1386/zdravko/database/models"
 	"code.tjo.space/mentos1386/zdravko/internal/config"
-	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 )
@@ -86,7 +87,7 @@ func (h *BaseHandler) OAuth2LoginGET(c echo.Context) error {
 	conf := newOAuth2(h.config)
 
 	state := newRandomState()
-	err := h.query.OAuth2State.WithContext(ctx).Create(&models.OAuth2State{State: state, Expiry: time.Now().Add(5 * time.Minute)})
+	err := services.CreateOAuth2State(ctx, h.db, &models.OAuth2State{State: state, ExpiresAt: time.Now().Add(5 * time.Minute)})
 	if err != nil {
 		return err
 	}
@@ -103,14 +104,11 @@ func (h *BaseHandler) OAuth2CallbackGET(c echo.Context) error {
 	state := c.QueryParam("state")
 	code := c.QueryParam("code")
 
-	result, err := h.query.OAuth2State.WithContext(ctx).Where(
-		h.query.OAuth2State.State.Eq(state),
-		h.query.OAuth2State.Expiry.Gt(time.Now()),
-	).Delete()
+	deleted, err := services.DeleteOAuth2State(ctx, h.db, state)
 	if err != nil {
 		return err
 	}
-	if result.RowsAffected != 1 {
+	if deleted == false {
 		return errors.New("invalid state")
 	}
 

@@ -3,8 +3,8 @@ package workflows
 import (
 	"time"
 
+	"code.tjo.space/mentos1386/zdravko/database/models"
 	"code.tjo.space/mentos1386/zdravko/internal/activities"
-	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"go.temporal.io/sdk/workflow"
 )
 

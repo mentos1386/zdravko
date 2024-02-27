@@ -6,6 +6,8 @@
     "tailwindcss@latest",
     "flyctl@latest",
     "just@latest",
-    "nodePackages.npm@latest"
+    "nodePackages.npm@latest",
+    "sqlite@latest",
+    "sqlite-web@latest"
   ]
 }

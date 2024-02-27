@@ -2,6 +2,7 @@ package temporal
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"code.tjo.space/mentos1386/zdravko/internal/config"
@@ -21,7 +22,7 @@ func (p *AuthHeadersProvider) GetHeaders(ctx context.Context) (map[string]string
 	}, nil
 }
 
-func ConnectServerToTemporal(cfg *config.ServerConfig) (client.Client, error) {
+func ConnectServerToTemporal(logger *slog.Logger, cfg *config.ServerConfig) (client.Client, error) {
 	// For server we generate new token with admin permissions
 	token, err := jwt.NewTokenForServer(cfg.Jwt.PrivateKey, cfg.Jwt.PublicKey)
 	if err != nil {
@@ -31,12 +32,18 @@ func ConnectServerToTemporal(cfg *config.ServerConfig) (client.Client, error) {
 	provider := &AuthHeadersProvider{token}
 
 	// Try to connect to the Temporal Server
-	return retry.Retry(10, 2*time.Second, func() (client.Client, error) {
+	c, err := retry.Retry(10, 2*time.Second, func() (client.Client, error) {
 		return client.Dial(client.Options{
 			HostPort:        cfg.Temporal.ServerHost,
 			HeadersProvider: provider,
 		})
 	})
+	if err != nil {
+		logger.Error("Failed to connect to Temporal Server after retries")
+		return nil, errors.Wrap(err, "failed to connect to Temporal Server after retries")
+	}
+
+	return c, nil
 }
 
 func ConnectWorkerToTemporal(token string, temporalHost string) (client.Client, error) {

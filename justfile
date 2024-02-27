@@ -17,7 +17,9 @@ _default:
 # Run full development environment
 run:
   watchexec -r -e tmpl,css just _tailwindcss-build | sed -e 's/^/tailwind: /;' &
+  sleep 1
   just run-temporal | sed -e 's/^/temporal: /;' &
+  sleep 1
   watchexec -r -e go,tmpl,css just run-server
 
 # Start worker
@@ -81,13 +83,12 @@ run-docker:
   -e WORKER_TOKEN \
   {{DOCKER_IMAGE}} --server --temporal --worker
 
-# Start devbox shell
-shell:
-  devbox shell
+# Start Sqlite web client
+sqlite-web:
+  sqlite_web zdravko.db
 
 # Generate and download all external dependencies.
 generate:
-  rm -rf internal/models/query/*
   go generate ./...
 
 _tailwindcss-build:
@@ -114,6 +115,3 @@ _monaco-download:
 _feather-icons-download:
   mkdir -p {{STATIC_DIR}}/icons
   curl -sLo {{STATIC_DIR}}/icons/feather-sprite.svg https://unpkg.com/feather-icons/dist/feather-sprite.svg
-
-_generate-gorm:
-  go run tools/generate/main.go

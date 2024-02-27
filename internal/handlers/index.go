@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"code.tjo.space/mentos1386/zdravko/database/models"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/labstack/echo/v4"
@@ -13,10 +13,10 @@ import (
 
 type IndexData struct {
 	*components.Base
-	HealthChecks       []*HealthCheck
+	HealthChecks   []*HealthCheck
 	MonitorsLength int
-	TimeRange          string
-	Status             string
+	TimeRange      string
+	Status         string
 }
 
 type HealthCheck struct {
@@ -39,7 +39,7 @@ func getHour(date time.Time) string {
 	return date.Format("2006-01-02T15:04")
 }
 
-func getDailyHistory(history []models.MonitorHistory) *History {
+func getDailyHistory(history []*models.MonitorHistory) *History {
 	numDays := 90
 	historyDailyMap := map[string]string{}
 	numOfSuccess := 0
@@ -88,7 +88,7 @@ func getDailyHistory(history []models.MonitorHistory) *History {
 	}
 }
 
-func getHourlyHistory(history []models.MonitorHistory) *History {
+func getHourlyHistory(history []*models.MonitorHistory) *History {
 	numHours := 48
 	historyHourlyMap := map[string]string{}
 	numOfSuccess := 0
@@ -139,7 +139,7 @@ func getHourlyHistory(history []models.MonitorHistory) *History {
 
 func (h *BaseHandler) Index(c echo.Context) error {
 	ctx := context.Background()
-	monitors, err := services.GetMonitors(ctx, h.query)
+	monitors, err := services.GetMonitors(ctx, h.db)
 	if err != nil {
 		return err
 	}
@@ -153,8 +153,13 @@ func (h *BaseHandler) Index(c echo.Context) error {
 
 	monitorsWithHistory := make([]*HealthCheck, len(monitors))
 	for i, monitor := range monitors {
-		historyDaily := getDailyHistory(monitor.History)
-		historyHourly := getHourlyHistory(monitor.History)
+		history, err := services.GetMonitorHistoryForMonitor(ctx, h.db, monitor.Slug)
+		if err != nil {
+			return err
+		}
+
+		historyDaily := getDailyHistory(history)
+		historyHourly := getHourlyHistory(history)
 
 		status := historyDaily.History[89]
 		if status != models.MonitorSuccess {
@@ -174,9 +179,9 @@ func (h *BaseHandler) Index(c echo.Context) error {
 			NavbarActive: GetPageByTitle(Pages, "Status"),
 			Navbar:       Pages,
 		},
-		HealthChecks:       monitorsWithHistory,
+		HealthChecks:   monitorsWithHistory,
 		MonitorsLength: len(monitors),
-		TimeRange:          timeRange,
-		Status:             overallStatus,
+		TimeRange:      timeRange,
+		Status:         overallStatus,
 	})
 }

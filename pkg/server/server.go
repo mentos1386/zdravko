@@ -2,10 +2,10 @@ package server
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 
-	"code.tjo.space/mentos1386/zdravko/internal"
+	"code.tjo.space/mentos1386/zdravko/database"
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/handlers"
 	"code.tjo.space/mentos1386/zdravko/internal/temporal"
@@ -16,14 +16,16 @@ import (
 )
 
 type Server struct {
-	echo *echo.Echo
-	cfg  *config.ServerConfig
+	echo   *echo.Echo
+	cfg    *config.ServerConfig
+	logger *slog.Logger
 }
 
 func NewServer(cfg *config.ServerConfig) (*Server, error) {
 	return &Server{
-		cfg:  cfg,
-		echo: echo.New(),
+		cfg:    cfg,
+		echo:   echo.New(),
+		logger: slog.Default().WithGroup("server"),
 	}, nil
 }
 
@@ -36,31 +38,24 @@ func (s *Server) Start() error {
 	//s.echo.Use(middleware.Logger())
 	s.echo.Use(middleware.Recover())
 
-	db, query, err := internal.ConnectToDatabase(s.cfg.DatabasePath)
+	db, err := database.ConnectToDatabase(s.logger, s.cfg.DatabasePath)
 	if err != nil {
 		return err
 	}
-	log.Println("Connected to database")
 
-	temporalClient, err := temporal.ConnectServerToTemporal(s.cfg)
+	temporalClient, err := temporal.ConnectServerToTemporal(s.logger, s.cfg)
 	if err != nil {
 		return err
 	}
-	log.Println("Connected to Temporal")
 
-	h := handlers.NewBaseHandler(query, temporalClient, s.cfg)
+	h := handlers.NewBaseHandler(db, temporalClient, s.cfg, s.logger)
 
 	// Health
 	s.echo.GET("/health", func(c echo.Context) error {
-		d, err := db.DB()
+		err = db.Ping()
 		if err != nil {
 			return err
 		}
-		err = d.Ping()
-		if err != nil {
-			return err
-		}
-
 		return c.JSON(http.StatusOK, map[string]string{"status": "ok"})
 	})
 

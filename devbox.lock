@@ -75,6 +75,46 @@
         }
       }
     },
+    "sqlite-web@latest": {
+      "last_modified": "2024-02-10T18:15:24Z",
+      "resolved": "github:NixOS/nixpkgs/10b813040df67c4039086db0f6eaf65c536886c6#sqlite-web",
+      "source": "devbox-search",
+      "version": "0.6.2",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/klkx4fv3al5dgg59w3xv0brnn28gmpkh-sqlite-web-0.6.2"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/liqjqlnwc111g2j1mxak0z6b0cbvn46i-sqlite-web-0.6.2"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/ip9c99c0r4avyxl68x1cxpn6649pff4j-sqlite-web-0.6.2"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/lfwrqdx8jjpqhzxhcfjnm82ll4a2jzhv-sqlite-web-0.6.2"
+        }
+      }
+    },
+    "sqlite@latest": {
+      "last_modified": "2024-02-20T22:56:03Z",
+      "resolved": "github:NixOS/nixpkgs/5eeded8e3518579daa13887297efa79f5be74b41#sqlite",
+      "source": "devbox-search",
+      "version": "3.45.1",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/ay9wvqp3p548p08symcy3q7avm86ck00-sqlite-3.45.1-bin"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/1j3xiiq0i2q69nmwi9ja99grnwlpqzgy-sqlite-3.45.1-bin"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/c9wndvymfnm4dcmi0bgy1lmljzx8dv4n-sqlite-3.45.1-bin"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/b3pbwqqpfllg2lxwhhv4iyw3m9xxbgld-sqlite-3.45.1-bin"
+        }
+      }
+    },
     "tailwindcss@latest": {
       "last_modified": "2024-01-27T14:55:31Z",
       "resolved": "github:NixOS/nixpkgs/160b762eda6d139ac10ae081f8f78d640dd523eb#tailwindcss",

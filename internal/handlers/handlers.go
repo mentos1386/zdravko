@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"log/slog"
+
 	"code.tjo.space/mentos1386/zdravko/internal/config"
-	"code.tjo.space/mentos1386/zdravko/internal/models/query"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/gorilla/sessions"
+	"github.com/jmoiron/sqlx"
 	"go.temporal.io/sdk/client"
 )
 
@@ -24,16 +26,23 @@ func GetPageByTitle(pages []*components.Page, title string) *components.Page {
 }
 
 type BaseHandler struct {
-	query  *query.Query
+	db     *sqlx.DB
 	config *config.ServerConfig
+	logger *slog.Logger
 
 	temporal client.Client
 
 	store *sessions.CookieStore
 }
 
-func NewBaseHandler(q *query.Query, temporal client.Client, config *config.ServerConfig) *BaseHandler {
+func NewBaseHandler(db *sqlx.DB, temporal client.Client, config *config.ServerConfig, logger *slog.Logger) *BaseHandler {
 	store := sessions.NewCookieStore([]byte(config.SessionSecret))
 
-	return &BaseHandler{q, config, temporal, store}
+	return &BaseHandler{
+		db:       db,
+		config:   config,
+		logger:   logger,
+		temporal: temporal,
+		store:    store,
+	}
 }

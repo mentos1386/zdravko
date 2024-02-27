@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"code.tjo.space/mentos1386/zdravko/database/models"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/go-playground/validator/v10"
@@ -29,19 +30,20 @@ type UpdateMonitor struct {
 
 type SettingsMonitors struct {
 	*Settings
-	Monitors       []*models.Monitor
+	Monitors       []*models.MonitorWithWorkerGroups
 	MonitorsLength int
 }
 
 type SettingsMonitor struct {
 	*Settings
-	Monitor *models.Monitor
+	Monitor *models.MonitorWithWorkerGroups
+	History []*models.MonitorHistory
 }
 
 func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
-	monitors, err := services.GetMonitors(context.Background(), h.query)
+	monitors, err := services.GetMonitorsWithWorkerGroups(context.Background(), h.db)
 	if err != nil {
 		return err
 	}
@@ -62,9 +64,19 @@ func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 
 	slug := c.Param("slug")
 
-	monitor, err := services.GetMonitor(context.Background(), h.query, slug)
+	monitor, err := services.GetMonitorWithWorkerGroups(context.Background(), h.db, slug)
 	if err != nil {
 		return err
+	}
+
+	history, err := services.GetMonitorHistoryForMonitor(context.Background(), h.db, slug)
+	if err != nil {
+		return err
+	}
+
+	maxElements := 10
+	if len(history) < maxElements {
+		maxElements = len(history)
 	}
 
 	return c.Render(http.StatusOK, "settings_monitors_describe.tmpl", &SettingsMonitor{
@@ -80,6 +92,7 @@ func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 				},
 			}),
 		Monitor: monitor,
+		History: history[:maxElements],
 	})
 }
 
@@ -97,7 +110,7 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 		return err
 	}
 
-	monitor, err := services.GetMonitor(ctx, h.query, monitorSlug)
+	monitor, err := services.GetMonitor(ctx, h.db, monitorSlug)
 	if err != nil {
 		return err
 	}
@@ -106,7 +119,7 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 
 	err = services.UpdateMonitor(
 		ctx,
-		h.query,
+		h.db,
 		monitor,
 	)
 	if err != nil {
@@ -118,18 +131,27 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 		if group == "" {
 			continue
 		}
-		workerGroup, err := services.GetOrCreateWorkerGroup(ctx, h.query, models.WorkerGroup{Name: group, Slug: slug.Make(group)})
+		workerGroup, err := services.GetWorkerGroup(ctx, h.db, slug.Make(group))
 		if err != nil {
-			return err
+			if err == sql.ErrNoRows {
+				workerGroup = &models.WorkerGroup{Name: group, Slug: slug.Make(group)}
+				err = services.CreateWorkerGroup(ctx, h.db, workerGroup)
+				if err != nil {
+					return err
+				}
+			} else {
+				return err
+			}
 		}
 		workerGroups = append(workerGroups, workerGroup)
 	}
-	err = services.UpdateMonitorWorkerGroups(ctx, h.query, monitor, workerGroups)
+
+	err = services.UpdateMonitorWorkerGroups(ctx, h.db, monitor, workerGroups)
 	if err != nil {
 		return err
 	}
 
-	err = services.CreateOrUpdateMonitorSchedule(ctx, h.temporal, monitor)
+	err = services.CreateOrUpdateMonitorSchedule(ctx, h.temporal, monitor, workerGroups)
 	if err != nil {
 		return err
 	}
@@ -165,32 +187,51 @@ func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 		return err
 	}
 
-	workerGroups := []models.WorkerGroup{}
+	workerGroups := []*models.WorkerGroup{}
 	for _, group := range strings.Split(create.WorkerGroups, " ") {
-		workerGroups = append(workerGroups, models.WorkerGroup{Name: group, Slug: slug.Make(group)})
+		if group == "" {
+			continue
+		}
+		workerGroup, err := services.GetWorkerGroup(ctx, h.db, slug.Make(group))
+		if err != nil {
+			if err == sql.ErrNoRows {
+				workerGroup = &models.WorkerGroup{Name: group, Slug: slug.Make(group)}
+				err = services.CreateWorkerGroup(ctx, h.db, workerGroup)
+				if err != nil {
+					return err
+				}
+			} else {
+				return err
+			}
+		}
+		workerGroups = append(workerGroups, workerGroup)
 	}
 
 	monitor := &models.Monitor{
-		Name:         create.Name,
-		Slug:         monitorSlug,
-		Schedule:     create.Schedule,
-		Script:       create.Script,
-		WorkerGroups: workerGroups,
+		Name:     create.Name,
+		Slug:     monitorSlug,
+		Schedule: create.Schedule,
+		Script:   create.Script,
 	}
 
 	err = services.CreateMonitor(
 		ctx,
-		h.query,
+		h.db,
 		monitor,
 	)
 	if err != nil {
 		return err
 	}
 
-	err = services.CreateOrUpdateMonitorSchedule(ctx, h.temporal, monitor)
+	err = services.UpdateMonitorWorkerGroups(ctx, h.db, monitor, workerGroups)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", monitorSlug))
+	err = services.CreateOrUpdateMonitorSchedule(ctx, h.temporal, monitor, workerGroups)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/settings/monitors")
 }

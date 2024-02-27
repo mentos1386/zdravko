@@ -2,14 +2,14 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"net/http"
 
-	"code.tjo.space/mentos1386/zdravko/internal/models"
+	"code.tjo.space/mentos1386/zdravko/database/models"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/pkg/api"
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
 type ApiV1WorkersConnectGETResponse struct {
@@ -21,9 +21,9 @@ func (h *BaseHandler) ApiV1WorkersConnectGET(c echo.Context) error {
 	ctx := context.Background()
 	cc := c.(AuthenticatedContext)
 
-	workerGroup, err := services.GetWorkerGroup(ctx, h.query, cc.Principal.Worker.Group)
+	workerGroup, err := services.GetWorkerGroup(ctx, h.db, cc.Principal.Worker.Group)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, sql.ErrNoRows) {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Token invalid")
 		}
 		return err
@@ -51,16 +51,19 @@ func (h *BaseHandler) ApiV1MonitorsHistoryPOST(c echo.Context) error {
 		return err
 	}
 
-	monitor, err := services.GetMonitor(ctx, h.query, slug)
+	_, err = services.GetMonitor(ctx, h.db, slug)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return echo.NewHTTPError(http.StatusNotFound, "Monitor not found")
+		}
 		return err
 	}
 
-	err = h.query.Monitor.History.Model(monitor).Append(
-		&models.MonitorHistory{
-			Status: body.Status,
-			Note:   body.Note,
-		})
+	err = services.AddHistoryForMonitor(ctx, h.db, &models.MonitorHistory{
+		MonitorSlug: slug,
+		Status:      body.Status,
+		Note:        body.Note,
+	})
 	if err != nil {
 		return err
 	}

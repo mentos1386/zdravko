@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"code.tjo.space/mentos1386/zdravko/database/models"
 	"code.tjo.space/mentos1386/zdravko/internal/jwt"
-	"code.tjo.space/mentos1386/zdravko/internal/models"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/go-playground/validator/v10"
@@ -21,7 +21,7 @@ type WorkerWithToken struct {
 
 type SettingsWorkerGroups struct {
 	*Settings
-	WorkerGroups       []*models.WorkerGroup
+	WorkerGroups       []*models.WorkerGroupWithMonitors
 	WorkerGroupsLength int
 }
 
@@ -33,7 +33,7 @@ type SettingsWorker struct {
 func (h *BaseHandler) SettingsWorkerGroupsGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
-	workerGroups, err := services.GetWorkerGroups(context.Background(), h.query)
+	workerGroups, err := services.GetWorkerGroupsWithMonitors(context.Background(), h.db)
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func (h *BaseHandler) SettingsWorkerGroupsDescribeGET(c echo.Context) error {
 
 	slug := c.Param("slug")
 
-	worker, err := services.GetWorkerGroup(context.Background(), h.query, slug)
+	worker, err := services.GetWorkerGroup(context.Background(), h.db, slug)
 	if err != nil {
 		return err
 	}
@@ -101,20 +101,20 @@ func (h *BaseHandler) SettingsWorkerGroupsCreatePOST(c echo.Context) error {
 	ctx := context.Background()
 	slug := slug.Make(c.FormValue("name"))
 
-	worker := models.WorkerGroup{
+	workerGroup := &models.WorkerGroup{
 		Name: c.FormValue("name"),
 		Slug: slug,
 	}
 
-	err := validator.New(validator.WithRequiredStructEnabled()).Struct(worker)
+	err := validator.New(validator.WithRequiredStructEnabled()).Struct(workerGroup)
 	if err != nil {
 		return err
 	}
 
-	_, err = services.GetOrCreateWorkerGroup(
+	err = services.CreateWorkerGroup(
 		ctx,
-		h.query,
-		worker,
+		h.db,
+		workerGroup,
 	)
 	if err != nil {
 		return err
