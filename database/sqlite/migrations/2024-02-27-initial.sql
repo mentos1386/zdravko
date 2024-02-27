@@ -1,5 +1,5 @@
 -- +migrate Up
-CREATE TABLE o_auth2_states  (
+CREATE TABLE oauth2_states  (
   state TEXT,
   expiry DATETIME,
   PRIMARY KEY (state)
@@ -39,7 +39,7 @@ CREATE TABLE monitor_worker_groups (
   CONSTRAINT fk_monitor_worker_groups_monitor FOREIGN KEY (monitor_slug) REFERENCES monitors(slug)
 );
 
-CREATE TABLE "monitor_histories"  (
+CREATE TABLE monitor_histories  (
   monitor_slug TEXT,
   status TEXT,
   note TEXT,
@@ -51,7 +51,7 @@ CREATE TABLE "monitor_histories"  (
 );
 
 -- +migrate Down
-DROP TABLE o_auth2_states;
+DROP TABLE oauth2_states;
 DROP TABLE monitor_worker_groups;
 DROP TABLE worker_groups;
 DROP TABLE monitor_histories;
