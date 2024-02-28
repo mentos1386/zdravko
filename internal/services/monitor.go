@@ -40,6 +40,20 @@ func GetMonitorStatus(ctx context.Context, temporal client.Client, slug string) 
 	return MonitorStatusActive, nil
 }
 
+func SetMonitorStatus(ctx context.Context, temporal client.Client, slug string, status MonitorStatus) error {
+	schedule := temporal.ScheduleClient().GetHandle(ctx, getScheduleId(slug))
+
+	if status == MonitorStatusActive {
+		return schedule.Unpause(ctx, client.ScheduleUnpauseOptions{Note: "Unpaused by user"})
+	}
+
+	if status == MonitorStatusPaused {
+		return schedule.Pause(ctx, client.SchedulePauseOptions{Note: "Paused by user"})
+	}
+
+	return nil
+}
+
 func CreateMonitor(ctx context.Context, db *sqlx.DB, monitor *models.Monitor) error {
 	_, err := db.NamedExecContext(ctx,
 		"INSERT INTO monitors (slug, name, script, schedule) VALUES (:slug, :name, :script, :schedule)",
@@ -52,6 +66,14 @@ func UpdateMonitor(ctx context.Context, db *sqlx.DB, monitor *models.Monitor) er
 	_, err := db.NamedExecContext(ctx,
 		"UPDATE monitors SET name=:name, script=:script, schedule=:schedule WHERE slug=:slug",
 		monitor,
+	)
+	return err
+}
+
+func DeleteMonitor(ctx context.Context, db *sqlx.DB, slug string) error {
+	_, err := db.ExecContext(ctx,
+		"UPDATE monitors SET deleted_at = datetime('now') WHERE slug=$1",
+		slug,
 	)
 	return err
 }
@@ -202,6 +224,11 @@ ORDER BY monitors.name
 	}
 
 	return maps.Values(monitors), err
+}
+
+func DeleteMonitorSchedule(ctx context.Context, t client.Client, slug string) error {
+	schedule := t.ScheduleClient().GetHandle(ctx, getScheduleId(slug))
+	return schedule.Delete(ctx)
 }
 
 func CreateOrUpdateMonitorSchedule(

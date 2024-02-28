@@ -46,7 +46,7 @@ func (s *Server) Start() error {
 	s.worker = NewWorker(temporalClient, s.cfg)
 
 	s.echo.Renderer = templates.NewTemplates()
-	//s.echo.Use(middleware.Logger())
+	s.echo.Use(middleware.Logger())
 	s.echo.Use(middleware.Recover())
 	Routes(s.echo, db, temporalClient, s.cfg, s.logger)
 

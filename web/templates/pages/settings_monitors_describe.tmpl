@@ -40,9 +40,16 @@
     </span>
     {{ end }}
     </h2>
-    <p class="text-sm mb-2">Pausing the monitor will stop it from executing. This can be useful in cases of expected downtime.</p>
-    <a class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100" href="/settings/monitors/{{ .Monitor.Slug }}/enable">Pause</a>
-    <a class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100" href="/settings/monitors/{{ .Monitor.Slug }}/disable">Resume</a>
+    <p class="text-sm mb-2">
+      Pausing the monitor will stop it from executing.
+      This can be useful in cases of expected downtime.
+      Or when the monitor is not needed anymore.
+    </p>
+    {{ if eq .Monitor.Status "ACTIVE" }}
+      <a class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100" href="/settings/monitors/{{ .Monitor.Slug }}/disable">Pause</a>
+    {{ else if eq .Monitor.Status "PAUSED" }}
+      <a class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100" href="/settings/monitors/{{ .Monitor.Slug }}/enable">Resume</a>
+    {{ end }}
   </section>
 
   <section class="p-2 flex-1 border-4 border-red-300">

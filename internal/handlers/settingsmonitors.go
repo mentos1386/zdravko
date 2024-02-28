@@ -123,6 +123,54 @@ func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 	})
 }
 
+func (h *BaseHandler) SettingsMonitorsDescribeDELETE(c echo.Context) error {
+	slug := c.Param("slug")
+
+	err := services.DeleteMonitor(context.Background(), h.db, slug)
+	if err != nil {
+		return err
+	}
+
+	err = services.DeleteMonitorSchedule(context.Background(), h.temporal, slug)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/settings/monitors")
+}
+
+func (h *BaseHandler) SettingsMonitorsDisableGET(c echo.Context) error {
+	slug := c.Param("slug")
+
+	monitor, err := services.GetMonitor(context.Background(), h.db, slug)
+	if err != nil {
+		return err
+	}
+
+	err = services.SetMonitorStatus(context.Background(), h.temporal, monitor.Slug, services.MonitorStatusPaused)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", slug))
+}
+
+func (h *BaseHandler) SettingsMonitorsEnableGET(c echo.Context) error {
+	slug := c.Param("slug")
+
+	monitor, err := services.GetMonitor(context.Background(), h.db, slug)
+	if err != nil {
+		return err
+	}
+
+	err = services.SetMonitorStatus(context.Background(), h.temporal, monitor.Slug, services.MonitorStatusActive)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", slug))
+}
+
 func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 	ctx := context.Background()
 	monitorSlug := c.Param("slug")

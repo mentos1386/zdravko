@@ -108,6 +108,17 @@ func (h *BaseHandler) SettingsWorkerGroupsDescribeGET(c echo.Context) error {
 	})
 }
 
+func (h *BaseHandler) SettingsWorkerGroupsDescribeDELETE(c echo.Context) error {
+	slug := c.Param("slug")
+
+	err := services.DeleteWorkerGroup(context.Background(), h.db, slug)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusSeeOther, "/settings/worker-groups")
+}
+
 func (h *BaseHandler) SettingsWorkerGroupsCreateGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 

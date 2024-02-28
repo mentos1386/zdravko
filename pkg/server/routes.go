@@ -50,10 +50,15 @@ func Routes(
 	settings.POST("/monitors/create", h.SettingsMonitorsCreatePOST)
 	settings.GET("/monitors/:slug", h.SettingsMonitorsDescribeGET)
 	settings.POST("/monitors/:slug", h.SettingsMonitorsDescribePOST)
+	settings.GET("/monitors/:slug/delete", h.SettingsMonitorsDescribeDELETE)
+	settings.GET("/monitors/:slug/disable", h.SettingsMonitorsDisableGET)
+	settings.GET("/monitors/:slug/enable", h.SettingsMonitorsEnableGET)
 	settings.GET("/worker-groups", h.SettingsWorkerGroupsGET)
 	settings.GET("/worker-groups/create", h.SettingsWorkerGroupsCreateGET)
 	settings.POST("/worker-groups/create", h.SettingsWorkerGroupsCreatePOST)
 	settings.GET("/worker-groups/:slug", h.SettingsWorkerGroupsDescribeGET)
+	settings.GET("/worker-groups/:slug/delete", h.SettingsWorkerGroupsDescribeDELETE)
+
 	settings.Match([]string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"}, "/temporal*", h.Temporal)
 
 	// OAuth2

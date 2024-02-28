@@ -32,6 +32,14 @@ func CreateWorkerGroup(ctx context.Context, db *sqlx.DB, workerGroup *models.Wor
 	return err
 }
 
+func DeleteWorkerGroup(ctx context.Context, db *sqlx.DB, slug string) error {
+	_, err := db.ExecContext(ctx,
+		"UPDATE worker_groups SET deleted_at = datetime('now') WHERE slug = $1",
+		slug,
+	)
+	return err
+}
+
 func GetWorkerGroups(ctx context.Context, db *sqlx.DB) ([]*models.WorkerGroup, error) {
 	var workerGroups []*models.WorkerGroup
 	err := db.SelectContext(ctx, &workerGroups,
