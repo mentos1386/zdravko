@@ -28,15 +28,20 @@ type UpdateMonitor struct {
 	Script       string `validate:"required"`
 }
 
+type MonitorWithWorkerGroupsAndStatus struct {
+	*models.MonitorWithWorkerGroups
+	Status services.MonitorStatus
+}
+
 type SettingsMonitors struct {
 	*Settings
-	Monitors       []*models.MonitorWithWorkerGroups
+	Monitors       []*MonitorWithWorkerGroupsAndStatus
 	MonitorsLength int
 }
 
 type SettingsMonitor struct {
 	*Settings
-	Monitor *models.MonitorWithWorkerGroups
+	Monitor *MonitorWithWorkerGroupsAndStatus
 	History []*models.MonitorHistory
 }
 
@@ -48,14 +53,26 @@ func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
 		return err
 	}
 
+	monitorsWithStatus := make([]*MonitorWithWorkerGroupsAndStatus, len(monitors))
+	for i, monitor := range monitors {
+		status, err := services.GetMonitorStatus(context.Background(), h.temporal, monitor.Slug)
+		if err != nil {
+			return err
+		}
+		monitorsWithStatus[i] = &MonitorWithWorkerGroupsAndStatus{
+			MonitorWithWorkerGroups: monitor,
+			Status:                  status,
+		}
+	}
+
 	return c.Render(http.StatusOK, "settings_monitors.tmpl", &SettingsMonitors{
 		Settings: NewSettings(
 			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Monitors"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Monitors")},
 		),
-		Monitors:       monitors,
-		MonitorsLength: len(monitors),
+		Monitors:       monitorsWithStatus,
+		MonitorsLength: len(monitorsWithStatus),
 	})
 }
 
@@ -67,6 +84,16 @@ func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 	monitor, err := services.GetMonitorWithWorkerGroups(context.Background(), h.db, slug)
 	if err != nil {
 		return err
+	}
+
+	status, err := services.GetMonitorStatus(context.Background(), h.temporal, monitor.Slug)
+	if err != nil {
+		return err
+	}
+
+	monitorWithStatus := &MonitorWithWorkerGroupsAndStatus{
+		MonitorWithWorkerGroups: monitor,
+		Status:                  status,
 	}
 
 	history, err := services.GetMonitorHistoryForMonitor(context.Background(), h.db, slug)
@@ -91,7 +118,7 @@ func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 					Breadcrumb: monitor.Name,
 				},
 			}),
-		Monitor: monitor,
+		Monitor: monitorWithStatus,
 		History: history[:maxElements],
 	})
 }

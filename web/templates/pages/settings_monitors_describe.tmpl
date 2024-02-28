@@ -26,6 +26,34 @@
   </form>
 </section>
 
+<div class="flex md:flex-row flex-col gap-4 h-min">
+  <section class="p-5 flex-1">
+    <h2 class="mb-2 flex flex-row gap-2">
+    Status
+    {{ if eq .Monitor.Status "ACTIVE" }}
+    <span class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+      ACTIVE
+    </span>
+    {{ else if eq .Monitor.Status "PAUSED" }}
+    <span class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+      PAUSED
+    </span>
+    {{ end }}
+    </h2>
+    <p class="text-sm mb-2">Pausing the monitor will stop it from executing. This can be useful in cases of expected downtime.</p>
+    <a class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100" href="/settings/monitors/{{ .Monitor.Slug }}/enable">Pause</a>
+    <a class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100" href="/settings/monitors/{{ .Monitor.Slug }}/disable">Resume</a>
+  </section>
+
+  <section class="p-2 flex-1 border-4 border-red-300">
+    <h2 class="mb-2">
+    Danger Zone
+    </h2>
+    <p class="text-sm mb-2">Permanently delete this monitor.</p>
+    <a class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2" href="/settings/monitors/{{ .Monitor.Slug }}/delete">Delete</a>
+  </section>
+</div>
+
 <section>
   <table>
     <caption>

@@ -80,14 +80,11 @@ code {
   @apply grid grid-cols-1 gap-5 grid-rows-[min-content] h-fit;
 }
 .settings section {
-  @apply relative overflow-x-auto shadow-md sm:rounded-lg text-gray-500 bg-white;
+  @apply relative overflow-x-auto shadow-md sm:rounded-lg text-gray-500 bg-white h-min;
 }
 
 .settings section h2 {
-  @apply flex flex-col text-lg font-semibold text-gray-900;
-}
-.settings section h2 span {
-  @apply text-sm font-medium text-gray-500;
+  @apply text-lg font-semibold text-gray-900;
 }
 
 .settings section form {

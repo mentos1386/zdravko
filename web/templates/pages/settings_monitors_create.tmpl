@@ -8,7 +8,7 @@
     <input type="text" name="workergroups" id="workergroups" placeholder="NA EU"/>
     <p>Worker groups are used to distribute the monitor to specific workers.</p>
     <label for="schedule">Schedule</label>
-    <input type="text" name="schedule" id="schedule" placeholder="@every 1m"/>
+    <input type="text" name="schedule" id="schedule" placeholder="@every 1m" value="@every 1m"/>
     <p>
     Schedule is a cron expression that defines when the monitor should be executed.
     </br>
@@ -41,8 +41,6 @@ export const options = {
     // http errors should be less than 1%
     http_req_failed: ['rate<0.01'],
   },
-  vus: 10,
-  duration: '5s',
 };
 
 export default function () {

@@ -16,30 +16,53 @@
   </div>
 </section>
 
-<section>
-  <table>
-    <caption>
-      Active Workers
-      <p >
-        Current workers that were online in last minutes.
-      </p>
-    </caption>
-    <thead>
-    <tr>
-      <th>Identity</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{range .Worker.ActiveWorkers }}
-    <tr>
-      <td>
-        {{ . }}
-      </td>
-    </tr>
-    {{end}}
-    </tbody>
-  </table>
-</section>
+<div class="flex md:flex-row flex-col gap-4 h-min">
+  <section class="flex-1">
+    <table>
+      <caption>
+        <span>
+          Active Workers
+          {{ if eq ( len .Worker.ActiveWorkers) 0 }}
+          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+            NONE
+          </span>
+          {{ else }}
+          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+            {{ len .Worker.ActiveWorkers }} ONLINE
+          </span>
+          {{ end }}
+        </span>
+        <p>
+          Current workers that were online in last minutes.
+        </p>
+      </caption>
+      {{ if eq ( len .Worker.ActiveWorkers) 0 }}
+      <thead><tr><th>No workers online for this worker group.</th></tr></thead>
+      {{ else }}
+        <thead>
+          <tr>
+            <th>Identity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .Worker.ActiveWorkers }}
+          <tr>
+            <th>{{ . }}</th>
+          </tr>
+          {{end}}
+        </tbody>
+      {{end}}
+    </table>
+  </section>
+
+  <section class="p-2 flex-1 border-4 border-red-300">
+    <h2 class="mb-2">
+    Danger Zone
+    </h2>
+    <p class="text-sm mb-2">Permanently delete this worker group. Workers will not be able to connect anymore.</p>
+    <a class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2" href="/settings/worker-groups/{{ .Worker.Slug }}/delete">Delete</a>
+  </section>
+</div>
 
 <script>
 const copyTokenButton = document.getElementById('copy-token');

@@ -13,8 +13,31 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-func getScheduleId(monitor *models.Monitor) string {
-	return "monitor-" + monitor.Slug
+type MonitorStatus string
+
+const (
+	MonitorStatusUnknown MonitorStatus = "UNKNOWN"
+	MonitorStatusPaused  MonitorStatus = "PAUSED"
+	MonitorStatusActive  MonitorStatus = "ACTIVE"
+)
+
+func getScheduleId(slug string) string {
+	return "monitor-" + slug
+}
+
+func GetMonitorStatus(ctx context.Context, temporal client.Client, slug string) (MonitorStatus, error) {
+	schedule := temporal.ScheduleClient().GetHandle(ctx, getScheduleId(slug))
+
+	description, err := schedule.Describe(ctx)
+	if err != nil {
+		return MonitorStatusUnknown, err
+	}
+
+	if description.Schedule.State.Paused {
+		return MonitorStatusPaused, nil
+	}
+
+	return MonitorStatusActive, nil
 }
 
 func CreateMonitor(ctx context.Context, db *sqlx.DB, monitor *models.Monitor) error {
@@ -202,13 +225,13 @@ func CreateOrUpdateMonitorSchedule(
 	}
 
 	options := client.ScheduleOptions{
-		ID: getScheduleId(monitor),
+		ID: getScheduleId(monitor.Slug),
 		Spec: client.ScheduleSpec{
 			CronExpressions: []string{monitor.Schedule},
 			Jitter:          time.Second * 10,
 		},
 		Action: &client.ScheduleWorkflowAction{
-			ID:        getScheduleId(monitor),
+			ID:        getScheduleId(monitor.Slug),
 			Workflow:  workflows.NewWorkflows(nil).MonitorWorkflowDefinition,
 			Args:      args,
 			TaskQueue: "default",
@@ -218,7 +241,7 @@ func CreateOrUpdateMonitorSchedule(
 		},
 	}
 
-	schedule := t.ScheduleClient().GetHandle(ctx, getScheduleId(monitor))
+	schedule := t.ScheduleClient().GetHandle(ctx, getScheduleId(monitor.Slug))
 
 	// If exists, we update
 	_, err := schedule.Describe(ctx)
