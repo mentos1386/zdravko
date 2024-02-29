@@ -96,7 +96,7 @@
               {{ else if eq .Status "FAILURE" }}
                 <span class="flex w-3 h-3 me-2 bg-red-400 rounded-full"></span>
               {{ else }}
-                <span class="flex w-3 h-3 me-2 bg-gray-400 rounded-full"></span>
+                <span class="flex w-3 h-3 me-2 bg-gray-200 rounded-full"></span>
               {{ end }}
               <p>{{ .Name }}</p>
             </div>
@@ -112,7 +112,7 @@
                 {{ else if eq . "FAILURE" }}
                   <div class="bg-red-400 hover:bg-red-500 flex-auto"></div>
                 {{ else }}
-                  <div class="bg-gray-400 hover:bg-gray-500 flex-auto"></div>
+                  <div class="bg-gray-200 hover:bg-gray-300 flex-auto"></div>
                 {{ end }}
               {{ end }}
             </div>

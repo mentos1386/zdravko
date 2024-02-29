@@ -31,7 +31,7 @@ type History struct {
 }
 
 func getHour(date time.Time) string {
-	return date.UTC().Format("2006-01-02T15:04")
+	return date.UTC().Format("2006-01-02T15:04:05")
 }
 
 func getHistory(history []*models.MonitorHistory, period time.Duration, buckets int) *History {
@@ -45,7 +45,7 @@ func getHistory(history []*models.MonitorHistory, period time.Duration, buckets 
 	}
 
 	for _, _history := range history {
-		hour := getHour(_history.CreatedAt.Time.Truncate(time.Hour))
+		hour := getHour(_history.CreatedAt.Time.Truncate(period))
 
 		// Skip if not part of the "buckets"
 		if _, ok := historyMap[hour]; !ok {
