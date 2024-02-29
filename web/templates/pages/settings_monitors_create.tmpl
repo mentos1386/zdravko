@@ -1,40 +1,61 @@
-{{define "settings"}}
-<section class="p-5">
-  <form action="/settings/monitors/create" method="post">
-    <label for="name">Name</label>
-    <input type="name" name="name" id="name" placeholder="Github.com">
-    <p>Name of the monitor can be anything.</p>
-    <label for="workergroups">Worker Groups</label>
-    <input type="text" name="workergroups" id="workergroups" placeholder="NA EU"/>
-    <p>Worker groups are used to distribute the monitor to specific workers.</p>
-    <label for="schedule">Schedule</label>
-    <input type="text" name="schedule" id="schedule" placeholder="@every 1m" value="@every 1m"/>
-    <p>
-    Schedule is a cron expression that defines when the monitor should be executed.
-    </br>
-    You can also use <code>@every [interval]</code> where interval is a duration like 5m, 1h, 60s.
-    Or use <code>@hourly</code>, <code>@daily</code>, <code>@weekly</code>, <code>@monthly</code>, <code>@yearly</code>.
-    </p>
-    <label for="script">Script</label>
-    <input required type="hidden" id="script" name="script">
-    <div id="editor" class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"></div>
-    <p>
-    Script is what determines the status of a service.
-    You can read more about it on <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/">k6 documentation</a>.
-    </p>
-    <button type="submit" onclick="save()">Create</button>
-  </form>
-</section>
+{{ define "settings" }}
+  <section class="p-5">
+    <form action="/settings/monitors/create" method="post">
+      <label for="name">Name</label>
+      <input type="name" name="name" id="name" placeholder="Github.com" />
+      <p>Name of the monitor can be anything.</p>
+      <label for="workergroups">Worker Groups</label>
+      <input
+        type="text"
+        name="workergroups"
+        id="workergroups"
+        placeholder="NA EU"
+      />
+      <p>
+        Worker groups are used to distribute the monitor to specific workers.
+      </p>
+      <label for="schedule">Schedule</label>
+      <input
+        type="text"
+        name="schedule"
+        id="schedule"
+        placeholder="@every 1m"
+        value="@every 1m"
+      />
+      <p>
+        Schedule is a cron expression that defines when the monitor should be
+        executed.
+        <br />
+        You can also use <code>@every [interval]</code> where interval is a
+        duration like 5m, 1h, 60s. Or use <code>@hourly</code>,
+        <code>@daily</code>, <code>@weekly</code>, <code>@monthly</code>,
+        <code>@yearly</code>.
+      </p>
+      <label for="script">Script</label>
+      <input required type="hidden" id="script" name="script" />
+      <div
+        id="editor"
+        class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+      ></div>
+      <p>
+        Script is what determines the status of a service. You can read more
+        about it on
+        <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/"
+          >k6 documentation</a
+        >.
+      </p>
+      <button type="submit" onclick="save()">Create</button>
+    </form>
+  </section>
 
+  <script src="/static/monaco/vs/loader.js"></script>
+  <script>
+    function save() {
+      const script = window.editor.getValue();
+      document.getElementById("script").value = script;
+    }
 
-<script src="/static/monaco/vs/loader.js"></script>
-<script>
-  function save() {
-    const script = window.editor.getValue();
-    document.getElementById('script').value = script;
-  }
-
-  script = `import http from 'k6/http';
+    script = `import http from 'k6/http';
 
 export const options = {
   thresholds: {
@@ -46,23 +67,23 @@ export const options = {
 export default function () {
   http.get('https://example.com');
 }
-`
+`;
 
-  require.config({ paths: { vs: '/static/monaco/vs' } });
-  require(['vs/editor/editor.main'], function () {
-    window.editor = monaco.editor.create(document.getElementById('editor'), {
-      value: script,
-      language: 'javascript',
-      minimap: { enabled: false },
-      codeLens: false,
-      contextmenu: false,
-    });
+    require.config({ paths: { vs: "/static/monaco/vs" } });
+    require(["vs/editor/editor.main"], function () {
+      window.editor = monaco.editor.create(document.getElementById("editor"), {
+        value: script,
+        language: "javascript",
+        minimap: { enabled: false },
+        codeLens: false,
+        contextmenu: false,
+      });
 
-    const divElem = document.getElementById('editor');
-    const resizeObserver = new ResizeObserver(entries => {
+      const divElem = document.getElementById("editor");
+      const resizeObserver = new ResizeObserver((entries) => {
         window.editor.layout();
+      });
+      resizeObserver.observe(divElem);
     });
-    resizeObserver.observe(divElem);
-  });
-</script>
-{{end}}
+  </script>
+{{ end }}

@@ -1,10 +1,12 @@
-{{define "settings"}}
-<section class="p-5">
-  <form action="/settings/worker-groups/create" method="post">
-    <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
-    <input type="text" name="name" id="name" placeholder="aws-eu-central-1"/>
-    <p>Worker group name can be anything.</p>
-    <button type="submit">Create</button>
-  </form>
-</section>
-{{end}}
+{{ define "settings" }}
+  <section class="p-5">
+    <form action="/settings/worker-groups/create" method="post">
+      <label for="name" class="block mb-2 text-sm font-medium text-gray-900"
+        >Name</label
+      >
+      <input type="text" name="name" id="name" placeholder="aws-eu-central-1" />
+      <p>Worker group name can be anything.</p>
+      <button type="submit">Create</button>
+    </form>
+  </section>
+{{ end }}

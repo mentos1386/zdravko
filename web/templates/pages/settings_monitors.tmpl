@@ -1,94 +1,109 @@
-{{define "settings"}}
+{{ define "settings" }}
+  {{ $description := "Monitors are constantly checking weather a service is online and working correctly." }}
 
-{{ $description := "Monitors are constantly checking weather a service is online and working correctly." }}
-
-{{ if eq .MonitorsLength 0 }}
-<div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
-    <h1 class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl">
-    There are no monitors yet.
-    </h1>
-    <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40">
-    {{ $description }}
-    </p>
-    <div class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0">
-        <a href="/settings/monitors/create" class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+  {{ if eq .MonitorsLength 0 }}
+    <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
+      <h1
+        class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl"
+      >
+        There are no monitors yet.
+      </h1>
+      <p
+        class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40"
+      >
+        {{ $description }}
+      </p>
+      <div
+        class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0"
+      >
+        <a
+          href="/settings/monitors/create"
+          class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
+        >
           Create First Monitor
-          <svg class="feather ml-1 h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
+          <svg class="feather ml-1 h-5 w-5 overflow-visible">
+            <use href="/static/icons/feather-sprite.svg#plus" />
+          </svg>
         </a>
+      </div>
     </div>
-</div>
-{{ else }}
-<section>
-    <table>
+  {{ else }}
+    <section>
+      <table>
         <caption>
           List of Monitors
           <div class="mt-1 gap-4 flex justify-between">
             <p>
               {{ $description }}
             </p>
-            <a href="/settings/monitors/create" class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300">
+            <a
+              href="/settings/monitors/create"
+              class="inline-flex justify-center items-center py-1 px-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
+            >
               Create New
-              <svg class="feather h-5 w-5 overflow-visible"><use href="/static/icons/feather-sprite.svg#plus" /></svg>
+              <svg class="feather h-5 w-5 overflow-visible">
+                <use href="/static/icons/feather-sprite.svg#plus" />
+              </svg>
             </a>
           </div>
         </caption>
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-            <tr>
-                <th scope="col">
-                    Name
-                </th>
-                <th scope="col">
-                    Worker Groups
-                </th>
-                <th scope="col">
-                    Status
-                </th>
-                <th scope="col">
-                    Schedule
-                </th>
-                <th scope="col">
-                    Action
-                </th>
-            </tr>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Worker Groups</th>
+            <th scope="col">Status</th>
+            <th scope="col">Schedule</th>
+            <th scope="col">Action</th>
+          </tr>
         </thead>
-        {{range .Monitors}}
-        <tbody>
+        {{ range .Monitors }}
+          <tbody>
             <tr>
-                <th scope="row">
-                    {{.Name}}
-                </th>
-                <td>
-                    {{range .WorkerGroups}}
-                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {{ . }}
-                      </span>
-                    {{end}}
-                </td>
-                <td>
-                  {{ if eq .Status "ACTIVE" }}
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+              <th scope="row">
+                {{ .Name }}
+              </th>
+              <td>
+                {{ range .WorkerGroups }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                  >
+                    {{ . }}
+                  </span>
+                {{ end }}
+              </td>
+              <td>
+                {{ if eq .Status "ACTIVE" }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                  >
                     ACTIVE
                   </span>
-                  {{ else if eq .Status "PAUSED" }}
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                {{ else if eq .Status "PAUSED" }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                  >
                     PAUSED
                   </span>
-                  {{ else }}
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                {{ else }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
+                  >
                     UNKNOWN
                   </span>
-                  {{ end }}
-                </td>
-                <td>
-                    {{.Schedule}}
-                </td>
-                <td>
-                    <a href="/settings/monitors/{{.Slug}}" class="link">Details</a>
-                </td>
+                {{ end }}
+              </td>
+              <td>
+                {{ .Schedule }}
+              </td>
+              <td>
+                <a href="/settings/monitors/{{ .Slug }}" class="link"
+                  >Details</a
+                >
+              </td>
             </tr>
-        </tbody>
-        {{end}}
-    </table>
-</section>
-{{end}}
-{{end}}
+          </tbody>
+        {{ end }}
+      </table>
+    </section>
+  {{ end }}
+{{ end }}

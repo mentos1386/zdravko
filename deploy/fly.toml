@@ -50,6 +50,12 @@ primary_region = 'waw'
 
 [[vm]]
   cpu_kind = 'shared'
+  cpus = 2
+  memory_mb = 512
+  processes = ['server']
+
+[[vm]]
+  cpu_kind = 'shared'
   cpus = 1
   memory_mb = 256
-  processes = ['server', 'worker']
+  processes = ['worker']

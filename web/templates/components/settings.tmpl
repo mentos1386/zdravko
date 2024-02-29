@@ -1,39 +1,54 @@
-{{define "main"}}
-{{ $title := "" }}
-{{ $path := "" }}
-{{ if ne nil .SettingsSidebarActive }}
-  {{ $title = .SettingsSidebarActive.Title }}
-  {{ $path = .SettingsSidebarActive.Path }}
-{{ end }}
+{{ define "main" }}
+  {{ $title := "" }}
+  {{ $path := "" }}
+  {{ if ne nil .SettingsSidebarActive }}
+    {{ $title = .SettingsSidebarActive.Title }}
+    {{ $path = .SettingsSidebarActive.Path }}
+  {{ end }}
 
-<div class="container max-w-screen-lg mt-8 lg:mt-20 grid grid-cols-1 lg:grid-cols-[min-content_minmax(0,1fr)] gap-8">
-  <ul class="sidebar">
-    {{range .SettingsSidebar}}
-    <li>
-      <a
-        {{$active := eq .Path $path }}
-        {{if $active}}aria-current="true"{{end}}
-        href="{{.Path}}"
-        class="{{if $active}}active{{end}}">
-          {{.Title}}
-      </a>
-    </li>
-    {{end}}
-  </ul>
-  <div class="settings">
-    <nav aria-label="Breadcrumb" class="mx-8 lg:mx-0 grid justify-center lg:justify-start">
-      <ol class="inline-flex items-center">
-        {{ range .SettingsBreadcrumbs }}
-        <li class="inline-flex items-center">
-          <a href="{{ .Path }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
-            {{ .Breadcrumb }}
-            <svg aria-hidden="true" class="feather h-4 w-4 mx-1 text-gray-400 overflow-visible"><use href="/static/icons/feather-sprite.svg#chevron-right"/></svg>
+
+  <div
+    class="container max-w-screen-lg mt-8 lg:mt-20 grid grid-cols-1 lg:grid-cols-[min-content_minmax(0,1fr)] gap-8"
+  >
+    <ul class="sidebar">
+      {{ range .SettingsSidebar }}
+        <li>
+          <a
+            {{ $active := eq .Path $path }}
+            {{ if $active }}aria-current="true"{{ end }}
+            href="{{ .Path }}"
+            class="{{ if $active }}active{{ end }}"
+          >
+            {{ .Title }}
           </a>
         </li>
-        {{ end }}
-      </ol>
-    </nav>
-    {{template "settings" .}}
+      {{ end }}
+    </ul>
+    <div class="settings">
+      <nav
+        aria-label="Breadcrumb"
+        class="mx-8 lg:mx-0 grid justify-center lg:justify-start"
+      >
+        <ol class="inline-flex items-center">
+          {{ range .SettingsBreadcrumbs }}
+            <li class="inline-flex items-center">
+              <a
+                href="{{ .Path }}"
+                class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
+              >
+                {{ .Breadcrumb }}
+                <svg
+                  aria-hidden="true"
+                  class="feather h-4 w-4 mx-1 text-gray-400 overflow-visible"
+                >
+                  <use href="/static/icons/feather-sprite.svg#chevron-right" />
+                </svg>
+              </a>
+            </li>
+          {{ end }}
+        </ol>
+      </nav>
+      {{ template "settings" . }}
+    </div>
   </div>
-</div>
-{{end}}
+{{ end }}

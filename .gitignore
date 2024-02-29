@@ -3,6 +3,7 @@ dist/
 # NPM
 package-lock.json
 package.json
+node_modules/
 
 # Database
 zdravko.db

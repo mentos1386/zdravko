@@ -1,106 +1,140 @@
-{{define "settings"}}
-<section class="p-5">
-  <form action="/settings/monitors/{{ .Monitor.Slug }}" method="post">
-    <h2>
-      Configuration
-    </h2>
-    <label for="workergroups">Worker Groups</label>
-    <input type="text" name="workergroups" id="workergroups" value="{{ range .Monitor.WorkerGroups }}{{.}} {{end}}"/>
-    <p>Worker groups are used to distribute the monitor to specific workers.</p>
-    <label for="schedule">Schedule</label>
-    <input type="text" name="schedule" id="schedule" value="{{ .Monitor.Schedule }}"/>
-    <p>
-    Schedule is a cron expression that defines when the monitor should be executed.
-    </br>
-    You can also use <code>@every [interval]</code> where interval is a duration like 5m, 1h, 60s.
-    Or use <code>@hourly</code>, <code>@daily</code>, <code>@weekly</code>, <code>@monthly</code>, <code>@yearly</code>.
-    </p>
-    <label for="script">Script</label>
-    <input required type="hidden" id="script" name="script">
-    <div id="editor" class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"></div>
-    <p>
-    Script is what determines the status of a service.
-    You can read more about it on <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/">k6 documentation</a>.
-    </p>
-    <button type="submit" onclick="save()">Save</button>
-  </form>
-</section>
-
-<div class="flex md:flex-row flex-col gap-4 h-min">
-  <section class="p-5 flex-1">
-    <h2 class="mb-2 flex flex-row gap-2">
-    Status
-    {{ if eq .Monitor.Status "ACTIVE" }}
-    <span class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-      ACTIVE
-    </span>
-    {{ else if eq .Monitor.Status "PAUSED" }}
-    <span class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-      PAUSED
-    </span>
-    {{ end }}
-    </h2>
-    <p class="text-sm mb-2">
-      Pausing the monitor will stop it from executing.
-      This can be useful in cases of expected downtime.
-      Or when the monitor is not needed anymore.
-    </p>
-    {{ if eq .Monitor.Status "ACTIVE" }}
-      <a class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100" href="/settings/monitors/{{ .Monitor.Slug }}/disable">Pause</a>
-    {{ else if eq .Monitor.Status "PAUSED" }}
-      <a class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100" href="/settings/monitors/{{ .Monitor.Slug }}/enable">Resume</a>
-    {{ end }}
-  </section>
-
-  <section class="p-2 flex-1 border-4 border-red-300">
-    <h2 class="mb-2">
-    Danger Zone
-    </h2>
-    <p class="text-sm mb-2">Permanently delete this monitor.</p>
-    <a class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2" href="/settings/monitors/{{ .Monitor.Slug }}/delete">Delete</a>
-  </section>
-</div>
-
-<section>
-  <table>
-    <caption>
-      History
+{{ define "settings" }}
+  <section class="p-5">
+    <form action="/settings/monitors/{{ .Monitor.Slug }}" method="post">
+      <h2>Configuration</h2>
+      <label for="workergroups">Worker Groups</label>
+      <input
+        type="text"
+        name="workergroups"
+        id="workergroups"
+        value="{{ range .Monitor.WorkerGroups }}{{ . }}{{ end }}"
+      />
       <p>
-        Last 10 executions of monitor script.
+        Worker groups are used to distribute the monitor to specific workers.
       </p>
-    </caption>
-    <thead>
-    <tr>
-      <th>Status</th>
-      <th>Created At</th>
-      <th>Duration</th>
-      <th>Note</th>
-    </tr>
-    </thead>
-    <tbody>
-    {{range .History}}
-    <tr>
-      <td>
-        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{if eq .Status "SUCCESS"}}bg-green-100 text-green-800{{else}}bg-red-100 text-red-800{{end}}">
-          {{ .Status }}
-        </span>
-      </td>
-      <td>
-        {{ .CreatedAt.Format "2006-01-02 15:04:05" }}
-      </td>
-      <td>
-        { .Duration }
-      </td>
-      <td class="whitespace-normal">
-        {{ .Note }}
-      </td>
-    </tr>
-    {{end}}
-    </tbody>
-  </table>
-</section>
+      <label for="schedule">Schedule</label>
+      <input
+        type="text"
+        name="schedule"
+        id="schedule"
+        value="{{ .Monitor.Schedule }}"
+      />
+      <p>
+        Schedule is a cron expression that defines when the monitor should be
+        executed.
+        <br />
+        You can also use <code>@every [interval]</code> where interval is a
+        duration like 5m, 1h, 60s. Or use <code>@hourly</code>,
+        <code>@daily</code>, <code>@weekly</code>, <code>@monthly</code>,
+        <code>@yearly</code>.
+      </p>
+      <label for="script">Script</label>
+      <input required type="hidden" id="script" name="script" />
+      <div
+        id="editor"
+        class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+      ></div>
+      <p>
+        Script is what determines the status of a service. You can read more
+        about it on
+        <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/"
+          >k6 documentation</a
+        >.
+      </p>
+      <button type="submit" onclick="save()">Save</button>
+    </form>
+  </section>
 
-<script src="/static/monaco/vs/loader.js"></script>
+  <div class="flex md:flex-row flex-col gap-4 h-min">
+    <section class="p-5 flex-1">
+      <h2 class="mb-2 flex flex-row gap-2">
+        Status
+        {{ if eq .Monitor.Status "ACTIVE" }}
+          <span
+            class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+          >
+            ACTIVE
+          </span>
+        {{ else if eq .Monitor.Status "PAUSED" }}
+          <span
+            class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+          >
+            PAUSED
+          </span>
+        {{ end }}
+      </h2>
+      <p class="text-sm mb-2">
+        Pausing the monitor will stop it from executing. This can be useful in
+        cases of expected downtime. Or when the monitor is not needed anymore.
+      </p>
+      {{ if eq .Monitor.Status "ACTIVE" }}
+        <a
+          class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
+          href="/settings/monitors/{{ .Monitor.Slug }}/disable"
+          >Pause</a
+        >
+      {{ else if eq .Monitor.Status "PAUSED" }}
+        <a
+          class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
+          href="/settings/monitors/{{ .Monitor.Slug }}/enable"
+          >Resume</a
+        >
+      {{ end }}
+    </section>
+
+    <section class="p-2 flex-1 border-4 border-red-300">
+      <h2 class="mb-2">Danger Zone</h2>
+      <p class="text-sm mb-2">Permanently delete this monitor.</p>
+      <a
+        class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+        href="/settings/monitors/{{ .Monitor.Slug }}/delete"
+        >Delete</a
+      >
+    </section>
+  </div>
+
+  <section>
+    <table>
+      <caption>
+        History
+        <p>Last 10 executions of monitor script.</p>
+      </caption>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Created At</th>
+          <th>Duration</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .History }}
+          <tr>
+            <td>
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ if eq .Status "SUCCESS" }}
+                  bg-green-100 text-green-800
+                {{ else }}
+                  bg-red-100 text-red-800
+                {{ end }}"
+              >
+                {{ .Status }}
+              </span>
+            </td>
+            <td>
+              {{ .CreatedAt.Format "2006-01-02 15:04:05" }}
+            </td>
+            <td>{ .Duration }</td>
+            <td class="whitespace-normal">
+              {{ .Note }}
+            </td>
+          </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </section>
+
+  <script src="/static/monaco/vs/loader.js"></script>
 <script>
   function save() {
     const script = window.editor.getValue();
@@ -126,4 +160,4 @@
     resizeObserver.observe(divElem);
   });
 </script>
-{{end}}
+{{ end }}

@@ -1,84 +1,108 @@
-{{define "settings"}}
-<section class="p-5">
-  <h2>
-    Token
-    <span>Use it as <code>WORKER_GROUP_TOKEN</code> configuration option.</span>
-  </h2>
-  <div class="grid grid-cols-[auto_min-content] gap-2">
-    <pre id="token" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 overflow-x-auto">{{ .Worker.Token }}</pre>
-    <button id="copy-token" data-copy-to-clipboard-target="npm-install" class="col-span-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto p-2.5 text-center items-center inline-flex justify-center">
-      <span id="default-message">Copy</span>
-      <span id="success-message" class="hidden inline-flex items-center">
-        <svg class="feather h-4 w-4 mr-1 overflow-visible"><use href="/static/icons/feather-sprite.svg#check"/></svg>
-        Copied!
-      </span>
-    </button>
-  </div>
-</section>
-
-<div class="flex md:flex-row flex-col gap-4 h-min">
-  <section class="flex-1">
-    <table>
-      <caption>
-        <span>
-          Active Workers
-          {{ if eq ( len .Worker.ActiveWorkers) 0 }}
-          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-            NONE
-          </span>
-          {{ else }}
-          <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-            {{ len .Worker.ActiveWorkers }} ONLINE
-          </span>
-          {{ end }}
-        </span>
-        <p>
-          Current workers that were online in last minutes.
-        </p>
-      </caption>
-      {{ if eq ( len .Worker.ActiveWorkers) 0 }}
-      <thead><tr><th>No workers online for this worker group.</th></tr></thead>
-      {{ else }}
-        <thead>
-          <tr>
-            <th>Identity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {{range .Worker.ActiveWorkers }}
-          <tr>
-            <th>{{ . }}</th>
-          </tr>
-          {{end}}
-        </tbody>
-      {{end}}
-    </table>
-  </section>
-
-  <section class="p-2 flex-1 border-4 border-red-300">
-    <h2 class="mb-2">
-    Danger Zone
+{{ define "settings" }}
+  <section class="p-5">
+    <h2>
+      Token
+      <span
+        >Use it as <code>WORKER_GROUP_TOKEN</code> configuration option.</span
+      >
     </h2>
-    <p class="text-sm mb-2">Permanently delete this worker group. Workers will not be able to connect anymore.</p>
-    <a class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2" href="/settings/worker-groups/{{ .Worker.Slug }}/delete">Delete</a>
+    <div class="grid grid-cols-[auto_min-content] gap-2">
+      <pre
+        id="token"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 overflow-x-auto"
+      >
+{{ .Worker.Token }}</pre
+      >
+      <button
+        id="copy-token"
+        data-copy-to-clipboard-target="npm-install"
+        class="col-span-1 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto p-2.5 text-center items-center inline-flex justify-center"
+      >
+        <span id="default-message">Copy</span>
+        <span id="success-message" class="hidden inline-flex items-center">
+          <svg class="feather h-4 w-4 mr-1 overflow-visible">
+            <use href="/static/icons/feather-sprite.svg#check" />
+          </svg>
+          Copied!
+        </span>
+      </button>
+    </div>
   </section>
-</div>
 
-<script>
-const copyTokenButton = document.getElementById('copy-token');
+  <div class="flex md:flex-row flex-col gap-4 h-min">
+    <section class="flex-1">
+      <table>
+        <caption>
+          <span>
+            Active Workers
+            {{ if eq ( len .Worker.ActiveWorkers) 0 }}
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
+              >
+                NONE
+              </span>
+            {{ else }}
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+              >
+                {{ len .Worker.ActiveWorkers }} ONLINE
+              </span>
+            {{ end }}
+          </span>
+          <p>Current workers that were online in last minutes.</p>
+        </caption>
+        {{ if eq ( len .Worker.ActiveWorkers) 0 }}
+          <thead>
+            <tr>
+              <th>No workers online for this worker group.</th>
+            </tr>
+          </thead>
+        {{ else }}
+          <thead>
+            <tr>
+              <th>Identity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .Worker.ActiveWorkers }}
+              <tr>
+                <th>{{ . }}</th>
+              </tr>
+            {{ end }}
+          </tbody>
+        {{ end }}
+      </table>
+    </section>
 
-copyTokenButton.addEventListener('click', function() {
-  this.blur();
-  const copyText = document.getElementById('token');
-  navigator.clipboard.writeText(copyText.innerText);
-  const defaultMessage = document.getElementById('default-message');
-  const successMessage = document.getElementById('success-message');
-  defaultMessage.classList.add('hidden');
-  successMessage.classList.remove('hidden');
-  setTimeout(() => {
-    defaultMessage.classList.remove('hidden');
-    successMessage.classList.add('hidden');
-  }, 1500);
-});
-</script>
-{{end}}
+    <section class="p-2 flex-1 border-4 border-red-300">
+      <h2 class="mb-2">Danger Zone</h2>
+      <p class="text-sm mb-2">
+        Permanently delete this worker group. Workers will not be able to
+        connect anymore.
+      </p>
+      <a
+        class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+        href="/settings/worker-groups/{{ .Worker.Slug }}/delete"
+        >Delete</a
+      >
+    </section>
+  </div>
+
+  <script>
+    const copyTokenButton = document.getElementById("copy-token");
+
+    copyTokenButton.addEventListener("click", function () {
+      this.blur();
+      const copyText = document.getElementById("token");
+      navigator.clipboard.writeText(copyText.innerText);
+      const defaultMessage = document.getElementById("default-message");
+      const successMessage = document.getElementById("success-message");
+      defaultMessage.classList.add("hidden");
+      successMessage.classList.remove("hidden");
+      setTimeout(() => {
+        defaultMessage.classList.remove("hidden");
+        successMessage.classList.add("hidden");
+      }, 1500);
+    });
+  </script>
+{{ end }}
