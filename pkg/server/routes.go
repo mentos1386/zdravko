@@ -48,16 +48,16 @@ func Routes(
 	settings.GET("/monitors", h.SettingsMonitorsGET)
 	settings.GET("/monitors/create", h.SettingsMonitorsCreateGET)
 	settings.POST("/monitors/create", h.SettingsMonitorsCreatePOST)
-	settings.GET("/monitors/:slug", h.SettingsMonitorsDescribeGET)
-	settings.POST("/monitors/:slug", h.SettingsMonitorsDescribePOST)
-	settings.GET("/monitors/:slug/delete", h.SettingsMonitorsDescribeDELETE)
-	settings.GET("/monitors/:slug/disable", h.SettingsMonitorsDisableGET)
-	settings.GET("/monitors/:slug/enable", h.SettingsMonitorsEnableGET)
+	settings.GET("/monitors/:id", h.SettingsMonitorsDescribeGET)
+	settings.POST("/monitors/:id", h.SettingsMonitorsDescribePOST)
+	settings.GET("/monitors/:id/delete", h.SettingsMonitorsDescribeDELETE)
+	settings.GET("/monitors/:id/disable", h.SettingsMonitorsDisableGET)
+	settings.GET("/monitors/:id/enable", h.SettingsMonitorsEnableGET)
 	settings.GET("/worker-groups", h.SettingsWorkerGroupsGET)
 	settings.GET("/worker-groups/create", h.SettingsWorkerGroupsCreateGET)
 	settings.POST("/worker-groups/create", h.SettingsWorkerGroupsCreatePOST)
-	settings.GET("/worker-groups/:slug", h.SettingsWorkerGroupsDescribeGET)
-	settings.GET("/worker-groups/:slug/delete", h.SettingsWorkerGroupsDescribeDELETE)
+	settings.GET("/worker-groups/:id", h.SettingsWorkerGroupsDescribeGET)
+	settings.GET("/worker-groups/:id/delete", h.SettingsWorkerGroupsDescribeDELETE)
 
 	settings.Match([]string{"GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"}, "/temporal*", h.Temporal)
 
@@ -71,7 +71,7 @@ func Routes(
 	apiv1 := e.Group("/api/v1")
 	apiv1.Use(h.Authenticated)
 	apiv1.GET("/workers/connect", h.ApiV1WorkersConnectGET)
-	apiv1.POST("/monitors/:slug/history", h.ApiV1MonitorsHistoryPOST)
+	apiv1.POST("/monitors/:id/history", h.ApiV1MonitorsHistoryPOST)
 
 	// Error handler
 	e.HTTPErrorHandler = func(err error, c echo.Context) {

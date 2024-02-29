@@ -31,7 +31,7 @@ func (h *BaseHandler) ApiV1WorkersConnectGET(c echo.Context) error {
 
 	response := ApiV1WorkersConnectGETResponse{
 		Endpoint: h.config.Temporal.ServerHost,
-		Group:    workerGroup.Slug,
+		Group:    workerGroup.Id,
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -42,8 +42,7 @@ func (h *BaseHandler) ApiV1WorkersConnectGET(c echo.Context) error {
 //	To somehow listen for the outcomes and then store them automatically.
 func (h *BaseHandler) ApiV1MonitorsHistoryPOST(c echo.Context) error {
 	ctx := context.Background()
-
-	slug := c.Param("slug")
+	id := c.Param("id")
 
 	var body api.ApiV1MonitorsHistoryPOSTBody
 	err := (&echo.DefaultBinder{}).BindBody(c, &body)
@@ -51,7 +50,7 @@ func (h *BaseHandler) ApiV1MonitorsHistoryPOST(c echo.Context) error {
 		return err
 	}
 
-	_, err = services.GetMonitor(ctx, h.db, slug)
+	_, err = services.GetMonitor(ctx, h.db, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return echo.NewHTTPError(http.StatusNotFound, "Monitor not found")
@@ -60,9 +59,10 @@ func (h *BaseHandler) ApiV1MonitorsHistoryPOST(c echo.Context) error {
 	}
 
 	err = services.AddHistoryForMonitor(ctx, h.db, &models.MonitorHistory{
-		MonitorSlug: slug,
-		Status:      body.Status,
-		Note:        body.Note,
+		MonitorId:     id,
+		WorkerGroupId: body.WorkerGroupId,
+		Status:        body.Status,
+		Note:          body.Note,
 	})
 	if err != nil {
 		return err

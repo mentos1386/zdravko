@@ -10,8 +10,14 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-func GetActiveWorkers(ctx context.Context, workerGroupSlug string, temporal client.Client) ([]string, error) {
-	response, err := temporal.DescribeTaskQueue(ctx, workerGroupSlug, enums.TASK_QUEUE_TYPE_ACTIVITY)
+func CountWorkerGroups(ctx context.Context, db *sqlx.DB) (int, error) {
+	var count int
+	err := db.GetContext(ctx, &count, "SELECT COUNT(*) FROM worker_groups")
+	return count, err
+}
+
+func GetActiveWorkers(ctx context.Context, workerGroupId string, temporal client.Client) ([]string, error) {
+	response, err := temporal.DescribeTaskQueue(ctx, workerGroupId, enums.TASK_QUEUE_TYPE_ACTIVITY)
 	if err != nil {
 		return make([]string, 0), err
 	}
@@ -26,16 +32,16 @@ func GetActiveWorkers(ctx context.Context, workerGroupSlug string, temporal clie
 
 func CreateWorkerGroup(ctx context.Context, db *sqlx.DB, workerGroup *models.WorkerGroup) error {
 	_, err := db.NamedExecContext(ctx,
-		"INSERT INTO worker_groups (slug, name) VALUES (:slug, :name)",
+		"INSERT INTO worker_groups (id, name) VALUES (:id, :name)",
 		workerGroup,
 	)
 	return err
 }
 
-func DeleteWorkerGroup(ctx context.Context, db *sqlx.DB, slug string) error {
+func DeleteWorkerGroup(ctx context.Context, db *sqlx.DB, id string) error {
 	_, err := db.ExecContext(ctx,
-		"UPDATE worker_groups SET deleted_at = datetime('now') WHERE slug = $1",
-		slug,
+		"DELETE FROM worker_groups WHERE id = $1",
+		id,
 	)
 	return err
 }
@@ -43,7 +49,7 @@ func DeleteWorkerGroup(ctx context.Context, db *sqlx.DB, slug string) error {
 func GetWorkerGroups(ctx context.Context, db *sqlx.DB) ([]*models.WorkerGroup, error) {
 	var workerGroups []*models.WorkerGroup
 	err := db.SelectContext(ctx, &workerGroups,
-		"SELECT * FROM worker_groups WHERE deleted_at IS NULL ORDER BY name",
+		"SELECT * FROM worker_groups ORDER BY name",
 	)
 	return workerGroups, err
 }
@@ -52,16 +58,14 @@ func GetWorkerGroupsWithMonitors(ctx context.Context, db *sqlx.DB) ([]*models.Wo
 	rows, err := db.QueryContext(ctx,
 		`
 SELECT
-  worker_groups.slug,
+  worker_groups.id,
   worker_groups.name,
   worker_groups.created_at,
   worker_groups.updated_at,
-  worker_groups.deleted_at,
   monitors.name as monitor_name
 FROM worker_groups
-LEFT OUTER JOIN monitor_worker_groups ON worker_groups.slug = monitor_worker_groups.worker_group_slug
-LEFT OUTER JOIN monitors ON monitor_worker_groups.monitor_slug = monitors.slug
-WHERE worker_groups.deleted_at IS NULL AND monitors.deleted_at IS NULL
+LEFT OUTER JOIN monitor_worker_groups ON worker_groups.id = monitor_worker_groups.worker_group_id
+LEFT OUTER JOIN monitors ON monitor_worker_groups.monitor_id = monitors.id
 ORDER BY worker_groups.name
 `)
 	if err != nil {
@@ -76,11 +80,10 @@ ORDER BY worker_groups.name
 
 		var monitorName *string
 		err = rows.Scan(
-			&workerGroup.Slug,
+			&workerGroup.Id,
 			&workerGroup.Name,
 			&workerGroup.CreatedAt,
 			&workerGroup.UpdatedAt,
-			&workerGroup.DeletedAt,
 			&monitorName,
 		)
 		if err != nil {
@@ -89,52 +92,51 @@ ORDER BY worker_groups.name
 
 		if monitorName != nil {
 			monitors := []string{}
-			if workerGroups[workerGroup.Slug] != nil {
-				monitors = workerGroups[workerGroup.Slug].Monitors
+			if workerGroups[workerGroup.Id] != nil {
+				monitors = workerGroups[workerGroup.Id].Monitors
 			}
 			workerGroup.Monitors = append(monitors, *monitorName)
 		}
 
-		workerGroups[workerGroup.Slug] = workerGroup
+		workerGroups[workerGroup.Id] = workerGroup
 	}
 
 	return maps.Values(workerGroups), err
 }
 
-func GetWorkerGroupsBySlug(ctx context.Context, db *sqlx.DB, slugs []string) ([]*models.WorkerGroup, error) {
+func GetWorkerGroupsById(ctx context.Context, db *sqlx.DB, ids []string) ([]*models.WorkerGroup, error) {
 	var workerGroups []*models.WorkerGroup
 	err := db.SelectContext(ctx, &workerGroups,
-		"SELECT * FROM worker_groups WHERE slug = ANY($1) AND deleted_at IS NULL",
-		slugs,
+		"SELECT * FROM worker_groups WHERE id = ANY($1)",
+		ids,
 	)
 	return workerGroups, err
 }
 
-func GetWorkerGroup(ctx context.Context, db *sqlx.DB, slug string) (*models.WorkerGroup, error) {
+func GetWorkerGroup(ctx context.Context, db *sqlx.DB, id string) (*models.WorkerGroup, error) {
 	var workerGroup models.WorkerGroup
 	err := db.GetContext(ctx, &workerGroup,
-		"SELECT * FROM worker_groups WHERE slug = $1 AND deleted_at IS NULL",
-		slug,
+		"SELECT * FROM worker_groups WHERE id = $1",
+		id,
 	)
 	return &workerGroup, err
 }
 
-func GetWorkerGroupWithMonitors(ctx context.Context, db *sqlx.DB, slug string) (*models.WorkerGroupWithMonitors, error) {
+func GetWorkerGroupWithMonitors(ctx context.Context, db *sqlx.DB, id string) (*models.WorkerGroupWithMonitors, error) {
 	rows, err := db.QueryContext(ctx,
 		`
 SELECT
-  worker_groups.slug,
+  worker_groups.id,
   worker_groups.name,
   worker_groups.created_at,
   worker_groups.updated_at,
-  worker_groups.deleted_at,
   monitors.name as monitor_name
 FROM worker_groups
-LEFT OUTER JOIN monitor_worker_groups ON worker_groups.slug = monitor_worker_groups.worker_group_slug
-LEFT OUTER JOIN monitors ON monitor_worker_groups.monitor_slug = monitors.slug
-WHERE worker_groups.slug=$1 AND worker_groups.deleted_at IS NULL AND monitors.deleted_at IS NULL
+LEFT OUTER JOIN monitor_worker_groups ON worker_groups.id = monitor_worker_groups.worker_group_id
+LEFT OUTER JOIN monitors ON monitor_worker_groups.monitor_id = monitors.id
+WHERE worker_groups.id=$1
 `,
-		slug,
+		id,
 	)
 	if err != nil {
 		return nil, err
@@ -146,11 +148,10 @@ WHERE worker_groups.slug=$1 AND worker_groups.deleted_at IS NULL AND monitors.de
 	for rows.Next() {
 		var monitorName *string
 		err = rows.Scan(
-			&workerGroup.Slug,
+			&workerGroup.Id,
 			&workerGroup.Name,
 			&workerGroup.CreatedAt,
 			&workerGroup.UpdatedAt,
-			&workerGroup.DeletedAt,
 			&monitorName,
 		)
 		if err != nil {

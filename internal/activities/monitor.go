@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"code.tjo.space/mentos1386/zdravko/database/models"
 	"code.tjo.space/mentos1386/zdravko/pkg/api"
 	"code.tjo.space/mentos1386/zdravko/pkg/k6"
 )
@@ -33,22 +34,22 @@ func (a *Activities) Monitor(ctx context.Context, param HealtcheckParam) (*Monit
 }
 
 type HealtcheckAddToHistoryParam struct {
-	Slug        string
-	Status      string
-	Note        string
-	WorkerGroup string
+	MonitorId     string
+	Status        models.MonitorStatus
+	Note          string
+	WorkerGroupId string
 }
 
 type MonitorAddToHistoryResult struct {
 }
 
 func (a *Activities) MonitorAddToHistory(ctx context.Context, param HealtcheckAddToHistoryParam) (*MonitorAddToHistoryResult, error) {
-	url := fmt.Sprintf("%s/api/v1/monitors/%s/history", a.config.ApiUrl, param.Slug)
+	url := fmt.Sprintf("%s/api/v1/monitors/%s/history", a.config.ApiUrl, param.MonitorId)
 
 	body := api.ApiV1MonitorsHistoryPOSTBody{
-		Status:      param.Status,
-		Note:        param.Note,
-		WorkerGroup: param.WorkerGroup,
+		Status:        param.Status,
+		Note:          param.Note,
+		WorkerGroupId: param.WorkerGroupId,
 	}
 
 	jsonBody, err := json.Marshal(body)

@@ -46,7 +46,7 @@ func (h *BaseHandler) SettingsWorkerGroupsGET(c echo.Context) error {
 
 	workerGroupsWithActiveWorkers := make([]*WorkerGroupWithActiveWorkers, len(workerGroups))
 	for i, workerGroup := range workerGroups {
-		activeWorkers, err := services.GetActiveWorkers(context.Background(), workerGroup.Slug, h.temporal)
+		activeWorkers, err := services.GetActiveWorkers(context.Background(), workerGroup.Id, h.temporal)
 		if err != nil {
 			return err
 		}
@@ -69,10 +69,9 @@ func (h *BaseHandler) SettingsWorkerGroupsGET(c echo.Context) error {
 
 func (h *BaseHandler) SettingsWorkerGroupsDescribeGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
+	id := c.Param("id")
 
-	slug := c.Param("slug")
-
-	worker, err := services.GetWorkerGroup(context.Background(), h.db, slug)
+	worker, err := services.GetWorkerGroup(context.Background(), h.db, id)
 	if err != nil {
 		return err
 	}
@@ -83,7 +82,7 @@ func (h *BaseHandler) SettingsWorkerGroupsDescribeGET(c echo.Context) error {
 		return err
 	}
 
-	activeWorkers, err := services.GetActiveWorkers(context.Background(), worker.Slug, h.temporal)
+	activeWorkers, err := services.GetActiveWorkers(context.Background(), worker.Id, h.temporal)
 	if err != nil {
 		return err
 	}
@@ -95,7 +94,7 @@ func (h *BaseHandler) SettingsWorkerGroupsDescribeGET(c echo.Context) error {
 			[]*components.Page{
 				GetPageByTitle(SettingsPages, "Worker Groups"),
 				{
-					Path:       fmt.Sprintf("/settings/worker-groups/%s", slug),
+					Path:       fmt.Sprintf("/settings/worker-groups/%s", id),
 					Title:      "Describe",
 					Breadcrumb: worker.Name,
 				},
@@ -109,9 +108,9 @@ func (h *BaseHandler) SettingsWorkerGroupsDescribeGET(c echo.Context) error {
 }
 
 func (h *BaseHandler) SettingsWorkerGroupsDescribeDELETE(c echo.Context) error {
-	slug := c.Param("slug")
+	id := c.Param("id")
 
-	err := services.DeleteWorkerGroup(context.Background(), h.db, slug)
+	err := services.DeleteWorkerGroup(context.Background(), h.db, id)
 	if err != nil {
 		return err
 	}
@@ -134,11 +133,11 @@ func (h *BaseHandler) SettingsWorkerGroupsCreateGET(c echo.Context) error {
 
 func (h *BaseHandler) SettingsWorkerGroupsCreatePOST(c echo.Context) error {
 	ctx := context.Background()
-	slug := slug.Make(c.FormValue("name"))
+	id := slug.Make(c.FormValue("name"))
 
 	workerGroup := &models.WorkerGroup{
 		Name: c.FormValue("name"),
-		Slug: slug,
+		Id:   id,
 	}
 
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(workerGroup)
@@ -155,5 +154,5 @@ func (h *BaseHandler) SettingsWorkerGroupsCreatePOST(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/worker-groups/%s", slug))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/worker-groups/%s", id))
 }

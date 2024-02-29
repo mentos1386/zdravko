@@ -1,39 +1,3 @@
-{{ define "daily" }}
-  <div class="justify-self-end text-sm">{{ .HistoryDaily.Uptime }}% uptime</div>
-  <div class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden">
-    {{ range .HistoryDaily.History }}
-      {{ if eq . "SUCCESS" }}
-        <div class="bg-green-400 hover:bg-green-500 flex-auto"></div>
-      {{ else if eq . "FAILURE" }}
-        <div class="bg-red-400 hover:bg-red-500 flex-auto"></div>
-      {{ else }}
-        <div class="bg-gray-400 hover:bg-gray-500 flex-auto"></div>
-      {{ end }}
-    {{ end }}
-  </div>
-  <div class="text-slate-500 justify-self-start text-sm">90 days ago</div>
-  <div class="text-slate-500 justify-self-end text-sm">Today</div>
-{{ end }}
-
-{{ define "hourly" }}
-  <div class="justify-self-end text-sm">
-    {{ .HistoryHourly.Uptime }}% uptime
-  </div>
-  <div class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden">
-    {{ range .HistoryHourly.History }}
-      {{ if eq . "SUCCESS" }}
-        <div class="bg-green-400 hover:bg-green-500 flex-auto"></div>
-      {{ else if eq . "FAILURE" }}
-        <div class="bg-red-400 hover:bg-red-500 flex-auto"></div>
-      {{ else }}
-        <div class="bg-gray-400 hover:bg-gray-500 flex-auto"></div>
-      {{ end }}
-    {{ end }}
-  </div>
-  <div class="text-slate-500 justify-self-start text-sm">48 hours ago</div>
-  <div class="text-slate-500 justify-self-end text-sm">Now</div>
-{{ end }}
-
 {{ define "main" }}
   <div class="container max-w-screen-md flex flex-col mt-20">
     {{ if eq .MonitorsLength 0 }}
@@ -136,11 +100,32 @@
               {{ end }}
               <p>{{ .Name }}</p>
             </div>
-            {{ if eq $.TimeRange "90days" }}
-              {{ template "daily" . }}
-            {{ else }}
-              {{ template "hourly" . }}
-            {{ end }}
+            <div class="justify-self-end text-sm">
+              {{ .History.Uptime }}% uptime
+            </div>
+            <div
+              class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden"
+            >
+              {{ range .History.List }}
+                {{ if eq . "SUCCESS" }}
+                  <div class="bg-green-400 hover:bg-green-500 flex-auto"></div>
+                {{ else if eq . "FAILURE" }}
+                  <div class="bg-red-400 hover:bg-red-500 flex-auto"></div>
+                {{ else }}
+                  <div class="bg-gray-400 hover:bg-gray-500 flex-auto"></div>
+                {{ end }}
+              {{ end }}
+            </div>
+            <div class="text-slate-500 justify-self-start text-sm">
+              {{ if eq $.TimeRange "90days" }}
+                90 days ago
+              {{ else if eq $.TimeRange "48hours" }}
+                48 hours ago
+              {{ else if eq $.TimeRange "90minutes" }}
+                90 minutes ago
+              {{ end }}
+            </div>
+            <div class="text-slate-500 justify-self-end text-sm">Now</div>
           </div>
         {{ end }}
       </div>

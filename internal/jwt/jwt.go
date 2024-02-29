@@ -79,7 +79,7 @@ func NewTokenForWorker(privateKey string, publicKey string, workerGroup *models.
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    "zdravko",
-			Subject:   "worker-group:" + workerGroup.Slug,
+			Subject:   "worker-group:" + workerGroup.Id,
 		},
 		// Ref: https://docs.temporal.io/self-hosted-guide/security#authorization
 		[]string{"default:read", "default:write", "default:worker"},

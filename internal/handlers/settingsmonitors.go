@@ -55,7 +55,7 @@ func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
 
 	monitorsWithStatus := make([]*MonitorWithWorkerGroupsAndStatus, len(monitors))
 	for i, monitor := range monitors {
-		status, err := services.GetMonitorStatus(context.Background(), h.temporal, monitor.Slug)
+		status, err := services.GetMonitorStatus(context.Background(), h.temporal, monitor.Id)
 		if err != nil {
 			return err
 		}
@@ -79,14 +79,14 @@ func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
 func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
-	slug := c.Param("slug")
+	slug := c.Param("id")
 
 	monitor, err := services.GetMonitorWithWorkerGroups(context.Background(), h.db, slug)
 	if err != nil {
 		return err
 	}
 
-	status, err := services.GetMonitorStatus(context.Background(), h.temporal, monitor.Slug)
+	status, err := services.GetMonitorStatus(context.Background(), h.temporal, monitor.Id)
 	if err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 }
 
 func (h *BaseHandler) SettingsMonitorsDescribeDELETE(c echo.Context) error {
-	slug := c.Param("slug")
+	slug := c.Param("id")
 
 	err := services.DeleteMonitor(context.Background(), h.db, slug)
 	if err != nil {
@@ -140,14 +140,14 @@ func (h *BaseHandler) SettingsMonitorsDescribeDELETE(c echo.Context) error {
 }
 
 func (h *BaseHandler) SettingsMonitorsDisableGET(c echo.Context) error {
-	slug := c.Param("slug")
+	slug := c.Param("id")
 
 	monitor, err := services.GetMonitor(context.Background(), h.db, slug)
 	if err != nil {
 		return err
 	}
 
-	err = services.SetMonitorStatus(context.Background(), h.temporal, monitor.Slug, services.MonitorStatusPaused)
+	err = services.SetMonitorStatus(context.Background(), h.temporal, monitor.Id, services.MonitorStatusPaused)
 	if err != nil {
 		return err
 	}
@@ -156,14 +156,14 @@ func (h *BaseHandler) SettingsMonitorsDisableGET(c echo.Context) error {
 }
 
 func (h *BaseHandler) SettingsMonitorsEnableGET(c echo.Context) error {
-	slug := c.Param("slug")
+	slug := c.Param("id")
 
 	monitor, err := services.GetMonitor(context.Background(), h.db, slug)
 	if err != nil {
 		return err
 	}
 
-	err = services.SetMonitorStatus(context.Background(), h.temporal, monitor.Slug, services.MonitorStatusActive)
+	err = services.SetMonitorStatus(context.Background(), h.temporal, monitor.Id, services.MonitorStatusActive)
 	if err != nil {
 		return err
 	}
@@ -173,7 +173,7 @@ func (h *BaseHandler) SettingsMonitorsEnableGET(c echo.Context) error {
 
 func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 	ctx := context.Background()
-	monitorSlug := c.Param("slug")
+	monitorId := c.Param("id")
 
 	update := UpdateMonitor{
 		WorkerGroups: strings.TrimSpace(c.FormValue("workergroups")),
@@ -185,7 +185,7 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 		return err
 	}
 
-	monitor, err := services.GetMonitor(ctx, h.db, monitorSlug)
+	monitor, err := services.GetMonitor(ctx, h.db, monitorId)
 	if err != nil {
 		return err
 	}
@@ -209,7 +209,7 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 		workerGroup, err := services.GetWorkerGroup(ctx, h.db, slug.Make(group))
 		if err != nil {
 			if err == sql.ErrNoRows {
-				workerGroup = &models.WorkerGroup{Name: group, Slug: slug.Make(group)}
+				workerGroup = &models.WorkerGroup{Name: group, Id: slug.Make(group)}
 				err = services.CreateWorkerGroup(ctx, h.db, workerGroup)
 				if err != nil {
 					return err
@@ -231,7 +231,7 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", monitorSlug))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", monitorId))
 }
 
 func (h *BaseHandler) SettingsMonitorsCreateGET(c echo.Context) error {
@@ -249,7 +249,7 @@ func (h *BaseHandler) SettingsMonitorsCreateGET(c echo.Context) error {
 
 func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 	ctx := context.Background()
-	monitorSlug := slug.Make(c.FormValue("name"))
+	monitorId := slug.Make(c.FormValue("name"))
 
 	create := CreateMonitor{
 		Name:         c.FormValue("name"),
@@ -270,7 +270,7 @@ func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 		workerGroup, err := services.GetWorkerGroup(ctx, h.db, slug.Make(group))
 		if err != nil {
 			if err == sql.ErrNoRows {
-				workerGroup = &models.WorkerGroup{Name: group, Slug: slug.Make(group)}
+				workerGroup = &models.WorkerGroup{Name: group, Id: slug.Make(group)}
 				err = services.CreateWorkerGroup(ctx, h.db, workerGroup)
 				if err != nil {
 					return err
@@ -284,7 +284,7 @@ func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 
 	monitor := &models.Monitor{
 		Name:     create.Name,
-		Slug:     monitorSlug,
+		Id:       monitorId,
 		Schedule: create.Schedule,
 		Script:   create.Script,
 	}

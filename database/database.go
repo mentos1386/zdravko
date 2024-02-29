@@ -2,6 +2,7 @@ package database
 
 import (
 	"embed"
+	"fmt"
 	"log/slog"
 
 	"github.com/jmoiron/sqlx"
@@ -13,7 +14,7 @@ import (
 var sqliteMigrations embed.FS
 
 func ConnectToDatabase(logger *slog.Logger, path string) (*sqlx.DB, error) {
-	db, err := sqlx.Connect("sqlite3", path)
+	db, err := sqlx.Connect("sqlite3", fmt.Sprintf("%s?_journal=WAL&_timeout=5000&_fk=true", path))
 	if err != nil {
 		return nil, err
 	}

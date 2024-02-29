@@ -87,7 +87,10 @@ func (h *BaseHandler) OAuth2LoginGET(c echo.Context) error {
 	conf := newOAuth2(h.config)
 
 	state := newRandomState()
-	err := services.CreateOAuth2State(ctx, h.db, &models.OAuth2State{State: state, ExpiresAt: time.Now().Add(5 * time.Minute)})
+	err := services.CreateOAuth2State(ctx, h.db, &models.OAuth2State{
+		State:     state,
+		ExpiresAt: models.Time{Time: time.Now().Add(5 * time.Minute)},
+	})
 	if err != nil {
 		return err
 	}
@@ -108,7 +111,7 @@ func (h *BaseHandler) OAuth2CallbackGET(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	if deleted == false {
+	if !deleted {
 		return errors.New("invalid state")
 	}
 

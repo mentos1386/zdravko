@@ -1,27 +1,64 @@
 package models
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
 )
 
 type OAuth2State struct {
-	State     string    `db:"state"`
-	ExpiresAt time.Time `db:"expires_at"`
+	State     string `db:"state"`
+	ExpiresAt Time   `db:"expires_at"`
 }
 
+type MonitorStatus string
+
 const (
-	MonitorSuccess string = "SUCCESS"
-	MonitorFailure string = "FAILURE"
-	MonitorError   string = "ERROR"
-	MonitorUnknown string = "UNKNOWN"
+	MonitorSuccess MonitorStatus = "SUCCESS"
+	MonitorFailure MonitorStatus = "FAILURE"
+	MonitorError   MonitorStatus = "ERROR"
+	MonitorUnknown MonitorStatus = "UNKNOWN"
 )
 
-type Monitor struct {
-	CreatedAt time.Time  `db:"created_at"`
-	UpdatedAt time.Time  `db:"updated_at"`
-	DeletedAt *time.Time `db:"deleted_at"`
+type Time struct {
+	Time time.Time
+}
 
-	Slug string `db:"slug"`
+// rfc3339Milli is like time.RFC3339Nano, but with millisecond precision, and fractional seconds do not have trailing
+// zeros removed.
+const rfc3339Milli = "2006-01-02T15:04:05.000Z07:00"
+
+// Value satisfies driver.Valuer interface.
+func (t *Time) Value() (driver.Value, error) {
+	return t.Time.UTC().Format(rfc3339Milli), nil
+}
+
+// Scan satisfies sql.Scanner interface.
+func (t *Time) Scan(src any) error {
+	if src == nil {
+		return nil
+	}
+
+	s, ok := src.(string)
+	if !ok {
+		return fmt.Errorf("error scanning time, got %+v", src)
+	}
+
+	parsedT, err := time.Parse(rfc3339Milli, s)
+	if err != nil {
+		return err
+	}
+
+	t.Time = parsedT.UTC()
+
+	return nil
+}
+
+type Monitor struct {
+	CreatedAt Time `db:"created_at"`
+	UpdatedAt Time `db:"updated_at"`
+
+	Id   string `db:"id"`
 	Name string `db:"name"`
 
 	Schedule string `db:"schedule"`
@@ -36,19 +73,21 @@ type MonitorWithWorkerGroups struct {
 }
 
 type MonitorHistory struct {
-	CreatedAt time.Time `db:"created_at"`
+	CreatedAt Time `db:"created_at"`
 
-	MonitorSlug string `db:"monitor_slug"`
-	Status      string `db:"status"`
-	Note        string `db:"note"`
+	MonitorId string        `db:"monitor_id"`
+	Status    MonitorStatus `db:"status"`
+	Note      string        `db:"note"`
+
+	WorkerGroupId   string `db:"worker_group_id"`
+	WorkerGroupName string `db:"worker_group_name"`
 }
 
 type WorkerGroup struct {
-	CreatedAt time.Time  `db:"created_at"`
-	UpdatedAt time.Time  `db:"updated_at"`
-	DeletedAt *time.Time `db:"deleted_at"`
+	CreatedAt Time `db:"created_at"`
+	UpdatedAt Time `db:"updated_at"`
 
-	Slug string `db:"slug"`
+	Id   string `db:"id"`
 	Name string `db:"name"`
 }
 

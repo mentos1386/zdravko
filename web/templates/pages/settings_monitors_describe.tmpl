@@ -1,6 +1,6 @@
 {{ define "settings" }}
   <section class="p-5">
-    <form action="/settings/monitors/{{ .Monitor.Slug }}" method="post">
+    <form action="/settings/monitors/{{ .Monitor.Id }}" method="post">
       <h2>Configuration</h2>
       <label for="workergroups">Worker Groups</label>
       <input
@@ -70,13 +70,13 @@
       {{ if eq .Monitor.Status "ACTIVE" }}
         <a
           class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
-          href="/settings/monitors/{{ .Monitor.Slug }}/disable"
+          href="/settings/monitors/{{ .Monitor.Id }}/disable"
           >Pause</a
         >
       {{ else if eq .Monitor.Status "PAUSED" }}
         <a
           class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
-          href="/settings/monitors/{{ .Monitor.Slug }}/enable"
+          href="/settings/monitors/{{ .Monitor.Id }}/enable"
           >Resume</a
         >
       {{ end }}
@@ -87,7 +87,7 @@
       <p class="text-sm mb-2">Permanently delete this monitor.</p>
       <a
         class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-        href="/settings/monitors/{{ .Monitor.Slug }}/delete"
+        href="/settings/monitors/{{ .Monitor.Id }}/delete"
         >Delete</a
       >
     </section>
@@ -102,6 +102,7 @@
       <thead>
         <tr>
           <th>Status</th>
+          <th>Worker Group</th>
           <th>Created At</th>
           <th>Duration</th>
           <th>Note</th>
@@ -122,7 +123,14 @@
               </span>
             </td>
             <td>
-              {{ .CreatedAt.Format "2006-01-02 15:04:05" }}
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+              >
+                {{ .WorkerGroupName }}
+              </span>
+            </td>
+            <td>
+              {{ .CreatedAt.Time.Format "2006-01-02 15:04:05" }}
             </td>
             <td>{ .Duration }</td>
             <td class="whitespace-normal">

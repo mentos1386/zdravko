@@ -16,45 +16,39 @@ type IndexData struct {
 	HealthChecks   []*HealthCheck
 	MonitorsLength int
 	TimeRange      string
-	Status         string
+	Status         models.MonitorStatus
 }
 
 type HealthCheck struct {
-	Name          string
-	Status        string
-	HistoryDaily  *History
-	HistoryHourly *History
+	Name    string
+	Status  models.MonitorStatus
+	History *History
 }
 
 type History struct {
-	History []string
-	Uptime  int
-}
-
-func getDay(date time.Time) string {
-	return date.Format("2006-01-02")
+	List   []models.MonitorStatus
+	Uptime int
 }
 
 func getHour(date time.Time) string {
-	return date.Format("2006-01-02T15:04")
+	return date.UTC().Format("2006-01-02T15:04")
 }
 
-func getDailyHistory(history []*models.MonitorHistory) *History {
-	numDays := 90
-	historyDailyMap := map[string]string{}
+func getHistory(history []*models.MonitorHistory, period time.Duration, buckets int) *History {
+	historyMap := map[string]models.MonitorStatus{}
 	numOfSuccess := 0
 	numTotal := 0
 
-	for i := 0; i < numDays; i++ {
-		day := getDay(time.Now().AddDate(0, 0, -i).Truncate(time.Hour * 24))
-		historyDailyMap[day] = models.MonitorUnknown
+	for i := 0; i < buckets; i++ {
+		datetime := getHour(time.Now().Add(period * time.Duration(-i)).Truncate(period))
+		historyMap[datetime] = models.MonitorUnknown
 	}
 
 	for _, _history := range history {
-		day := getDay(_history.CreatedAt.Truncate(time.Hour * 24))
+		hour := getHour(_history.CreatedAt.Time.Truncate(time.Hour))
 
-		// skip if day is not in the last 90 days
-		if _, ok := historyDailyMap[day]; !ok {
+		// Skip if not part of the "buckets"
+		if _, ok := historyMap[hour]; !ok {
 			continue
 		}
 
@@ -63,18 +57,18 @@ func getDailyHistory(history []*models.MonitorHistory) *History {
 			numOfSuccess++
 		}
 
-		// skip if day is already set to failure
-		if historyDailyMap[day] == models.MonitorFailure {
+		// skip if it is already set to failure
+		if historyMap[hour] == models.MonitorFailure {
 			continue
 		}
 
-		historyDailyMap[day] = _history.Status
+		historyMap[hour] = _history.Status
 	}
 
-	historyDaily := make([]string, numDays)
-	for i := 0; i < numDays; i++ {
-		day := getDay(time.Now().AddDate(0, 0, -numDays+i+1).Truncate(time.Hour * 24))
-		historyDaily[i] = historyDailyMap[day]
+	historyHourly := make([]models.MonitorStatus, buckets)
+	for i := 0; i < buckets; i++ {
+		datetime := getHour(time.Now().Add(period * time.Duration(-buckets+i+1)).Truncate(period))
+		historyHourly[i] = historyMap[datetime]
 	}
 
 	uptime := 0
@@ -83,57 +77,8 @@ func getDailyHistory(history []*models.MonitorHistory) *History {
 	}
 
 	return &History{
-		History: historyDaily,
-		Uptime:  uptime,
-	}
-}
-
-func getHourlyHistory(history []*models.MonitorHistory) *History {
-	numHours := 48
-	historyHourlyMap := map[string]string{}
-	numOfSuccess := 0
-	numTotal := 0
-
-	for i := 0; i < numHours; i++ {
-		hour := getHour(time.Now().Add(time.Hour * time.Duration(-i)).Truncate(time.Hour))
-		historyHourlyMap[hour] = models.MonitorUnknown
-	}
-
-	for _, _history := range history {
-		hour := getHour(_history.CreatedAt.Truncate(time.Hour))
-
-		// skip if day is not in the last 90 days
-		if _, ok := historyHourlyMap[hour]; !ok {
-			continue
-		}
-
-		numTotal++
-		if _history.Status == models.MonitorSuccess {
-			numOfSuccess++
-		}
-
-		// skip if day is already set to failure
-		if historyHourlyMap[hour] == models.MonitorFailure {
-			continue
-		}
-
-		historyHourlyMap[hour] = _history.Status
-	}
-
-	historyHourly := make([]string, numHours)
-	for i := 0; i < numHours; i++ {
-		hour := getHour(time.Now().Add(time.Hour * time.Duration(-numHours+i+1)).Truncate(time.Hour))
-		historyHourly[i] = historyHourlyMap[hour]
-	}
-
-	uptime := 0
-	if numTotal > 0 {
-		uptime = 100 * numOfSuccess / numTotal
-	}
-
-	return &History{
-		History: historyHourly,
-		Uptime:  uptime,
+		List:   historyHourly,
+		Uptime: uptime,
 	}
 }
 
@@ -145,32 +90,38 @@ func (h *BaseHandler) Index(c echo.Context) error {
 	}
 
 	timeRange := c.QueryParam("time-range")
-	if timeRange != "48hours" && timeRange != "90days" {
+	if timeRange != "48hours" && timeRange != "90days" && timeRange != "90minutes" {
 		timeRange = "90days"
 	}
 
-	overallStatus := "SUCCESS"
+	overallStatus := models.MonitorSuccess
 
 	monitorsWithHistory := make([]*HealthCheck, len(monitors))
 	for i, monitor := range monitors {
-		history, err := services.GetMonitorHistoryForMonitor(ctx, h.db, monitor.Slug)
+		history, err := services.GetMonitorHistoryForMonitor(ctx, h.db, monitor.Id)
 		if err != nil {
 			return err
 		}
 
-		historyDaily := getDailyHistory(history)
-		historyHourly := getHourlyHistory(history)
+		var historyResult *History
+		switch timeRange {
+		case "48hours":
+			historyResult = getHistory(history, time.Hour, 48)
+		case "90days":
+			historyResult = getHistory(history, time.Hour*24, 90)
+		case "90minutes":
+			historyResult = getHistory(history, time.Minute, 90)
+		}
 
-		status := historyDaily.History[89]
+		status := historyResult.List[len(historyResult.List)-1]
 		if status != models.MonitorSuccess {
 			overallStatus = status
 		}
 
 		monitorsWithHistory[i] = &HealthCheck{
-			Name:          monitor.Name,
-			Status:        status,
-			HistoryDaily:  historyDaily,
-			HistoryHourly: historyHourly,
+			Name:    monitor.Name,
+			Status:  status,
+			History: historyResult,
 		}
 	}
 

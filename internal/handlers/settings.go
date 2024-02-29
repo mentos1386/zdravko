@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/labstack/echo/v4"
 )
@@ -48,12 +49,42 @@ var SettingsNavbar = []*components.Page{
 	GetPageByTitle(SettingsPages, "Logout"),
 }
 
+type SettingsOverview struct {
+	*Settings
+	WorkerGroupsCount  int
+	MonitorsCount      int
+	NotificationsCount int
+	History            []*services.MonitorHistoryWithMonitor
+}
+
 func (h *BaseHandler) SettingsOverviewGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
+	ctx := c.Request().Context()
 
-	return c.Render(http.StatusOK, "settings_overview.tmpl", NewSettings(
-		cc.Principal.User,
-		GetPageByTitle(SettingsPages, "Overview"),
-		[]*components.Page{GetPageByTitle(SettingsPages, "Overview")},
-	))
+	workerGroups, err := services.CountWorkerGroups(ctx, h.db)
+	if err != nil {
+		return err
+	}
+
+	monitors, err := services.CountMonitors(ctx, h.db)
+	if err != nil {
+		return err
+	}
+
+	history, err := services.GetLastNMonitorHistory(ctx, h.db, 10)
+	if err != nil {
+		return err
+	}
+
+	return c.Render(http.StatusOK, "settings_overview.tmpl", SettingsOverview{
+		Settings: NewSettings(
+			cc.Principal.User,
+			GetPageByTitle(SettingsPages, "Overview"),
+			[]*components.Page{GetPageByTitle(SettingsPages, "Overview")},
+		),
+		WorkerGroupsCount:  workerGroups,
+		MonitorsCount:      monitors,
+		NotificationsCount: 42,
+		History:            history,
+	})
 }

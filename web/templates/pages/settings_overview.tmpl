@@ -6,33 +6,90 @@
       Hi there, {{ .User.Email }}.
     </h1>
     <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 md:px-40">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua.
+      Welcome to the settings page. Here you can manage your worker groups,
+      monitors, and notifications.
     </p>
   </div>
 
   <div class="mx-auto max-w-screen-xl flex flex-col sm:flex-row gap-4">
     <div
-      class="inline-block bg-white rounded-lg shadow p-5 text-center sm:mt-0 sm:ml-2 sm:text-left"
+      class="inline-block bg-white rounded-lg shadow p-5 text-center sm:text-left"
     >
-      <h3 class="text-sm leading-6 font-medium text-gray-400">Total Workers</h3>
-      <p class="text-3xl font-bold text-black">42</p>
+      <h3 class="text-sm leading-6 font-medium text-gray-400">
+        Total Worker Groups
+      </h3>
+      <p class="text-3xl font-bold text-black">{{ .WorkerGroupsCount }}</p>
     </div>
     <div
-      class="inline-block bg-white rounded-lg shadow p-5 text-center sm:mt-0 sm:ml-2 sm:text-left"
+      class="inline-block bg-white rounded-lg shadow p-5 text-center sm:text-left"
     >
       <h3 class="text-sm leading-6 font-medium text-gray-400">
         Total Monitors
       </h3>
-      <p class="text-3xl font-bold text-black">42</p>
+      <p class="text-3xl font-bold text-black">{{ .MonitorsCount }}</p>
     </div>
     <div
-      class="inline-block bg-white rounded-lg shadow p-5 text-center sm:mt-0 sm:ml-2 sm:text-left"
+      class="inline-block bg-white rounded-lg shadow p-5 text-center sm:text-left"
     >
       <h3 class="text-sm leading-6 font-medium text-gray-400">
         Total Notifications
       </h3>
-      <p class="text-3xl font-bold text-black">42</p>
+      <p class="text-3xl font-bold text-black">{{ .NotificationsCount }}</p>
     </div>
   </div>
+
+  <section class="mt-4">
+    <table>
+      <caption>
+        Execution History
+        <p>Last 10 executions for all monitors and worker groups.</p>
+      </caption>
+      <thead>
+        <tr>
+          <th>Monitor</th>
+          <th>Worker Group</th>
+          <th>Status</th>
+          <th>Executed At</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .History }}
+          <tr>
+            <th>
+              <a
+                class="underline hover:text-blue-600"
+                href="/settings/monitors/{{ .MonitorId }}"
+                >{{ .MonitorName }}</a
+              >
+            </th>
+            <td>
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+              >
+                {{ .WorkerGroupName }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ if eq .Status "SUCCESS" }}
+                  bg-green-100 text-green-800
+                {{ else }}
+                  bg-red-100 text-red-800
+                {{ end }}"
+              >
+                {{ .Status }}
+              </span>
+            </td>
+            <td>
+              {{ .CreatedAt.Time.Format "2006-01-02 15:04:05" }}
+            </td>
+            <td class="whitespace-normal">
+              {{ .Note }}
+            </td>
+          </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </section>
 {{ end }}

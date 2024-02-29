@@ -6,9 +6,8 @@ package.json
 node_modules/
 
 # Database
-zdravko.db
-temporal.db
-temporal.db-journal
+zdravko.db*
+temporal.db*
 
 # Keys
 *.pem
