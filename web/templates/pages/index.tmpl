@@ -75,7 +75,8 @@
           </svg>
           <h1 class="text-slate-500 mt-4">All services are online</h1>
           <p class="text-slate-500 text-sm">
-            Last updated on Feb 10 at 10:55am UTC
+            Last updated on
+            {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
           </p>
         </div>
       {{ else }}
@@ -87,7 +88,8 @@
           </svg>
           <h3 class="text-slate-500 mt-4">Degraded performance</h3>
           <p class="text-slate-500 text-sm">
-            Last updated on Feb 10 at 10:55am UTC
+            Last updated on
+            {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
           </p>
         </div>
       {{ end }}
@@ -97,7 +99,7 @@
             Monitors
           </p>
           <div
-            class="inline-flex rounded-md shadow-sm justify-self-center sm:justify-self-end time-range"
+            class="inline-flex gap-1 rounded-md shadow-sm justify-self-center sm:justify-self-end time-range py-1 px-1 bg-gray-100"
             role="group"
           >
             <a
@@ -111,6 +113,12 @@
               class="{{ if eq .TimeRange "48hours" }}active{{ end }}"
               type="button"
               >48 Hours</a
+            >
+            <a
+              href="/?time-range=90minutes"
+              class="{{ if eq .TimeRange "90minutes" }}active{{ end }}"
+              type="button"
+              >90 Minutes</a
             >
           </div>
         </div>

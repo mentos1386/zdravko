@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -25,6 +26,7 @@ func load(files ...string) *template.Template {
 	t := template.New("default").Funcs(
 		template.FuncMap{
 			"StringsJoin": strings.Join,
+			"Now":         time.Now,
 		})
 
 	return template.Must(t.ParseFS(templates, files...))
