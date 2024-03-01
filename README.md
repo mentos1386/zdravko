@@ -13,11 +13,18 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
  - [x] Abbility for multiple workers.
     - Spread workers across regions to monitor latency from different locations.
  - [x] Use [k6](https://github.com/grafana/k6) for checks, so that they can be written in javascript.
- - [ ] History and working home page.
-    - Kinda working atm. But look if all the data could be stored/fetched from temporal.
- - [ ] Edit/Delete operations for healthchecks and workers.
+ - [x] History and working home page.
+    - Kinda working atm. ~But look if all the data could be stored/fetched from temporal.~
+ - [x] Edit/Delete operations for healthchecks and workers.
  - [ ] CronJob Healthchecks (via webhooks).
  - [ ] Notifications (webhooks, slack, etc).
+ - [ ] Incidents (based on script that is triggered by monitors/crobjobs).
+ - [ ] Prepare i18n.
+ - [ ] Alpha Version (1H 2024)
+ - [ ] ??
+ - [ ] Beta Version (2H 2024)
+ - [ ] ??
+ - [ ] Stable Release (2025)
 
 ![Screenshot](docs/screenshot.png)
 Demo is available at https://zdravko.mnts.dev.
