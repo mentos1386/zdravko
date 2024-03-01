@@ -1,13 +1,13 @@
 {{ define "settings" }}
-  {{ $description := "Monitors are constantly checking weather a service is online and working correctly." }}
+  {{ $description := "Incidents can be manually created or based on monitors. They are used to notify about issues." }}
 
-  {{ $length := len .Monitors }}
+  {{ $length := len .Incidents }}
   {{ if eq $length 0 }}
     <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
       <h1
         class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl"
       >
-        There are no monitors yet.
+        There are no incidents yet.
       </h1>
       <p
         class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40"
@@ -18,10 +18,10 @@
         class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0"
       >
         <a
-          href="/settings/monitors/create"
+          href="/settings/incidents/create"
           class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
         >
-          Create First Monitor
+          Create First Worker Group
           <svg class="feather ml-1 h-5 w-5 overflow-visible">
             <use href="/static/icons/feather-sprite.svg#plus" />
           </svg>
@@ -32,13 +32,13 @@
     <section>
       <table>
         <caption>
-          List of Monitors
+          List of Incidents
           <div class="mt-1 gap-4 grid grid-cols-1 md:grid-cols-[1fr,20%]">
             <p>
               {{ $description }}
             </p>
             <a
-              href="/settings/monitors/create"
+              href="/settings/incidents/create"
               class="h-min inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
             >
               Create New
@@ -48,23 +48,21 @@
             </a>
           </div>
         </caption>
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+        <thead>
           <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Worker Groups</th>
-            <th scope="col">Status</th>
-            <th scope="col">Schedule</th>
-            <th scope="col">Action</th>
+            <th>Name</th>
+            <th>Notifications</th>
+            <th>Action</th>
           </tr>
         </thead>
-        {{ range .Monitors }}
+        {{ range .Incidents }}
           <tbody>
             <tr>
               <th scope="row">
                 {{ .Name }}
               </th>
               <td>
-                {{ range .WorkerGroups }}
+                {{ range .Notifications }}
                   <span
                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
                   >
@@ -73,31 +71,7 @@
                 {{ end }}
               </td>
               <td>
-                {{ if eq .Status "ACTIVE" }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                  >
-                    ACTIVE
-                  </span>
-                {{ else if eq .Status "PAUSED" }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
-                  >
-                    PAUSED
-                  </span>
-                {{ else }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                  >
-                    UNKNOWN
-                  </span>
-                {{ end }}
-              </td>
-              <td>
-                {{ .Schedule }}
-              </td>
-              <td>
-                <a href="/settings/monitors/{{ .Id }}" class="link">Details</a>
+                <a href="/settings/incidents/{{ .Id }}" class="link">Details</a>
               </td>
             </tr>
           </tbody>

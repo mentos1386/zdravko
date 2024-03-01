@@ -89,7 +89,7 @@ func (h *BaseHandler) OAuth2LoginGET(c echo.Context) error {
 	state := newRandomState()
 	err := services.CreateOAuth2State(ctx, h.db, &models.OAuth2State{
 		State:     state,
-		ExpiresAt: models.Time{Time: time.Now().Add(5 * time.Minute)},
+		ExpiresAt: &models.Time{Time: time.Now().Add(5 * time.Minute)},
 	})
 	if err != nil {
 		return err

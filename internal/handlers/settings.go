@@ -36,15 +36,19 @@ var SettingsPages = []*components.Page{
 	{Path: "/settings/worker-groups", Title: "Worker Groups", Breadcrumb: "Worker Groups"},
 	{Path: "/settings/worker-groups/create", Title: "Worker Groups Create", Breadcrumb: "Create"},
 	{Path: "/settings/notifications", Title: "Notifications", Breadcrumb: "Notifications"},
+	{Path: "/settings/notifications/create", Title: "Notifications Create", Breadcrumb: "Create"},
+	{Path: "/settings/incidents", Title: "Incidents", Breadcrumb: "Incidents"},
+	{Path: "/settings/incidents/create", Title: "Incidents Create", Breadcrumb: "Create"},
 	{Path: "/settings/temporal", Title: "Temporal", Breadcrumb: "Temporal"},
 	{Path: "/oauth2/logout", Title: "Logout", Breadcrumb: "Logout"},
 }
 
 var SettingsNavbar = []*components.Page{
 	GetPageByTitle(SettingsPages, "Overview"),
+	GetPageByTitle(SettingsPages, "Incidents"),
 	GetPageByTitle(SettingsPages, "Monitors"),
-	GetPageByTitle(SettingsPages, "Worker Groups"),
 	GetPageByTitle(SettingsPages, "Notifications"),
+	GetPageByTitle(SettingsPages, "Worker Groups"),
 	GetPageByTitle(SettingsPages, "Temporal"),
 	GetPageByTitle(SettingsPages, "Logout"),
 }

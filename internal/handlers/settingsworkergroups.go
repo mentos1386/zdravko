@@ -27,8 +27,7 @@ type WorkerGroupWithActiveWorkers struct {
 
 type SettingsWorkerGroups struct {
 	*Settings
-	WorkerGroups       []*WorkerGroupWithActiveWorkers
-	WorkerGroupsLength int
+	WorkerGroups []*WorkerGroupWithActiveWorkers
 }
 
 type SettingsWorker struct {
@@ -62,8 +61,7 @@ func (h *BaseHandler) SettingsWorkerGroupsGET(c echo.Context) error {
 			GetPageByTitle(SettingsPages, "Worker Groups"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Worker Groups")},
 		),
-		WorkerGroups:       workerGroupsWithActiveWorkers,
-		WorkerGroupsLength: len(workerGroupsWithActiveWorkers),
+		WorkerGroups: workerGroupsWithActiveWorkers,
 	})
 }
 

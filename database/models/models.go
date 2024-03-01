@@ -6,20 +6,6 @@ import (
 	"time"
 )
 
-type OAuth2State struct {
-	State     string `db:"state"`
-	ExpiresAt Time   `db:"expires_at"`
-}
-
-type MonitorStatus string
-
-const (
-	MonitorSuccess MonitorStatus = "SUCCESS"
-	MonitorFailure MonitorStatus = "FAILURE"
-	MonitorError   MonitorStatus = "ERROR"
-	MonitorUnknown MonitorStatus = "UNKNOWN"
-)
-
 type Time struct {
 	Time time.Time
 }
@@ -54,9 +40,23 @@ func (t *Time) Scan(src any) error {
 	return nil
 }
 
+type OAuth2State struct {
+	State     string `db:"state"`
+	ExpiresAt *Time  `db:"expires_at"`
+}
+
+type MonitorStatus string
+
+const (
+	MonitorSuccess MonitorStatus = "SUCCESS"
+	MonitorFailure MonitorStatus = "FAILURE"
+	MonitorError   MonitorStatus = "ERROR"
+	MonitorUnknown MonitorStatus = "UNKNOWN"
+)
+
 type Monitor struct {
-	CreatedAt Time `db:"created_at"`
-	UpdatedAt Time `db:"updated_at"`
+	CreatedAt *Time `db:"created_at"`
+	UpdatedAt *Time `db:"updated_at"`
 
 	Id   string `db:"id"`
 	Name string `db:"name"`
@@ -73,7 +73,7 @@ type MonitorWithWorkerGroups struct {
 }
 
 type MonitorHistory struct {
-	CreatedAt Time `db:"created_at"`
+	CreatedAt *Time `db:"created_at"`
 
 	MonitorId string        `db:"monitor_id"`
 	Status    MonitorStatus `db:"status"`
@@ -84,8 +84,8 @@ type MonitorHistory struct {
 }
 
 type WorkerGroup struct {
-	CreatedAt Time `db:"created_at"`
-	UpdatedAt Time `db:"updated_at"`
+	CreatedAt *Time `db:"created_at"`
+	UpdatedAt *Time `db:"updated_at"`
 
 	Id   string `db:"id"`
 	Name string `db:"name"`

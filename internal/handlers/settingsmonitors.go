@@ -35,8 +35,7 @@ type MonitorWithWorkerGroupsAndStatus struct {
 
 type SettingsMonitors struct {
 	*Settings
-	Monitors       []*MonitorWithWorkerGroupsAndStatus
-	MonitorsLength int
+	Monitors []*MonitorWithWorkerGroupsAndStatus
 }
 
 type SettingsMonitor struct {
@@ -71,8 +70,7 @@ func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
 			GetPageByTitle(SettingsPages, "Monitors"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Monitors")},
 		),
-		Monitors:       monitorsWithStatus,
-		MonitorsLength: len(monitorsWithStatus),
+		Monitors: monitorsWithStatus,
 	})
 }
 
