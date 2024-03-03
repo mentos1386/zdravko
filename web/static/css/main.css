@@ -56,10 +56,10 @@ code {
   @apply bg-blue-700 text-white;
 }
 
-.monitors {
-  @apply grid justify-items-stretch justify-stretch items-center mt-20 bg-white shadow-md p-5 rounded-lg;
+.monitors .monitors-list {
+  @apply grid justify-items-stretch justify-stretch items-center bg-white shadow-md p-5 py-2 rounded-lg;
 }
-.monitors > div:not(:last-child) {
+.monitors .monitors-list > div:not(:last-child) {
   @apply mb-3;
 }
 .monitors .time-range > a {
@@ -113,9 +113,16 @@ code {
 .settings section table thead th {
   @apply px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider;
 }
+.settings section table tbody tr {
+  @apply odd:bg-white even:bg-gray-50;
+}
 .settings section table tbody tr th {
   @apply px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-center;
 }
 .settings section table tbody tr td {
   @apply px-6 py-4 text-center whitespace-nowrap;
+}
+.settings section table tbody tr.row-special {
+  @apply bg-gray-100;
+  @apply font-semibold text-xs uppercase tracking-wider;
 }

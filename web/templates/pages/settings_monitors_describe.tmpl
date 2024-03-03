@@ -2,6 +2,12 @@
   <section class="p-5">
     <form action="/settings/monitors/{{ .Monitor.Id }}" method="post">
       <h2>Configuration</h2>
+      <label for="group">Group</label>
+      <input type="text" name="group" id="group" value="{{ .Monitor.Group }}" />
+      <p>
+        Group monitors together. This affects how they are presented on the
+        homepage.
+      </p>
       <label for="workergroups">Worker Groups</label>
       <input
         type="text"

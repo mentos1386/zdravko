@@ -2,8 +2,20 @@
   <section class="p-5">
     <form action="/settings/monitors/create" method="post">
       <label for="name">Name</label>
-      <input type="name" name="name" id="name" placeholder="Github.com" />
+      <input type="text" name="name" id="name" placeholder="Github.com" />
       <p>Name of the monitor can be anything.</p>
+      <label for="group">Group</label>
+      <input
+        type="text"
+        name="group"
+        id="group"
+        placeholder="default"
+        value="default"
+      />
+      <p>
+        Group monitors together. This affects how they are presented on the
+        homepage.
+      </p>
       <label for="workergroups">Worker Groups</label>
       <input
         type="text"

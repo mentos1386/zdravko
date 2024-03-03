@@ -62,7 +62,7 @@ func SetMonitorStatus(ctx context.Context, temporal client.Client, id string, st
 
 func CreateMonitor(ctx context.Context, db *sqlx.DB, monitor *models.Monitor) error {
 	_, err := db.NamedExecContext(ctx,
-		"INSERT INTO monitors (id, name, script, schedule) VALUES (:id, :name, :script, :schedule)",
+		`INSERT INTO monitors (id, name, "group", script, schedule) VALUES (:id, :name, :group, :script, :schedule)`,
 		monitor,
 	)
 	return err
@@ -70,7 +70,7 @@ func CreateMonitor(ctx context.Context, db *sqlx.DB, monitor *models.Monitor) er
 
 func UpdateMonitor(ctx context.Context, db *sqlx.DB, monitor *models.Monitor) error {
 	_, err := db.NamedExecContext(ctx,
-		"UPDATE monitors SET name=:name, script=:script, schedule=:schedule WHERE id=:id",
+		`UPDATE monitors SET "group"=:group, script=:script, schedule=:schedule WHERE id=:id`,
 		monitor,
 	)
 	return err
@@ -126,6 +126,7 @@ func GetMonitorWithWorkerGroups(ctx context.Context, db *sqlx.DB, id string) (*m
 SELECT
   monitors.id,
   monitors.name,
+  monitors."group",
   monitors.script,
   monitors.schedule,
   monitors.created_at,
@@ -150,6 +151,7 @@ WHERE monitors.id=$1
 		err = rows.Scan(
 			&monitor.Id,
 			&monitor.Name,
+			&monitor.Group,
 			&monitor.Script,
 			&monitor.Schedule,
 			&monitor.CreatedAt,
@@ -181,6 +183,7 @@ func GetMonitorsWithWorkerGroups(ctx context.Context, db *sqlx.DB) ([]*models.Mo
 SELECT
   monitors.id,
   monitors.name,
+  monitors."group",
   monitors.script,
   monitors.schedule,
   monitors.created_at,
@@ -205,6 +208,7 @@ ORDER BY monitors.name
 		err = rows.Scan(
 			&monitor.Id,
 			&monitor.Name,
+			&monitor.Group,
 			&monitor.Script,
 			&monitor.Schedule,
 			&monitor.CreatedAt,

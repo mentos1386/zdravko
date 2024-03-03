@@ -9,6 +9,7 @@ CREATE TABLE oauth2_states  (
 CREATE TABLE monitors (
   id TEXT NOT NULL,
   name TEXT NOT NULL,
+  "group" TEXT NOT NULL DEFAULT 'default',
   schedule TEXT NOT NULL,
   script TEXT NOT NULL,
 

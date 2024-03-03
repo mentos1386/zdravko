@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 
 	"code.tjo.space/mentos1386/zdravko/database/models"
@@ -17,12 +18,14 @@ import (
 
 type CreateMonitor struct {
 	Name         string `validate:"required"`
+	Group        string `validate:"required"`
 	WorkerGroups string `validate:"required"`
 	Schedule     string `validate:"required,cron"`
 	Script       string `validate:"required"`
 }
 
 type UpdateMonitor struct {
+	Group        string `validate:"required"`
 	WorkerGroups string `validate:"required"`
 	Schedule     string `validate:"required,cron"`
 	Script       string `validate:"required"`
@@ -35,7 +38,8 @@ type MonitorWithWorkerGroupsAndStatus struct {
 
 type SettingsMonitors struct {
 	*Settings
-	Monitors []*MonitorWithWorkerGroupsAndStatus
+	Monitors      map[string][]*MonitorWithWorkerGroupsAndStatus
+	MonitorGroups []string
 }
 
 type SettingsMonitor struct {
@@ -64,13 +68,23 @@ func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
 		}
 	}
 
+	monitorGroups := []string{}
+	monitorsByGroup := map[string][]*MonitorWithWorkerGroupsAndStatus{}
+	for _, monitor := range monitorsWithStatus {
+		monitorsByGroup[monitor.Group] = append(monitorsByGroup[monitor.Group], monitor)
+		if slices.Contains(monitorGroups, monitor.Group) == false {
+			monitorGroups = append(monitorGroups, monitor.Group)
+		}
+	}
+
 	return c.Render(http.StatusOK, "settings_monitors.tmpl", &SettingsMonitors{
 		Settings: NewSettings(
 			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Monitors"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Monitors")},
 		),
-		Monitors: monitorsWithStatus,
+		Monitors:      monitorsByGroup,
+		MonitorGroups: monitorGroups,
 	})
 }
 
@@ -174,6 +188,7 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 	monitorId := c.Param("id")
 
 	update := UpdateMonitor{
+		Group:        c.FormValue("group"),
 		WorkerGroups: strings.TrimSpace(c.FormValue("workergroups")),
 		Schedule:     c.FormValue("schedule"),
 		Script:       c.FormValue("script"),
@@ -187,6 +202,7 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	monitor.Group = update.Group
 	monitor.Schedule = update.Schedule
 	monitor.Script = update.Script
 
@@ -251,6 +267,7 @@ func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 
 	create := CreateMonitor{
 		Name:         c.FormValue("name"),
+		Group:        c.FormValue("group"),
 		Schedule:     c.FormValue("schedule"),
 		WorkerGroups: c.FormValue("workergroups"),
 		Script:       c.FormValue("script"),
@@ -282,6 +299,7 @@ func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 
 	monitor := &models.Monitor{
 		Name:     create.Name,
+		Group:    create.Group,
 		Id:       monitorId,
 		Schedule: create.Schedule,
 		Script:   create.Script,

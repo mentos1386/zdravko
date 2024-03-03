@@ -697,6 +697,10 @@ video {
   height: 1.25rem;
 }
 
+.h-6 {
+  height: 1.5rem;
+}
+
 .h-8 {
   height: 2rem;
 }
@@ -729,6 +733,10 @@ video {
 
 .w-5 {
   width: 1.25rem;
+}
+
+.w-6 {
+  width: 1.5rem;
 }
 
 .w-fit {
@@ -794,6 +802,10 @@ video {
 
 .gap-2 {
   gap: 0.5rem;
+}
+
+.gap-20 {
+  gap: 5rem;
 }
 
 .gap-4 {
@@ -1039,9 +1051,19 @@ video {
   line-height: 1.5rem;
 }
 
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
 }
 
 .text-xs {
@@ -1322,8 +1344,7 @@ code {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.monitors {
-  margin-top: 5rem;
+.monitors .monitors-list {
   display: grid;
   align-items: center;
   justify-content: stretch;
@@ -1332,12 +1353,14 @@ code {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
   padding: 1.25rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
   --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.monitors > div:not(:last-child) {
+.monitors .monitors-list > div:not(:last-child) {
   margin-bottom: 0.75rem;
 }
 
@@ -1581,6 +1604,16 @@ code {
   color: rgb(75 85 99 / var(--tw-text-opacity));
 }
 
+.settings section table tbody tr:nth-child(odd) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+.settings section table tbody tr:nth-child(even) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+}
+
 .settings section table tbody tr th {
   white-space: nowrap;
   padding-left: 1.5rem;
@@ -1600,6 +1633,16 @@ code {
   padding-top: 1rem;
   padding-bottom: 1rem;
   text-align: center;
+}
+
+.settings section table tbody tr.row-special {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .hover\:bg-blue-800:hover {
@@ -1701,6 +1744,11 @@ code {
 
   .sm\:justify-self-end {
     justify-self: end;
+  }
+
+  .sm\:px-0 {
+    padding-left: 0px;
+    padding-right: 0px;
   }
 
   .sm\:px-8 {

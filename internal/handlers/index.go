@@ -13,14 +13,15 @@ import (
 
 type IndexData struct {
 	*components.Base
-	HealthChecks   []*HealthCheck
+	Monitors       map[string][]*Monitor
 	MonitorsLength int
 	TimeRange      string
 	Status         models.MonitorStatus
 }
 
-type HealthCheck struct {
+type Monitor struct {
 	Name    string
+	Group   string
 	Status  models.MonitorStatus
 	History *History
 }
@@ -96,7 +97,7 @@ func (h *BaseHandler) Index(c echo.Context) error {
 
 	overallStatus := models.MonitorSuccess
 
-	monitorsWithHistory := make([]*HealthCheck, len(monitors))
+	monitorsWithHistory := make([]*Monitor, len(monitors))
 	for i, monitor := range monitors {
 		history, err := services.GetMonitorHistoryForMonitor(ctx, h.db, monitor.Id)
 		if err != nil {
@@ -118,11 +119,17 @@ func (h *BaseHandler) Index(c echo.Context) error {
 			overallStatus = status
 		}
 
-		monitorsWithHistory[i] = &HealthCheck{
+		monitorsWithHistory[i] = &Monitor{
 			Name:    monitor.Name,
+			Group:   monitor.Group,
 			Status:  status,
 			History: historyResult,
 		}
+	}
+
+	monitorsByGroup := map[string][]*Monitor{}
+	for _, monitor := range monitorsWithHistory {
+		monitorsByGroup[monitor.Group] = append(monitorsByGroup[monitor.Group], monitor)
 	}
 
 	return c.Render(http.StatusOK, "index.tmpl", &IndexData{
@@ -130,9 +137,8 @@ func (h *BaseHandler) Index(c echo.Context) error {
 			NavbarActive: GetPageByTitle(Pages, "Status"),
 			Navbar:       Pages,
 		},
-		HealthChecks:   monitorsWithHistory,
-		MonitorsLength: len(monitors),
-		TimeRange:      timeRange,
-		Status:         overallStatus,
+		Monitors:  monitorsByGroup,
+		TimeRange: timeRange,
+		Status:    overallStatus,
 	})
 }

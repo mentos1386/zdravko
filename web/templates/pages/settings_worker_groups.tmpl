@@ -56,8 +56,8 @@
             <th>Action</th>
           </tr>
         </thead>
-        {{ range .WorkerGroups }}
-          <tbody>
+        <tbody>
+          {{ range .WorkerGroups }}
             <tr>
               <th scope="row">
                 {{ .Name }}
@@ -86,8 +86,8 @@
                 >
               </td>
             </tr>
-          </tbody>
-        {{ end }}
+          {{ end }}
+        </tbody>
       </table>
     </section>
   {{ end }}

@@ -50,6 +50,7 @@
         </caption>
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
+            <th scope="col">Group</th>
             <th scope="col">Name</th>
             <th scope="col">Worker Groups</th>
             <th scope="col">Status</th>
@@ -57,51 +58,71 @@
             <th scope="col">Action</th>
           </tr>
         </thead>
-        {{ range .Monitors }}
-          <tbody>
-            <tr>
+        <tbody>
+          {{ range .MonitorGroups }}
+            {{ $currentGroup := . }}
+            <tr class="row-special">
               <th scope="row">
-                {{ .Name }}
+                {{ . }}
               </th>
-              <td>
-                {{ range .WorkerGroups }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
-                  >
-                    {{ . }}
-                  </span>
-                {{ end }}
-              </td>
-              <td>
-                {{ if eq .Status "ACTIVE" }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                  >
-                    ACTIVE
-                  </span>
-                {{ else if eq .Status "PAUSED" }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
-                  >
-                    PAUSED
-                  </span>
-                {{ else }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                  >
-                    UNKNOWN
-                  </span>
-                {{ end }}
-              </td>
-              <td>
-                {{ .Schedule }}
-              </td>
-              <td>
-                <a href="/settings/monitors/{{ .Id }}" class="link">Details</a>
-              </td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
             </tr>
-          </tbody>
-        {{ end }}
+            {{ range $group, $monitors := $.Monitors }}
+              {{ if eq $group $currentGroup }}
+                {{ range $monitors }}
+                  <tr>
+                    <th scope="row"></th>
+                    <th scope="row">
+                      {{ .Name }}
+                    </th>
+                    <td>
+                      {{ range .WorkerGroups }}
+                        <span
+                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                        >
+                          {{ . }}
+                        </span>
+                      {{ end }}
+                    </td>
+                    <td>
+                      {{ if eq .Status "ACTIVE" }}
+                        <span
+                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                        >
+                          ACTIVE
+                        </span>
+                      {{ else if eq .Status "PAUSED" }}
+                        <span
+                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                        >
+                          PAUSED
+                        </span>
+                      {{ else }}
+                        <span
+                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
+                        >
+                          UNKNOWN
+                        </span>
+                      {{ end }}
+                    </td>
+                    <td>
+                      {{ .Schedule }}
+                    </td>
+                    <td>
+                      <a href="/settings/monitors/{{ .Id }}" class="link"
+                        >Details</a
+                      >
+                    </td>
+                  </tr>
+                {{ end }}
+              {{ end }}
+            {{ end }}
+          {{ end }}
+        </tbody>
       </table>
     </section>
   {{ end }}
