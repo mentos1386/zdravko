@@ -56,9 +56,6 @@ code {
   @apply bg-blue-700 text-white;
 }
 
-.monitors .monitors-list {
-  @apply grid justify-items-stretch justify-stretch items-center bg-white shadow-md rounded-lg;
-}
 .monitors .time-range > a {
   @apply font-medium text-sm px-2.5 py-1 rounded-lg;
   @apply text-black bg-gray-100 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400;

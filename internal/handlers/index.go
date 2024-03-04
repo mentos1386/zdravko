@@ -13,7 +13,7 @@ import (
 
 type IndexData struct {
 	*components.Base
-	Monitors       map[string][]*Monitor
+	Monitors       map[string]MonitorsAndStatus
 	MonitorsLength int
 	TimeRange      string
 	Status         models.MonitorStatus
@@ -26,12 +26,22 @@ type Monitor struct {
 	History *History
 }
 
+type HistoryItem struct {
+	Status models.MonitorStatus
+	Date   time.Time
+}
+
 type History struct {
-	List   []models.MonitorStatus
+	List   []HistoryItem
 	Uptime int
 }
 
-func getHour(date time.Time) string {
+type MonitorsAndStatus struct {
+	Status   models.MonitorStatus
+	Monitors []*Monitor
+}
+
+func getDateString(date time.Time) string {
 	return date.UTC().Format("2006-01-02T15:04:05")
 }
 
@@ -41,15 +51,15 @@ func getHistory(history []*models.MonitorHistory, period time.Duration, buckets 
 	numTotal := 0
 
 	for i := 0; i < buckets; i++ {
-		datetime := getHour(time.Now().Add(period * time.Duration(-i)).Truncate(period))
-		historyMap[datetime] = models.MonitorUnknown
+		dateString := getDateString(time.Now().Add(period * time.Duration(-i)).Truncate(period))
+		historyMap[dateString] = models.MonitorUnknown
 	}
 
 	for _, _history := range history {
-		hour := getHour(_history.CreatedAt.Time.Truncate(period))
+		dateString := getDateString(_history.CreatedAt.Time.Truncate(period))
 
 		// Skip if not part of the "buckets"
-		if _, ok := historyMap[hour]; !ok {
+		if _, ok := historyMap[dateString]; !ok {
 			continue
 		}
 
@@ -59,17 +69,23 @@ func getHistory(history []*models.MonitorHistory, period time.Duration, buckets 
 		}
 
 		// skip if it is already set to failure
-		if historyMap[hour] == models.MonitorFailure {
+		if historyMap[dateString] == models.MonitorFailure {
 			continue
 		}
 
-		historyMap[hour] = _history.Status
+		// FIXME: This is wrong! As we can have multiple checks in dateString.
+		// We should look at only the newest one.
+		historyMap[dateString] = _history.Status
 	}
 
-	historyHourly := make([]models.MonitorStatus, buckets)
+	historyItems := make([]HistoryItem, buckets)
 	for i := 0; i < buckets; i++ {
-		datetime := getHour(time.Now().Add(period * time.Duration(-buckets+i+1)).Truncate(period))
-		historyHourly[i] = historyMap[datetime]
+		date := time.Now().Add(period * time.Duration(-buckets+i+1)).Truncate(period)
+		datestring := getDateString(date)
+		historyItems[i] = HistoryItem{
+			Status: historyMap[datestring],
+			Date:   date,
+		}
 	}
 
 	uptime := 0
@@ -78,7 +94,7 @@ func getHistory(history []*models.MonitorHistory, period time.Duration, buckets 
 	}
 
 	return &History{
-		List:   historyHourly,
+		List:   historyItems,
 		Uptime: uptime,
 	}
 }
@@ -95,7 +111,8 @@ func (h *BaseHandler) Index(c echo.Context) error {
 		timeRange = "90days"
 	}
 
-	overallStatus := models.MonitorSuccess
+	overallStatus := models.MonitorUnknown
+	statusByGroup := make(map[string]models.MonitorStatus)
 
 	monitorsWithHistory := make([]*Monitor, len(monitors))
 	for i, monitor := range monitors {
@@ -114,22 +131,38 @@ func (h *BaseHandler) Index(c echo.Context) error {
 			historyResult = getHistory(history, time.Minute, 90)
 		}
 
+		if statusByGroup[monitor.Group] == "" {
+			statusByGroup[monitor.Group] = models.MonitorUnknown
+		}
+
 		status := historyResult.List[len(historyResult.List)-1]
-		if status != models.MonitorSuccess {
-			overallStatus = status
+		if status.Status == models.MonitorSuccess {
+			if overallStatus == models.MonitorUnknown {
+				overallStatus = status.Status
+			}
+			if statusByGroup[monitor.Group] == models.MonitorUnknown {
+				statusByGroup[monitor.Group] = status.Status
+			}
+		}
+		if status.Status != models.MonitorSuccess && status.Status != models.MonitorUnknown {
+			overallStatus = status.Status
+			statusByGroup[monitor.Group] = status.Status
 		}
 
 		monitorsWithHistory[i] = &Monitor{
 			Name:    monitor.Name,
 			Group:   monitor.Group,
-			Status:  status,
+			Status:  status.Status,
 			History: historyResult,
 		}
 	}
 
-	monitorsByGroup := map[string][]*Monitor{}
+	monitorsByGroup := map[string]MonitorsAndStatus{}
 	for _, monitor := range monitorsWithHistory {
-		monitorsByGroup[monitor.Group] = append(monitorsByGroup[monitor.Group], monitor)
+		monitorsByGroup[monitor.Group] = MonitorsAndStatus{
+			Status:   statusByGroup[monitor.Group],
+			Monitors: append(monitorsByGroup[monitor.Group].Monitors, monitor),
+		}
 	}
 
 	return c.Render(http.StatusOK, "index.tmpl", &IndexData{

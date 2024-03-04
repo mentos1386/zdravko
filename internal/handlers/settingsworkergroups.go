@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"code.tjo.space/mentos1386/zdravko/database/models"
 	"code.tjo.space/mentos1386/zdravko/internal/jwt"
@@ -134,7 +135,7 @@ func (h *BaseHandler) SettingsWorkerGroupsCreatePOST(c echo.Context) error {
 	id := slug.Make(c.FormValue("name"))
 
 	workerGroup := &models.WorkerGroup{
-		Name: c.FormValue("name"),
+		Name: strings.ToLower(c.FormValue("name")),
 		Id:   id,
 	}
 

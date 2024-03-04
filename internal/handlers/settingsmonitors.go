@@ -16,6 +16,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const example = `
+import http from 'k6/http';
+
+export const options = {
+  thresholds: {
+    // http errors should be less than 1%
+    http_req_failed: ['rate<0.01'],
+  },
+};
+
+export default function () {
+  http.get('https://example.com');
+}
+`
+
 type CreateMonitor struct {
 	Name         string `validate:"required"`
 	Group        string `validate:"required"`
@@ -46,6 +61,11 @@ type SettingsMonitor struct {
 	*Settings
 	Monitor *MonitorWithWorkerGroupsAndStatus
 	History []*models.MonitorHistory
+}
+
+type SettingsMonitorCreate struct {
+	*Settings
+	Example string
 }
 
 func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
@@ -188,8 +208,8 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 	monitorId := c.Param("id")
 
 	update := UpdateMonitor{
-		Group:        c.FormValue("group"),
-		WorkerGroups: strings.TrimSpace(c.FormValue("workergroups")),
+		Group:        strings.ToLower(c.FormValue("group")),
+		WorkerGroups: strings.ToLower(strings.TrimSpace(c.FormValue("workergroups"))),
 		Schedule:     c.FormValue("schedule"),
 		Script:       c.FormValue("script"),
 	}
@@ -251,14 +271,17 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 func (h *BaseHandler) SettingsMonitorsCreateGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
-	return c.Render(http.StatusOK, "settings_monitors_create.tmpl", NewSettings(
-		cc.Principal.User,
-		GetPageByTitle(SettingsPages, "Monitors"),
-		[]*components.Page{
+	return c.Render(http.StatusOK, "settings_monitors_create.tmpl", &SettingsMonitorCreate{
+		Settings: NewSettings(
+			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Monitors"),
-			GetPageByTitle(SettingsPages, "Monitors Create"),
-		},
-	))
+			[]*components.Page{
+				GetPageByTitle(SettingsPages, "Monitors"),
+				GetPageByTitle(SettingsPages, "Monitors Create"),
+			},
+		),
+		Example: example,
+	})
 }
 
 func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
@@ -267,9 +290,9 @@ func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 
 	create := CreateMonitor{
 		Name:         c.FormValue("name"),
-		Group:        c.FormValue("group"),
+		Group:        strings.ToLower(c.FormValue("group")),
+		WorkerGroups: strings.ToLower(strings.TrimSpace(c.FormValue("workergroups"))),
 		Schedule:     c.FormValue("schedule"),
-		WorkerGroups: c.FormValue("workergroups"),
 		Script:       c.FormValue("script"),
 	}
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(create)

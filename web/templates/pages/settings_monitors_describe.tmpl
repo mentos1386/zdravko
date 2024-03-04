@@ -2,8 +2,14 @@
   <section class="p-5">
     <form action="/settings/monitors/{{ .Monitor.Id }}" method="post">
       <h2>Configuration</h2>
-      <label for="group">Group</label>
-      <input type="text" name="group" id="group" value="{{ .Monitor.Group }}" />
+      <label for="group">Monitor Group</label>
+      <input
+        type="text"
+        name="group"
+        id="group"
+        value="{{ .Monitor.Group }}"
+        required
+      />
       <p>
         Group monitors together. This affects how they are presented on the
         homepage.
@@ -14,6 +20,7 @@
         name="workergroups"
         id="workergroups"
         value="{{ range .Monitor.WorkerGroups }}{{ . }}{{ end }}"
+        required
       />
       <p>
         Worker groups are used to distribute the monitor to specific workers.
@@ -24,6 +31,7 @@
         name="schedule"
         id="schedule"
         value="{{ .Monitor.Schedule }}"
+        required
       />
       <p>
         Schedule is a cron expression that defines when the monitor should be
@@ -35,10 +43,12 @@
         <code>@yearly</code>.
       </p>
       <label for="script">Script</label>
-      <input required type="hidden" id="script" name="script" />
+      <textarea required id="script" name="script" class="h-96">
+{{ .Monitor.Script }}</textarea
+      >
       <div
         id="editor"
-        class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+        class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden hidden"
       ></div>
       <p>
         Script is what determines the status of a service. You can read more
@@ -150,6 +160,9 @@
 
   <script src="/static/monaco/vs/loader.js"></script>
 <script>
+  document.getElementById("editor").classList.remove("hidden");
+  document.getElementById("script").hidden = true;
+
   function save() {
     const script = window.editor.getValue();
     document.getElementById('script').value = script;
