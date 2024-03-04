@@ -8,6 +8,17 @@
   fill: none;
 }
 
+/* https://stackoverflow.com/a/6202729 */
+details summary::-webkit-details-marker {
+  display: none;
+}
+::marker {
+  display: none;
+}
+summary {
+  list-style: none;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

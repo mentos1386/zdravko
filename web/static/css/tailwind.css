@@ -8,9 +8,21 @@
   fill: none;
 }
 
-/*
-! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com
-*/
+/* https://stackoverflow.com/a/6202729 */
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+::marker {
+  display: none;
+}
+
+summary {
+  list-style: none;
+}
+
+/* ! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com */
 
 /*
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
