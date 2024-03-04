@@ -17,8 +17,8 @@ primary_region = 'waw'
   ROOT_URL = 'https://zdravko.mnts.dev'
   TEMPORAL_SERVER_HOST = 'server.process.zdravko.internal:7233'
 
-  TEMPORAL_DATABASE_PATH = '/data/temporal-8.db'
-  DATABASE_PATH = '/data/zdravko-8.db'
+  TEMPORAL_DATABASE_PATH = '/data/temporal-9.db'
+  DATABASE_PATH = '/data/zdravko-9.db'
 
 [processes]
   server = '--temporal --server'

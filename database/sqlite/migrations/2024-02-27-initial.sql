@@ -45,8 +45,8 @@ CREATE TABLE monitor_worker_groups (
   monitor_id      TEXT NOT NULL,
 
   PRIMARY KEY (worker_group_id,monitor_id),
-  CONSTRAINT fk_monitor_worker_groups_worker_group FOREIGN KEY (worker_group_id) REFERENCES worker_groups(id),
-  CONSTRAINT fk_monitor_worker_groups_monitor FOREIGN KEY (monitor_id) REFERENCES monitors(id)
+  CONSTRAINT fk_monitor_worker_groups_worker_group FOREIGN KEY (worker_group_id) REFERENCES worker_groups(id) ON DELETE CASCADE,
+  CONSTRAINT fk_monitor_worker_groups_monitor FOREIGN KEY (monitor_id) REFERENCES monitors(id) ON DELETE CASCADE
 ) STRICT;
 
 CREATE TABLE monitor_histories  (
@@ -59,8 +59,8 @@ CREATE TABLE monitor_histories  (
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ')),
 
   PRIMARY KEY (monitor_id, worker_group_id, created_at),
-  CONSTRAINT fk_monitor_histories_monitor FOREIGN KEY (monitor_id) REFERENCES monitors(id),
-  CONSTRAINT fk_monitor_histories_worker_group FOREIGN KEY (worker_group_id) REFERENCES worker_groups(id)
+  CONSTRAINT fk_monitor_histories_monitor FOREIGN KEY (monitor_id) REFERENCES monitors(id) ON DELETE CASCADE,
+  CONSTRAINT fk_monitor_histories_worker_group FOREIGN KEY (worker_group_id) REFERENCES worker_groups(id) ON DELETE CASCADE
 ) STRICT;
 
 -- +migrate Down
