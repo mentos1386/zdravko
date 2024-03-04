@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"log"
+	"sort"
 	"time"
 
 	"code.tjo.space/mentos1386/zdravko/database/models"
@@ -136,6 +137,7 @@ FROM monitors
 LEFT OUTER JOIN monitor_worker_groups ON monitors.id = monitor_worker_groups.monitor_id
 LEFT OUTER JOIN worker_groups ON monitor_worker_groups.worker_group_id = worker_groups.id
 WHERE monitors.id=$1
+ORDER BY monitors.name
 `,
 		id,
 	)
@@ -228,7 +230,12 @@ ORDER BY monitors.name
 		monitors[monitor.Id] = monitor
 	}
 
-	return maps.Values(monitors), err
+	monitorsWithWorkerGroups := maps.Values(monitors)
+	sort.SliceStable(monitorsWithWorkerGroups, func(i, j int) bool {
+		return monitorsWithWorkerGroups[i].Name < monitorsWithWorkerGroups[j].Name
+	})
+
+	return monitorsWithWorkerGroups, err
 }
 
 func DeleteMonitorSchedule(ctx context.Context, t client.Client, id string) error {
