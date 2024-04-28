@@ -84,7 +84,7 @@
         </div>
         {{ range $group, $monitorsAndStatus := .Monitors }}
           <details
-            class="bg-white shadow-md rounded-lg p-6 py-4 gap-2 [&_svg]:open:-rotate-180"
+            class="bg-white shadow-md rounded-lg p-6 py-4 gap-2 [&_svg]:open:rotate-90"
           >
             <summary
               class="flex flex-row gap-2 p-3 py-2 -mx-3 cursor-pointer hover:bg-blue-50 rounded-lg"
@@ -108,7 +108,7 @@
               <svg
                 class="feather h-6 w-6 overflow-visible self-center transition-all duration-300"
               >
-                <use href="/static/icons/feather-sprite.svg#chevron-down" />
+                <use href="/static/icons/feather-sprite.svg#chevron-right" />
               </svg>
             </summary>
             {{ range $monitorsAndStatus.Monitors }}
