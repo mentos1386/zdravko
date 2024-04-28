@@ -18,7 +18,8 @@ primary_region = 'waw'
   TEMPORAL_SERVER_HOST = 'server.process.zdravko.internal:7233'
 
   TEMPORAL_DATABASE_PATH = '/data/temporal-9.db'
-  DATABASE_PATH = '/data/zdravko-9.db'
+  SQLITE_DATABASE_PATH = '/data/zdravko-9.db'
+  KEYVALUE_DATABASE_PATH = '/data/zdravko_kv.db'
 
 [processes]
   server = '--temporal --server'
