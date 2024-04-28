@@ -87,6 +87,21 @@ run-docker:
 sqlite-web:
   sqlite_web zdravko.db
 
+# New migration file
+migration-new name:
+  #!/bin/bash
+  FILENAME="database/sqlite/migrations/`date --iso-8601`_{{name}}.sql"
+
+  cat <<EOF > $FILENAME
+  -- +migrate Up
+  -- SQL in section 'Up' is executed when this migration is applied
+
+  -- +migrate Down
+  -- SQL in section 'Down' is executed when this migration is rolled back
+  EOF
+
+  echo "Created migration file: $FILENAME"
+
 # Generate and download all external dependencies.
 generate:
   go generate ./...

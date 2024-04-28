@@ -1,13 +1,13 @@
 {{ define "settings" }}
-  {{ $description := "Incidents can be manually created or based on monitors. They are used to notify about issues." }}
+  {{ $description := "Triggers can be manually created or based on monitors. They are used to notify about issues." }}
 
-  {{ $length := len .Incidents }}
+  {{ $length := len .Triggers }}
   {{ if eq $length 0 }}
     <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
       <h1
         class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl"
       >
-        There are no incidents yet.
+        There are no triggers yet.
       </h1>
       <p
         class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40"
@@ -18,10 +18,10 @@
         class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0"
       >
         <a
-          href="/settings/incidents/create"
+          href="/settings/triggers/create"
           class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
         >
-          Create First Incident
+          Create First Trigger
           <svg class="feather ml-1 h-5 w-5 overflow-visible">
             <use href="/static/icons/feather-sprite.svg#plus" />
           </svg>
@@ -32,13 +32,13 @@
     <section>
       <table>
         <caption>
-          List of Incidents
+          List of Triggers
           <div class="mt-1 gap-4 grid grid-cols-1 md:grid-cols-[1fr,20%]">
             <p>
               {{ $description }}
             </p>
             <a
-              href="/settings/incidents/create"
+              href="/settings/triggers/create"
               class="h-min inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
             >
               Create New
@@ -51,27 +51,17 @@
         <thead>
           <tr>
             <th>Name</th>
-            <th>Notifications</th>
             <th>Action</th>
           </tr>
         </thead>
-        {{ range .Incidents }}
+        {{ range .Triggers }}
           <tbody>
             <tr>
               <th scope="row">
                 {{ .Name }}
               </th>
               <td>
-                {{ range .Notifications }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
-                  >
-                    {{ . }}
-                  </span>
-                {{ end }}
-              </td>
-              <td>
-                <a href="/settings/incidents/{{ .Id }}" class="link">Details</a>
+                <a href="/settings/triggers/{{ .Id }}" class="link">Details</a>
               </td>
             </tr>
           </tbody>

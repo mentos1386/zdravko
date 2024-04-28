@@ -53,8 +53,16 @@ func Routes(
 	settings := e.Group("/settings")
 	settings.Use(h.Authenticated)
 	settings.GET("", h.SettingsOverviewGET)
-	settings.GET("/incidents", h.SettingsIncidentsGET)
-	settings.GET("/monitors", h.SettingsMonitorsGET)
+
+	settings.GET("/triggers", h.SettingsTriggersGET)
+	settings.GET("/triggers/:id", h.SettingsTriggersDescribeGET)
+	settings.POST("/triggers/:id", h.SettingsTriggersDescribePOST)
+	settings.GET("/triggers/create", h.SettingsTriggersCreateGET)
+	settings.POST("/triggers/create", h.SettingsTriggersCreatePOST)
+	settings.GET("/triggers/:id/delete", h.SettingsTriggersDescribeDELETE)
+	settings.GET("/triggers/:id/disable", h.SettingsTriggersDisableGET)
+	settings.GET("/triggers/:id/enable", h.SettingsTriggersEnableGET)
+
 	settings.GET("/monitors/create", h.SettingsMonitorsCreateGET)
 	settings.POST("/monitors/create", h.SettingsMonitorsCreatePOST)
 	settings.GET("/monitors/:id", h.SettingsMonitorsDescribeGET)
@@ -62,7 +70,9 @@ func Routes(
 	settings.GET("/monitors/:id/delete", h.SettingsMonitorsDescribeDELETE)
 	settings.GET("/monitors/:id/disable", h.SettingsMonitorsDisableGET)
 	settings.GET("/monitors/:id/enable", h.SettingsMonitorsEnableGET)
+
 	settings.GET("/notifications", h.SettingsNotificationsGET)
+
 	settings.GET("/worker-groups", h.SettingsWorkerGroupsGET)
 	settings.GET("/worker-groups/create", h.SettingsWorkerGroupsCreateGET)
 	settings.POST("/worker-groups/create", h.SettingsWorkerGroupsCreatePOST)

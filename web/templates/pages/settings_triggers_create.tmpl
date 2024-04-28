@@ -1,0 +1,55 @@
+{{ define "settings" }}
+  <section class="p-5">
+    <form action="/settings/triggers/create" method="post">
+      <label for="name">Name</label>
+      <input type="text" name="name" id="name" value="Five subsequent failures trigger notification" />
+      <p>Name of the trigger can be anything.</p>
+      <label for="script">Script</label>
+      <textarea required id="script" name="script" class="h-96">
+{{ .Example }}</textarea
+      >
+      <div
+        id="editor"
+        class="hidden block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+      ></div>
+      <p>
+        Script is what determines the status of a service. You can read more
+        about it on
+        <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/"
+          >k6 documentation</a
+        >.
+      </p>
+      <button type="submit" onclick="save()">Create</button>
+    </form>
+  </section>
+
+  <script src="/static/monaco/vs/loader.js"></script>
+  <script>
+    script = `{{ .Example }}`;
+
+    document.getElementById("editor").classList.remove("hidden");
+    document.getElementById("script").hidden = true;
+
+    function save() {
+      const script = window.editor.getValue();
+      document.getElementById("script").value = script;
+    }
+
+    require.config({ paths: { vs: "/static/monaco/vs" } });
+    require(["vs/editor/editor.main"], function () {
+      window.editor = monaco.editor.create(document.getElementById("editor"), {
+        value: script,
+        language: "javascript",
+        minimap: { enabled: false },
+        codeLens: false,
+        contextmenu: false,
+      });
+
+      const divElem = document.getElementById("editor");
+      const resizeObserver = new ResizeObserver((entries) => {
+        window.editor.layout();
+      });
+      resizeObserver.observe(divElem);
+    });
+  </script>
+{{ end }}

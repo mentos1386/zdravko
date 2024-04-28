@@ -98,3 +98,30 @@ type WorkerGroupWithMonitors struct {
 	// List of worker group names
 	Monitors []string
 }
+
+type TriggerStatus string
+
+const (
+	TriggerSuccess TriggerStatus = "SUCCESS"
+	TriggerFailure TriggerStatus = "FAILURE"
+	TriggerError   TriggerStatus = "ERROR"
+	TriggerUnknown TriggerStatus = "UNKNOWN"
+)
+
+type Trigger struct {
+	CreatedAt *Time `db:"created_at"`
+	UpdatedAt *Time `db:"updated_at"`
+
+	Id     string        `db:"id"`
+	Name   string        `db:"name"`
+	Script string        `db:"script"`
+	Status TriggerStatus `db:"status"`
+}
+
+type TriggerHistory struct {
+	CreatedAt *Time `db:"created_at"`
+
+	TriggerId string        `db:"trigger_id"`
+	Status    TriggerStatus `db:"status"`
+	Note      string        `db:"note"`
+}

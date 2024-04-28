@@ -1,0 +1,142 @@
+{{ define "settings" }}
+  <section class="p-5">
+    <form action="/settings/triggers/{{ .Trigger.Id }}" method="post">
+      <h2>Configuration</h2>
+      <label for="script">Script</label>
+      <textarea required id="script" name="script" class="h-96">
+{{ .Trigger.Script }}</textarea
+      >
+      <div
+        id="editor"
+        class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden hidden"
+      ></div>
+      <p>
+        Script is what determines the status of a service. You can read more
+        about it on
+        <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/"
+          >k6 documentation</a
+        >.
+      </p>
+      <button type="submit" onclick="save()">Save</button>
+    </form>
+  </section>
+
+  <div class="flex md:flex-row flex-col gap-4 h-min">
+    <section class="p-5 flex-1">
+      <h2 class="mb-2 flex flex-row gap-2">
+        Status
+        {{ if eq .Trigger.Status "ACTIVE" }}
+          <span
+            class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+          >
+            ACTIVE
+          </span>
+        {{ else if eq .Trigger.Status "PAUSED" }}
+          <span
+            class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+          >
+            PAUSED
+          </span>
+        {{ end }}
+      </h2>
+      <p class="text-sm mb-2">
+        Pausing the trigger will stop it from executing. This can be useful in
+        cases of expected downtime. Or when the trigger is not needed anymore.
+      </p>
+      {{ if eq .Trigger.Status "ACTIVE" }}
+        <a
+          class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
+          href="/settings/triggers/{{ .Trigger.Id }}/disable"
+          >Pause</a
+        >
+      {{ else if eq .Trigger.Status "PAUSED" }}
+        <a
+          class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
+          href="/settings/triggers/{{ .Trigger.Id }}/enable"
+          >Resume</a
+        >
+      {{ end }}
+    </section>
+
+    <section class="p-2 flex-1 border-4 border-red-300">
+      <h2 class="mb-2">Danger Zone</h2>
+      <p class="text-sm mb-2">Permanently delete this trigger.</p>
+      <a
+        class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+        href="/settings/triggers/{{ .Trigger.Id }}/delete"
+        >Delete</a
+      >
+    </section>
+  </div>
+
+  <section>
+    <table>
+      <caption>
+        History
+        <p>Last 10 executions of trigger script.</p>
+      </caption>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Created At</th>
+          <th>Duration</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .History }}
+          <tr>
+            <td>
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ if eq .Status "SUCCESS" }}
+                  bg-green-100 text-green-800
+                {{ else }}
+                  bg-red-100 text-red-800
+                {{ end }}"
+              >
+                {{ .Status }}
+              </span>
+            </td>
+            <td>
+              {{ .CreatedAt.Time.Format "2006-01-02 15:04:05" }}
+            </td>
+            <td>{ .Duration }</td>
+            <td class="whitespace-normal">
+              {{ .Note }}
+            </td>
+          </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </section>
+
+  <script src="/static/monaco/vs/loader.js"></script>
+<script>
+  document.getElementById("editor").classList.remove("hidden");
+  document.getElementById("script").hidden = true;
+
+  function save() {
+    const script = window.editor.getValue();
+    document.getElementById('script').value = script;
+  }
+
+  script = `{{ .Trigger.Script }}`
+
+  require.config({ paths: { vs: '/static/monaco/vs' } });
+  require(['vs/editor/editor.main'], function () {
+    window.editor = monaco.editor.create(document.getElementById('editor'), {
+      value: script,
+      language: 'javascript',
+      minimap: { enabled: false },
+      codeLens: false,
+      contextmenu: false,
+    });
+
+    const divElem = document.getElementById('editor');
+    const resizeObserver = new ResizeObserver(entries => {
+        window.editor.layout();
+    });
+    resizeObserver.observe(divElem);
+  });
+</script>
+{{ end }}
