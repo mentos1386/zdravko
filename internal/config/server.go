@@ -10,10 +10,11 @@ import (
 )
 
 type ServerConfig struct {
-	Port          string `validate:"required"`
-	RootUrl       string `validate:"required,url"`
-	DatabasePath  string `validate:"required"`
-	SessionSecret string `validate:"required"`
+	Port                 string `validate:"required"`
+	RootUrl              string `validate:"required,url"`
+	SqliteDatabasePath   string `validate:"required"`
+	KeyValueDatabasePath string `validate:"required"`
+	SessionSecret        string `validate:"required"`
 
 	Jwt    ServerJwt    `validate:"required"`
 	OAuth2 ServerOAuth2 `validate:"required"`
@@ -47,7 +48,8 @@ func NewServerConfig() *ServerConfig {
 	// Set defaults
 	v.SetDefault("port", GetEnvOrDefault("PORT", "8000"))
 	v.SetDefault("rooturl", GetEnvOrDefault("ROOT_URL", "http://localhost:8000"))
-	v.SetDefault("databasepath", GetEnvOrDefault("DATABASE_PATH", "zdravko.db"))
+	v.SetDefault("sqlitedatabasepath", GetEnvOrDefault("SQLITE_DATABASE_PATH", "zdravko.db"))
+	v.SetDefault("keyvaluedatabasepath", GetEnvOrDefault("KEYVALUE_DATABASE_PATH", "zdravko_kv.db"))
 	v.SetDefault("sessionsecret", os.Getenv("SESSION_SECRET"))
 	v.SetDefault("temporal.uihost", GetEnvOrDefault("TEMPORAL_UI_HOST", "127.0.0.1:8223"))
 	v.SetDefault("temporal.serverhost", GetEnvOrDefault("TEMPORAL_SERVER_HOST", "127.0.0.1:7233"))

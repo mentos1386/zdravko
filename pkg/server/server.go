@@ -6,10 +6,12 @@ import (
 
 	"code.tjo.space/mentos1386/zdravko/database"
 	"code.tjo.space/mentos1386/zdravko/internal/config"
+	"code.tjo.space/mentos1386/zdravko/internal/kv"
 	"code.tjo.space/mentos1386/zdravko/internal/temporal"
 	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/pkg/errors"
 )
 
 type Server struct {
@@ -33,14 +35,19 @@ func (s *Server) Name() string {
 }
 
 func (s *Server) Start() error {
-	db, err := database.ConnectToDatabase(s.logger, s.cfg.DatabasePath)
+	sqliteDb, err := database.ConnectToDatabase(s.logger, s.cfg.SqliteDatabasePath)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to connect to sqlite")
 	}
 
 	temporalClient, err := temporal.ConnectServerToTemporal(s.logger, s.cfg)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to connect to temporal")
+	}
+
+	kvStore, err := kv.NewBadgerKeyValueStore(s.cfg.KeyValueDatabasePath)
+	if err != nil {
+		return errors.Wrap(err, "failed to open kv store")
 	}
 
 	s.worker = NewWorker(temporalClient, s.cfg)
@@ -49,7 +56,7 @@ func (s *Server) Start() error {
 	s.echo.Use(middleware.Logger())
 	s.echo.Use(middleware.Recover())
 	s.echo.Use(middleware.Secure())
-	Routes(s.echo, db, temporalClient, s.cfg, s.logger)
+	Routes(s.echo, sqliteDb, kvStore, temporalClient, s.cfg, s.logger)
 
 	go func() {
 		if err := s.worker.Start(); err != nil {

@@ -6,6 +6,7 @@ import (
 
 	"code.tjo.space/mentos1386/zdravko/internal/config"
 	"code.tjo.space/mentos1386/zdravko/internal/handlers"
+	"code.tjo.space/mentos1386/zdravko/internal/kv"
 	"code.tjo.space/mentos1386/zdravko/web/static"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
@@ -15,16 +16,17 @@ import (
 
 func Routes(
 	e *echo.Echo,
-	db *sqlx.DB,
+	sqlDb *sqlx.DB,
+	kvStore kv.KeyValueStore,
 	temporalClient client.Client,
 	cfg *config.ServerConfig,
 	logger *slog.Logger,
 ) {
-	h := handlers.NewBaseHandler(db, temporalClient, cfg, logger)
+	h := handlers.NewBaseHandler(sqlDb, kvStore, temporalClient, cfg, logger)
 
 	// Health
 	e.GET("/health", func(c echo.Context) error {
-		err := db.Ping()
+		err := sqlDb.Ping()
 		if err != nil {
 			return err
 		}

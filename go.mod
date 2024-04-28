@@ -3,6 +3,7 @@ module code.tjo.space/mentos1386/zdravko
 go 1.21.6
 
 require (
+	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/go-playground/validator/v10 v10.18.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/gorilla/sessions v1.2.2
@@ -16,6 +17,7 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/temporalio/ui-server/v2 v2.23.0
 	go.k6.io/k6 v0.49.0
+	go.temporal.io/api v1.27.0
 	go.temporal.io/sdk v1.26.0-rc.2
 	go.temporal.io/server v1.22.4
 	golang.org/x/exp v0.0.0-20231127185646-65229373498e
@@ -49,6 +51,7 @@ require (
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/coreos/go-oidc/v3 v3.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.9.0 // indirect
@@ -71,10 +74,12 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/golang/glog v1.1.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.7.0-rc.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/google/flatbuffers v1.12.1 // indirect
 	github.com/google/pprof v0.0.0-20230728192033-2ba5b33183c6 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -165,7 +170,6 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.19.0 // indirect
 	go.opentelemetry.io/otel/trace v1.21.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
-	go.temporal.io/api v1.27.0 // indirect
 	go.temporal.io/version v0.3.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/dig v1.17.0 // indirect
