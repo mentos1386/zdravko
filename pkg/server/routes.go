@@ -35,6 +35,12 @@ func Routes(
 
 	// Server static files
 	stat := e.Group("/static")
+	stat.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Response().Header().Set("Cache-Control", "public, max-age=60")
+			return next(c)
+		}
+	})
 	stat.Use(middleware.StaticWithConfig(middleware.StaticConfig{
 		Filesystem: http.FS(static.Static),
 	}))

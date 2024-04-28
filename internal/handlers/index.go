@@ -165,6 +165,8 @@ func (h *BaseHandler) Index(c echo.Context) error {
 		}
 	}
 
+	c.Response().Header().Set("Cache-Control", "max-age=10")
+
 	return c.Render(http.StatusOK, "index.tmpl", &IndexData{
 		Base: &components.Base{
 			NavbarActive: GetPageByTitle(Pages, "Status"),
