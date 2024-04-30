@@ -63,6 +63,7 @@ func Routes(
 	settings.GET("/triggers/:id/disable", h.SettingsTriggersDisableGET)
 	settings.GET("/triggers/:id/enable", h.SettingsTriggersEnableGET)
 
+	settings.GET("/monitors", h.SettingsMonitorsGET)
 	settings.GET("/monitors/create", h.SettingsMonitorsCreateGET)
 	settings.POST("/monitors/create", h.SettingsMonitorsCreatePOST)
 	settings.GET("/monitors/:id", h.SettingsMonitorsDescribeGET)
