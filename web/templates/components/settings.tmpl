@@ -8,7 +8,7 @@
 
 
   <div
-    class="container max-w-screen-lg mt-8 lg:mt-20 grid grid-cols-1 lg:grid-cols-[min-content_minmax(0,1fr)] gap-8"
+    class="mx-8 mt-8 max-w-screen-xl lg:mt-20 grid grid-cols-1 lg:grid-cols-[min-content_minmax(0,1fr)] gap-8"
   >
     <ul class="sidebar">
       {{ range .SettingsSidebar }}
@@ -18,8 +18,13 @@
             {{ if $active }}aria-current="true"{{ end }}
             href="{{ .Path }}"
             class="{{ if $active }}active{{ end }}"
+            {{ if eq .Title "Temporal" }}target="_blank" rel="noreferrer noopener"{{ end }}
           >
             {{ .Title }}
+            {{ if eq .Title "Monitors" }}<span class="text-slate-400">(3)</span>{{ end }}
+            {{ if eq .Title "Triggers" }}<span class="text-slate-400">(3)</span>{{ end }}
+            {{ if eq .Title "Notifications" }}<span class="text-slate-400">(3)</span>{{ end }}
+            {{ if eq .Title "Worker Groups" }}<span class="text-slate-400">(3)</span>{{ end }}
           </a>
         </li>
       {{ end }}

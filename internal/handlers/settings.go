@@ -45,8 +45,8 @@ var SettingsPages = []*components.Page{
 
 var SettingsNavbar = []*components.Page{
 	GetPageByTitle(SettingsPages, "Overview"),
-	GetPageByTitle(SettingsPages, "Triggers"),
 	GetPageByTitle(SettingsPages, "Monitors"),
+	GetPageByTitle(SettingsPages, "Triggers"),
 	GetPageByTitle(SettingsPages, "Notifications"),
 	GetPageByTitle(SettingsPages, "Worker Groups"),
 	GetPageByTitle(SettingsPages, "Temporal"),
