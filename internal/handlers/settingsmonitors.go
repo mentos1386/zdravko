@@ -9,27 +9,13 @@ import (
 	"strings"
 
 	"code.tjo.space/mentos1386/zdravko/database/models"
+	"code.tjo.space/mentos1386/zdravko/internal/script"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/go-playground/validator/v10"
 	"github.com/gosimple/slug"
 	"github.com/labstack/echo/v4"
 )
-
-const example = `
-import http from 'k6/http';
-
-export const options = {
-  thresholds: {
-    // http errors should be less than 1%
-    http_req_failed: ['rate<0.01'],
-  },
-};
-
-export default function () {
-  http.get('https://example.com');
-}
-`
 
 type CreateMonitor struct {
 	Name         string `validate:"required"`
@@ -211,7 +197,7 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 		Group:        strings.ToLower(c.FormValue("group")),
 		WorkerGroups: strings.ToLower(strings.TrimSpace(c.FormValue("workergroups"))),
 		Schedule:     c.FormValue("schedule"),
-		Script:       c.FormValue("script"),
+		Script:       script.EscapeString(c.FormValue("script")),
 	}
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(update)
 	if err != nil {
@@ -280,7 +266,7 @@ func (h *BaseHandler) SettingsMonitorsCreateGET(c echo.Context) error {
 				GetPageByTitle(SettingsPages, "Monitors Create"),
 			},
 		),
-		Example: example,
+		Example: h.examples.Monitor,
 	})
 }
 
@@ -293,7 +279,7 @@ func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 		Group:        strings.ToLower(c.FormValue("group")),
 		WorkerGroups: strings.ToLower(strings.TrimSpace(c.FormValue("workergroups"))),
 		Schedule:     c.FormValue("schedule"),
-		Script:       c.FormValue("script"),
+		Script:       script.EscapeString(c.FormValue("script")),
 	}
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(create)
 	if err != nil {

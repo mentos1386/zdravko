@@ -21,6 +21,7 @@
             {{ if eq .Title "Temporal" }}target="_blank" rel="noreferrer noopener"{{ end }}
           >
             {{ .Title }}
+            {{ if eq .Title "Targets" }}<span class="text-slate-400">(3)</span>{{ end }}
             {{ if eq .Title "Monitors" }}<span class="text-slate-400">(3)</span>{{ end }}
             {{ if eq .Title "Triggers" }}<span class="text-slate-400">(3)</span>{{ end }}
             {{ if eq .Title "Notifications" }}<span class="text-slate-400">(3)</span>{{ end }}

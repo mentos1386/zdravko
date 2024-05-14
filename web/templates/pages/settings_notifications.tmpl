@@ -1,5 +1,5 @@
 {{ define "settings" }}
-  {{ $description := "Notifications are connections to other services to notify about events." }}
+  {{ $description := "Notifications are connections to other services to notify about events. This can be slack messages, emails, webhooks, anything." }}
 
   {{ $length := len .Notifications }}
   {{ if eq $length 0 }}
@@ -10,13 +10,11 @@
         There are no notifications yet.
       </h1>
       <p
-        class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40"
+        class="mb-8 text-l font-normal text-gray-700 lg:text-l sm:px-8 lg:px-40"
       >
         {{ $description }}
       </p>
-      <div
-        class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0"
-      >
+      <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
         <a
           href="/settings/notifications/create"
           class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"

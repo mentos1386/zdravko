@@ -51,7 +51,7 @@
       </p>
       <label for="script">Script</label>
       <textarea required id="script" name="script" class="h-96">
-{{ .Example }}</textarea
+{{ ScriptUnescapeString .Example }}</textarea
       >
       <div
         id="editor"
@@ -70,7 +70,11 @@
 
   <script src="/static/monaco/vs/loader.js"></script>
   <script>
-    script = `{{ .Example }}`;
+    function htmlDecode(input) {
+      var doc = new DOMParser().parseFromString(input, "text/html");
+      return doc.documentElement.textContent;
+    }
+    script = htmlDecode("{{ .Example }}");
 
     document.getElementById("editor").classList.remove("hidden");
     document.getElementById("script").hidden = true;

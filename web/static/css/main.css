@@ -79,7 +79,7 @@ code {
   @apply grid grid-cols-1 gap-5 grid-rows-[min-content] h-fit;
 }
 .settings section {
-  @apply relative overflow-x-auto shadow-md sm:rounded-lg text-gray-500 bg-white h-min;
+  @apply relative overflow-x-auto shadow-md sm:rounded-lg text-gray-700 bg-white h-min;
 }
 
 .settings section h2 {
@@ -110,7 +110,7 @@ code {
   @apply p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white;
 }
 .settings section table caption p {
-  @apply mt-1 text-sm font-normal text-gray-500;
+  @apply mt-1 text-sm font-normal text-gray-700;
 }
 .settings section table thead {
   @apply text-xs text-gray-700 uppercase bg-gray-50;

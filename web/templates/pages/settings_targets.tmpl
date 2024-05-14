@@ -1,13 +1,13 @@
 {{ define "settings" }}
-  {{ $description := "Worker Groups are used to match multiple workers together. They can be used to difirentiate between regions, environments, networks etc." }}
+  {{ $description := "Targets are definitions of what will be monitored. This can include webpages, servers, anything. You can also use discovery mechanisem to automatically add targets from Kubernetes, Docker, Terraform, DNS and other sources." }}
 
-  {{ $length := len .WorkerGroups }}
+  {{ $length := len .Targets }}
   {{ if eq $length 0 }}
     <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
       <h1
         class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl"
       >
-        There are no worker groups yet.
+        There are no targets yet.
       </h1>
       <p
         class="mb-8 text-l font-normal text-gray-700 lg:text-l sm:px-8 lg:px-40"
@@ -16,10 +16,19 @@
       </p>
       <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
         <a
-          href="/settings/worker-groups/create"
+          href="/settings/targets/create"
           class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
         >
-          Create First Worker Group
+          Add Manual Target
+          <svg class="feather ml-1 h-5 w-5 overflow-visible">
+            <use href="/static/icons/feather-sprite.svg#plus" />
+          </svg>
+        </a>
+        <a
+          href="/settings/targets/create"
+          class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
+        >
+          Add Auto Discovered Targets
           <svg class="feather ml-1 h-5 w-5 overflow-visible">
             <use href="/static/icons/feather-sprite.svg#plus" />
           </svg>
@@ -30,13 +39,13 @@
     <section>
       <table>
         <caption>
-          List of Worker Groups
+          List of Targets
           <div class="mt-1 gap-4 grid grid-cols-1 md:grid-cols-[1fr,20%]">
             <p>
               {{ $description }}
             </p>
             <a
-              href="/settings/worker-groups/create"
+              href="/settings/targets/create"
               class="h-min inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
             >
               Create New
@@ -49,43 +58,29 @@
         <thead>
           <tr>
             <th>Name</th>
-            <th>Workers</th>
-            <th>Monitors</th>
+            <th>Type</th>
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          {{ range .WorkerGroups }}
+        {{ range .Targets }}
+          <tbody>
             <tr>
               <th scope="row">
                 {{ .Name }}
               </th>
               <td>
-                {{ if eq ( len .ActiveWorkers) 0 }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                  >
-                    NONE
-                  </span>
-                {{ else }}
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                  >
-                    {{ len .ActiveWorkers }} ONLINE
-                  </span>
-                {{ end }}
-              </td>
-              <td>
-                {{ len .Monitors }}
-              </td>
-              <td>
-                <a href="/settings/worker-groups/{{ .Id }}" class="link"
-                  >Details</a
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
                 >
+                  {{ .Type }}
+                </span>
+              </td>
+              <td>
+                <a href="/settings/targets/{{ .Id }}" class="link">Details</a>
               </td>
             </tr>
-          {{ end }}
-        </tbody>
+          </tbody>
+        {{ end }}
       </table>
     </section>
   {{ end }}

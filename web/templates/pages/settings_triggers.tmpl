@@ -1,5 +1,5 @@
 {{ define "settings" }}
-  {{ $description := "Triggers can be manually created or based on monitors. They are used to notify about issues." }}
+  {{ $description := "Triggers process monitor outcomes and determine if an incident should be created, updated or closed." }}
 
   {{ $length := len .Triggers }}
   {{ if eq $length 0 }}
@@ -10,13 +10,11 @@
         There are no triggers yet.
       </h1>
       <p
-        class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40"
+        class="mb-8 text-l font-normal text-gray-700 lg:text-l sm:px-8 lg:px-40"
       >
         {{ $description }}
       </p>
-      <div
-        class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0"
-      >
+      <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
         <a
           href="/settings/triggers/create"
           class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"

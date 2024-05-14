@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"code.tjo.space/mentos1386/zdravko/database/models"
+	"code.tjo.space/mentos1386/zdravko/internal/script"
 	"code.tjo.space/mentos1386/zdravko/internal/services"
 	"code.tjo.space/mentos1386/zdravko/web/templates/components"
 	"github.com/go-playground/validator/v10"
@@ -19,28 +20,6 @@ type SettingsIncidents struct {
 	*Settings
 	Incidents []*Incident
 }
-
-// FIXME: This should be moved in to a files to not worry about so much escaping.
-const exampleTrigger = `
-import kv from 'zdravko/kv';
-import slack from 'zdravko/notify/slack';
-
-export default function (monitor, outcome) {
-  // If the outcome is not failure, we can reset the counter.
-  if (outcome.status !== 'FAILURE') {
-    return kv.delete(` + "\\`\\${monitor.name}:issues:5min\\`" + `);
-  }
-
-  const count = kv.get(` + "\\`\\${monitor.name}:issues:5min\\`" + `) || 0;
-
-  if (count > 5) {
-    slack.notify(` + "\\`\\${monitor.name} has had more than 5 issues in the last 5 minutes\\`" + `);
-  }
-
-  // Increment and set TTL to 5 minutes
-  kv.increment(` + "\\`\\${monitor.name}:issues:5min\\`" + `, count + 1);
-}
-`
 
 type CreateTrigger struct {
 	Name   string `validate:"required"`
@@ -160,7 +139,7 @@ func (h *BaseHandler) SettingsTriggersDescribePOST(c echo.Context) error {
 	triggerId := c.Param("id")
 
 	update := UpdateTrigger{
-		Script: c.FormValue("script"),
+		Script: script.EscapeString(c.FormValue("script")),
 	}
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(update)
 	if err != nil {
@@ -197,7 +176,7 @@ func (h *BaseHandler) SettingsTriggersCreateGET(c echo.Context) error {
 				GetPageByTitle(SettingsPages, "Triggers Create"),
 			},
 		),
-		Example: exampleTrigger,
+		Example: h.examples.Trigger,
 	})
 }
 
@@ -207,7 +186,7 @@ func (h *BaseHandler) SettingsTriggersCreatePOST(c echo.Context) error {
 
 	create := CreateTrigger{
 		Name:   c.FormValue("name"),
-		Script: c.FormValue("script"),
+		Script: script.EscapeString(c.FormValue("script")),
 	}
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(create)
 	if err != nil {

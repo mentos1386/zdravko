@@ -8,6 +8,7 @@ import (
 	"text/template"
 	"time"
 
+	"code.tjo.space/mentos1386/zdravko/internal/script"
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,8 +26,10 @@ func load(files ...string) *template.Template {
 
 	t := template.New("default").Funcs(
 		template.FuncMap{
-			"StringsJoin": strings.Join,
-			"Now":         time.Now,
+			"StringsJoin":          strings.Join,
+			"Now":                  time.Now,
+			"ScriptUnescapeString": script.UnescapeString,
+			"ScriptEscapeString":   script.EscapeString,
 		})
 
 	return template.Must(t.ParseFS(templates, files...))
@@ -47,6 +50,7 @@ func NewTemplates() *Templates {
 			"settings_triggers.tmpl":               loadSettings("pages/settings_triggers.tmpl"),
 			"settings_triggers_create.tmpl":        loadSettings("pages/settings_triggers_create.tmpl"),
 			"settings_triggers_describe.tmpl":      loadSettings("pages/settings_triggers_describe.tmpl"),
+			"settings_targets.tmpl":                loadSettings("pages/settings_targets.tmpl"),
 			"settings_notifications.tmpl":          loadSettings("pages/settings_notifications.tmpl"),
 			"settings_worker_groups.tmpl":          loadSettings("pages/settings_worker_groups.tmpl"),
 			"settings_worker_groups_create.tmpl":   loadSettings("pages/settings_worker_groups_create.tmpl"),

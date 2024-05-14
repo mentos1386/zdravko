@@ -63,6 +63,15 @@ func Routes(
 	settings.GET("/triggers/:id/disable", h.SettingsTriggersDisableGET)
 	settings.GET("/triggers/:id/enable", h.SettingsTriggersEnableGET)
 
+	settings.GET("/targets", h.SettingsTargetsGET)
+	//settings.GET("/targets/create", h.SettingsTargetsCreateGET)
+	//settings.POST("/targets/create", h.SettingsTargetsCreatePOST)
+	//settings.GET("/targets/:id", h.SettingsTargetsDescribeGET)
+	//settings.POST("/targets/:id", h.SettingsTargetsDescribePOST)
+	//settings.GET("/targets/:id/delete", h.SettingsTargetsDescribeDELETE)
+	//settings.GET("/targets/:id/disable", h.SettingsTargetsDisableGET)
+	//settings.GET("/targets/:id/enable", h.SettingsTargetsEnableGET)
+
 	settings.GET("/monitors", h.SettingsMonitorsGET)
 	settings.GET("/monitors/create", h.SettingsMonitorsCreateGET)
 	settings.POST("/monitors/create", h.SettingsMonitorsCreatePOST)

@@ -44,7 +44,7 @@
       </p>
       <label for="script">Script</label>
       <textarea required id="script" name="script" class="h-96">
-{{ .Monitor.Script }}</textarea
+{{ ScriptUnescapeString .Monitor.Script }}</textarea
       >
       <div
         id="editor"
@@ -168,7 +168,11 @@
     document.getElementById('script').value = script;
   }
 
-  script = `{{ .Monitor.Script }}`
+  function htmlDecode(input) {
+    var doc = new DOMParser().parseFromString(input, "text/html");
+    return doc.documentElement.textContent;
+  }
+  script = htmlDecode("{{ .Monitor.Script }}")
 
   require.config({ paths: { vs: '/static/monaco/vs' } });
   require(['vs/editor/editor.main'], function () {

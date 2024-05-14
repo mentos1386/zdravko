@@ -1,0 +1,35 @@
+# Example trigger code
+trigger: |
+  import kv from 'zdravko/kv';
+  import slack from 'zdravko/notify/slack';
+
+  export default function (monitor, outcome) {
+    // If the outcome is not failure, we can reset the counter.
+    if (outcome.status !== 'FAILURE') {
+      return kv.delete(`${monitor.name}:issues:5min`);
+    }
+
+    const count = kv.get(`${monitor.name}:issues:5min`) || 0;
+
+    if (count > 5) {
+      slack.notify(`${monitor.name} has had more than 5 issues in the last 5 minutes`);
+    }
+
+    // Increment and set TTL to 5 minutes
+    kv.increment(`${monitor.name}:issues:5min`, count + 1);
+  }
+
+# Example monitor code
+monitor: |
+  import http from 'k6/http';
+
+  export const options = {
+    thresholds: {
+      // http errors should be less than 1%
+      http_req_failed: ['rate<0.01'],
+    },
+  };
+
+  export default function () {
+    http.get('https://example.com');
+  }

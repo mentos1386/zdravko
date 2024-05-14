@@ -4,7 +4,7 @@
       <h2>Configuration</h2>
       <label for="script">Script</label>
       <textarea required id="script" name="script" class="h-96">
-{{ .Trigger.Script }}</textarea
+{{ ScriptUnescapeString .Trigger.Script }}</textarea
       >
       <div
         id="editor"
@@ -120,7 +120,11 @@
     document.getElementById('script').value = script;
   }
 
-  script = `{{ .Trigger.Script }}`
+  function htmlDecode(input) {
+    var doc = new DOMParser().parseFromString(input, "text/html");
+    return doc.documentElement.textContent;
+  }
+  script = htmlDecode("{{ .Trigger.Script }}")
 
   require.config({ paths: { vs: '/static/monaco/vs' } });
   require(['vs/editor/editor.main'], function () {

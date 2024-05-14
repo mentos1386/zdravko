@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"code.tjo.space/mentos1386/zdravko/database/models"
+	"code.tjo.space/mentos1386/zdravko/internal/script"
 	"code.tjo.space/mentos1386/zdravko/pkg/api"
 	"code.tjo.space/mentos1386/zdravko/pkg/k6"
 )
@@ -23,7 +24,7 @@ type MonitorResult struct {
 }
 
 func (a *Activities) Monitor(ctx context.Context, param HealtcheckParam) (*MonitorResult, error) {
-	execution := k6.NewExecution(slog.Default(), param.Script)
+	execution := k6.NewExecution(slog.Default(), script.UnescapeString(param.Script))
 
 	result, err := execution.Run(ctx)
 	if err != nil {

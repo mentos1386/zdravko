@@ -1,5 +1,5 @@
 {{ define "settings" }}
-  {{ $description := "Monitors are constantly checking weather a service is online and working correctly." }}
+  {{ $description := "Monitors are constantly determining if targets are healthy or not." }}
 
   {{ $length := len .Monitors }}
   {{ if eq $length 0 }}
@@ -10,13 +10,11 @@
         There are no monitors yet.
       </h1>
       <p
-        class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 lg:px-40"
+        class="mb-8 text-l font-normal text-gray-700 lg:text-l sm:px-8 lg:px-40"
       >
         {{ $description }}
       </p>
-      <div
-        class="flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0"
-      >
+      <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
         <a
           href="/settings/monitors/create"
           class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
@@ -52,6 +50,7 @@
           <tr>
             <th scope="col">Monitor Group</th>
             <th scope="col">Name</th>
+            <th scope="col">Visibility</th>
             <th scope="col">Worker Groups</th>
             <th scope="col">Status</th>
             <th scope="col">Schedule</th>
@@ -70,6 +69,7 @@
               <td></td>
               <td></td>
               <td></td>
+              <td></td>
             </tr>
             {{ range $group, $monitors := $.Monitors }}
               {{ if eq $group $currentGroup }}
@@ -79,6 +79,18 @@
                     <th scope="row">
                       {{ .Name }}
                     </th>
+                    <td>
+                      <span
+                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                      >
+                        Public
+                      </span>
+                      <span
+                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-fuchsia-100 text-fuchsia-800"
+                      >
+                        Private
+                      </span>
+                    </td>
                     <td>
                       {{ range .WorkerGroups }}
                         <span

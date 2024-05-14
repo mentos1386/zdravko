@@ -31,6 +31,8 @@ func NewSettings(user *AuthenticatedUser, page *components.Page, breadCrumbs []*
 
 var SettingsPages = []*components.Page{
 	{Path: "/settings", Title: "Overview", Breadcrumb: "Overview"},
+	{Path: "/settings/targets", Title: "Targets", Breadcrumb: "Monitors"},
+	{Path: "/settings/targets/create", Title: "Targets Create", Breadcrumb: "Create"},
 	{Path: "/settings/monitors", Title: "Monitors", Breadcrumb: "Monitors"},
 	{Path: "/settings/monitors/create", Title: "Monitors Create", Breadcrumb: "Create"},
 	{Path: "/settings/worker-groups", Title: "Worker Groups", Breadcrumb: "Worker Groups"},
@@ -45,6 +47,7 @@ var SettingsPages = []*components.Page{
 
 var SettingsNavbar = []*components.Page{
 	GetPageByTitle(SettingsPages, "Overview"),
+	GetPageByTitle(SettingsPages, "Targets"),
 	GetPageByTitle(SettingsPages, "Monitors"),
 	GetPageByTitle(SettingsPages, "Triggers"),
 	GetPageByTitle(SettingsPages, "Notifications"),
