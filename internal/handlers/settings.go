@@ -8,10 +8,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type SettingsSidebarGroup struct {
+	Group string
+	Pages []*components.Page
+}
+
 type Settings struct {
 	*components.Base
 	SettingsSidebarActive *components.Page
-	SettingsSidebar       []*components.Page
+	SettingsSidebar       []SettingsSidebarGroup
 	User                  *AuthenticatedUser
 	SettingsBreadcrumbs   []*components.Page
 }
@@ -23,7 +28,7 @@ func NewSettings(user *AuthenticatedUser, page *components.Page, breadCrumbs []*
 			Navbar:       Pages,
 		},
 		SettingsSidebarActive: page,
-		SettingsSidebar:       SettingsNavbar,
+		SettingsSidebar:       SettingsSidebar,
 		SettingsBreadcrumbs:   breadCrumbs,
 		User:                  user,
 	}
@@ -31,10 +36,11 @@ func NewSettings(user *AuthenticatedUser, page *components.Page, breadCrumbs []*
 
 var SettingsPages = []*components.Page{
 	{Path: "/settings", Title: "Overview", Breadcrumb: "Overview"},
-	{Path: "/settings/targets", Title: "Targets", Breadcrumb: "Monitors"},
+	{Path: "/settings/targets", Title: "Incidents", Breadcrumb: "Incidents"},
+	{Path: "/settings/targets", Title: "Targets", Breadcrumb: "Targets"},
 	{Path: "/settings/targets/create", Title: "Targets Create", Breadcrumb: "Create"},
-	{Path: "/settings/monitors", Title: "Monitors", Breadcrumb: "Monitors"},
-	{Path: "/settings/monitors/create", Title: "Monitors Create", Breadcrumb: "Create"},
+	{Path: "/settings/monitors", Title: "Checks", Breadcrumb: "Checks"},
+	{Path: "/settings/monitors/create", Title: "Checks Create", Breadcrumb: "Create"},
 	{Path: "/settings/worker-groups", Title: "Worker Groups", Breadcrumb: "Worker Groups"},
 	{Path: "/settings/worker-groups/create", Title: "Worker Groups Create", Breadcrumb: "Create"},
 	{Path: "/settings/notifications", Title: "Notifications", Breadcrumb: "Notifications"},
@@ -45,15 +51,41 @@ var SettingsPages = []*components.Page{
 	{Path: "/oauth2/logout", Title: "Logout", Breadcrumb: "Logout"},
 }
 
-var SettingsNavbar = []*components.Page{
-	GetPageByTitle(SettingsPages, "Overview"),
-	GetPageByTitle(SettingsPages, "Targets"),
-	GetPageByTitle(SettingsPages, "Monitors"),
-	GetPageByTitle(SettingsPages, "Triggers"),
-	GetPageByTitle(SettingsPages, "Notifications"),
-	GetPageByTitle(SettingsPages, "Worker Groups"),
-	GetPageByTitle(SettingsPages, "Temporal"),
-	GetPageByTitle(SettingsPages, "Logout"),
+var SettingsSidebar = []SettingsSidebarGroup{
+	{
+		Group: "Overview",
+		Pages: []*components.Page{
+			GetPageByTitle(SettingsPages, "Overview"),
+		},
+	},
+	{
+		Group: "Monitor",
+		Pages: []*components.Page{
+			GetPageByTitle(SettingsPages, "Targets"),
+			GetPageByTitle(SettingsPages, "Checks"),
+		},
+	},
+	{
+		Group: "Decide",
+		Pages: []*components.Page{
+			GetPageByTitle(SettingsPages, "Triggers"),
+		},
+	},
+	{
+		Group: "Notify",
+		Pages: []*components.Page{
+			GetPageByTitle(SettingsPages, "Incidents"),
+			GetPageByTitle(SettingsPages, "Notifications"),
+		},
+	},
+	{
+		Group: "Manage",
+		Pages: []*components.Page{
+			GetPageByTitle(SettingsPages, "Worker Groups"),
+			GetPageByTitle(SettingsPages, "Temporal"),
+			GetPageByTitle(SettingsPages, "Logout"),
+		},
+	},
 }
 
 type SettingsOverview struct {

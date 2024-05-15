@@ -86,8 +86,8 @@ func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
 	return c.Render(http.StatusOK, "settings_monitors.tmpl", &SettingsMonitors{
 		Settings: NewSettings(
 			cc.Principal.User,
-			GetPageByTitle(SettingsPages, "Monitors"),
-			[]*components.Page{GetPageByTitle(SettingsPages, "Monitors")},
+			GetPageByTitle(SettingsPages, "Checks"),
+			[]*components.Page{GetPageByTitle(SettingsPages, "Checks")},
 		),
 		Monitors:      monitorsByGroup,
 		MonitorGroups: monitorGroups,
@@ -127,9 +127,9 @@ func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 	return c.Render(http.StatusOK, "settings_monitors_describe.tmpl", &SettingsMonitor{
 		Settings: NewSettings(
 			cc.Principal.User,
-			GetPageByTitle(SettingsPages, "Monitors"),
+			GetPageByTitle(SettingsPages, "Checks"),
 			[]*components.Page{
-				GetPageByTitle(SettingsPages, "Monitors"),
+				GetPageByTitle(SettingsPages, "Checks"),
 				{
 					Path:       fmt.Sprintf("/settings/monitors/%s", slug),
 					Title:      "Describe",
@@ -260,10 +260,10 @@ func (h *BaseHandler) SettingsMonitorsCreateGET(c echo.Context) error {
 	return c.Render(http.StatusOK, "settings_monitors_create.tmpl", &SettingsMonitorCreate{
 		Settings: NewSettings(
 			cc.Principal.User,
-			GetPageByTitle(SettingsPages, "Monitors"),
+			GetPageByTitle(SettingsPages, "Checks"),
 			[]*components.Page{
-				GetPageByTitle(SettingsPages, "Monitors"),
-				GetPageByTitle(SettingsPages, "Monitors Create"),
+				GetPageByTitle(SettingsPages, "Checks"),
+				GetPageByTitle(SettingsPages, "Checks Create"),
 			},
 		),
 		Example: h.examples.Monitor,
