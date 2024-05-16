@@ -103,6 +103,7 @@ func Routes(
 	apiv1 := e.Group("/api/v1")
 	apiv1.Use(h.Authenticated)
 	apiv1.GET("/workers/connect", h.ApiV1WorkersConnectGET)
+	apiv1.POST("/checks/:id/history", h.ApiV1ChecksHistoryPOST)
 
 	// Error handler
 	e.HTTPErrorHandler = func(err error, c echo.Context) {
