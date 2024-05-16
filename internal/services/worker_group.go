@@ -54,7 +54,7 @@ func GetWorkerGroups(ctx context.Context, db *sqlx.DB) ([]*models.WorkerGroup, e
 	return workerGroups, err
 }
 
-func GetWorkerGroupsWithMonitors(ctx context.Context, db *sqlx.DB) ([]*models.WorkerGroupWithMonitors, error) {
+func GetWorkerGroupsWithChecks(ctx context.Context, db *sqlx.DB) ([]*models.WorkerGroupWithChecks, error) {
 	rows, err := db.QueryContext(ctx,
 		`
 SELECT
@@ -62,10 +62,10 @@ SELECT
   worker_groups.name,
   worker_groups.created_at,
   worker_groups.updated_at,
-  monitors.name as monitor_name
+  checks.name as check_name
 FROM worker_groups
-LEFT OUTER JOIN monitor_worker_groups ON worker_groups.id = monitor_worker_groups.worker_group_id
-LEFT OUTER JOIN monitors ON monitor_worker_groups.monitor_id = monitors.id
+LEFT OUTER JOIN check_worker_groups ON worker_groups.id = check_worker_groups.worker_group_id
+LEFT OUTER JOIN checks ON check_worker_groups.check_id = checks.id
 ORDER BY worker_groups.name
 `)
 	if err != nil {
@@ -73,29 +73,29 @@ ORDER BY worker_groups.name
 	}
 	defer rows.Close()
 
-	workerGroups := map[string]*models.WorkerGroupWithMonitors{}
+	workerGroups := map[string]*models.WorkerGroupWithChecks{}
 
 	for rows.Next() {
-		workerGroup := &models.WorkerGroupWithMonitors{}
+		workerGroup := &models.WorkerGroupWithChecks{}
 
-		var monitorName *string
+		var checkName *string
 		err = rows.Scan(
 			&workerGroup.Id,
 			&workerGroup.Name,
 			&workerGroup.CreatedAt,
 			&workerGroup.UpdatedAt,
-			&monitorName,
+			&checkName,
 		)
 		if err != nil {
 			return nil, err
 		}
 
-		if monitorName != nil {
-			monitors := []string{}
+		if checkName != nil {
+			checks := []string{}
 			if workerGroups[workerGroup.Id] != nil {
-				monitors = workerGroups[workerGroup.Id].Monitors
+				checks = workerGroups[workerGroup.Id].Checks
 			}
-			workerGroup.Monitors = append(monitors, *monitorName)
+			workerGroup.Checks = append(checks, *checkName)
 		}
 
 		workerGroups[workerGroup.Id] = workerGroup
@@ -122,7 +122,7 @@ func GetWorkerGroup(ctx context.Context, db *sqlx.DB, id string) (*models.Worker
 	return &workerGroup, err
 }
 
-func GetWorkerGroupWithMonitors(ctx context.Context, db *sqlx.DB, id string) (*models.WorkerGroupWithMonitors, error) {
+func GetWorkerGroupWithChecks(ctx context.Context, db *sqlx.DB, id string) (*models.WorkerGroupWithChecks, error) {
 	rows, err := db.QueryContext(ctx,
 		`
 SELECT
@@ -130,10 +130,10 @@ SELECT
   worker_groups.name,
   worker_groups.created_at,
   worker_groups.updated_at,
-  monitors.name as monitor_name
+  checks.name as check_name
 FROM worker_groups
-LEFT OUTER JOIN monitor_worker_groups ON worker_groups.id = monitor_worker_groups.worker_group_id
-LEFT OUTER JOIN monitors ON monitor_worker_groups.monitor_id = monitors.id
+LEFT OUTER JOIN check_worker_groups ON worker_groups.id = check_worker_groups.worker_group_id
+LEFT OUTER JOIN checks ON check_worker_groups.check_id = checks.id
 WHERE worker_groups.id=$1
 `,
 		id,
@@ -143,22 +143,22 @@ WHERE worker_groups.id=$1
 	}
 	defer rows.Close()
 
-	workerGroup := &models.WorkerGroupWithMonitors{}
+	workerGroup := &models.WorkerGroupWithChecks{}
 
 	for rows.Next() {
-		var monitorName *string
+		var checkName *string
 		err = rows.Scan(
 			&workerGroup.Id,
 			&workerGroup.Name,
 			&workerGroup.CreatedAt,
 			&workerGroup.UpdatedAt,
-			&monitorName,
+			&checkName,
 		)
 		if err != nil {
 			return nil, err
 		}
-		if monitorName != nil {
-			workerGroup.Monitors = append(workerGroup.Monitors, *monitorName)
+		if checkName != nil {
+			workerGroup.Checks = append(workerGroup.Checks, *checkName)
 		}
 	}
 

@@ -20,7 +20,7 @@ func NewWorker(temporalClient client.Client, cfg *config.ServerConfig) *Worker {
 	workerWorkflows := workflows.NewWorkflows(workerActivities)
 
 	// Register Workflows
-	w.RegisterWorkflow(workerWorkflows.MonitorWorkflowDefinition)
+	w.RegisterWorkflow(workerWorkflows.CheckWorkflowDefinition)
 
 	return &Worker{
 		worker: w,

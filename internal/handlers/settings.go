@@ -36,11 +36,13 @@ func NewSettings(user *AuthenticatedUser, page *components.Page, breadCrumbs []*
 
 var SettingsPages = []*components.Page{
 	{Path: "/settings", Title: "Overview", Breadcrumb: "Overview"},
-	{Path: "/settings/targets", Title: "Incidents", Breadcrumb: "Incidents"},
+	{Path: "/settings/incidents", Title: "Incidents", Breadcrumb: "Incidents"},
 	{Path: "/settings/targets", Title: "Targets", Breadcrumb: "Targets"},
 	{Path: "/settings/targets/create", Title: "Targets Create", Breadcrumb: "Create"},
-	{Path: "/settings/monitors", Title: "Checks", Breadcrumb: "Checks"},
-	{Path: "/settings/monitors/create", Title: "Checks Create", Breadcrumb: "Create"},
+	{Path: "/settings/hooks", Title: "Hooks", Breadcrumb: "Hooks"},
+	{Path: "/settings/hooks/create", Title: "Hooks Create", Breadcrumb: "Create"},
+	{Path: "/settings/checks", Title: "Checks", Breadcrumb: "Checks"},
+	{Path: "/settings/checks/create", Title: "Checks Create", Breadcrumb: "Create"},
 	{Path: "/settings/worker-groups", Title: "Worker Groups", Breadcrumb: "Worker Groups"},
 	{Path: "/settings/worker-groups/create", Title: "Worker Groups Create", Breadcrumb: "Create"},
 	{Path: "/settings/notifications", Title: "Notifications", Breadcrumb: "Notifications"},
@@ -63,10 +65,11 @@ var SettingsSidebar = []SettingsSidebarGroup{
 		Pages: []*components.Page{
 			GetPageByTitle(SettingsPages, "Targets"),
 			GetPageByTitle(SettingsPages, "Checks"),
+			GetPageByTitle(SettingsPages, "Hooks"),
 		},
 	},
 	{
-		Group: "Decide",
+		Group: "Alert",
 		Pages: []*components.Page{
 			GetPageByTitle(SettingsPages, "Triggers"),
 		},
@@ -91,9 +94,9 @@ var SettingsSidebar = []SettingsSidebarGroup{
 type SettingsOverview struct {
 	*Settings
 	WorkerGroupsCount  int
-	MonitorsCount      int
+	ChecksCount        int
 	NotificationsCount int
-	History            []*services.MonitorHistoryWithMonitor
+	History            []*services.CheckHistoryWithCheck
 }
 
 func (h *BaseHandler) SettingsOverviewGET(c echo.Context) error {
@@ -105,12 +108,12 @@ func (h *BaseHandler) SettingsOverviewGET(c echo.Context) error {
 		return err
 	}
 
-	monitors, err := services.CountMonitors(ctx, h.db)
+	checks, err := services.CountChecks(ctx, h.db)
 	if err != nil {
 		return err
 	}
 
-	history, err := services.GetLastNMonitorHistory(ctx, h.db, 10)
+	history, err := services.GetLastNCheckHistory(ctx, h.db, 10)
 	if err != nil {
 		return err
 	}
@@ -122,7 +125,7 @@ func (h *BaseHandler) SettingsOverviewGET(c echo.Context) error {
 			[]*components.Page{GetPageByTitle(SettingsPages, "Overview")},
 		),
 		WorkerGroupsCount:  workerGroups,
-		MonitorsCount:      monitors,
+		ChecksCount:        checks,
 		NotificationsCount: 42,
 		History:            history,
 	})

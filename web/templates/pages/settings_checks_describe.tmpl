@@ -1,17 +1,17 @@
 {{ define "settings" }}
   <section class="p-5">
-    <form action="/settings/monitors/{{ .Monitor.Id }}" method="post">
+    <form action="/settings/checks/{{ .Check.Id }}" method="post">
       <h2>Configuration</h2>
-      <label for="group">Monitor Group</label>
+      <label for="group">Check Group</label>
       <input
         type="text"
         name="group"
         id="group"
-        value="{{ .Monitor.Group }}"
+        value="{{ .Check.Group }}"
         required
       />
       <p>
-        Group monitors together. This affects how they are presented on the
+        Group checks together. This affects how they are presented on the
         homepage.
       </p>
       <label for="workergroups">Worker Groups</label>
@@ -19,22 +19,22 @@
         type="text"
         name="workergroups"
         id="workergroups"
-        value="{{ range .Monitor.WorkerGroups }}{{ . }}{{ end }}"
+        value="{{ range .Check.WorkerGroups }}{{ . }}{{ end }}"
         required
       />
       <p>
-        Worker groups are used to distribute the monitor to specific workers.
+        Worker groups are used to distribute the check to specific workers.
       </p>
       <label for="schedule">Schedule</label>
       <input
         type="text"
         name="schedule"
         id="schedule"
-        value="{{ .Monitor.Schedule }}"
+        value="{{ .Check.Schedule }}"
         required
       />
       <p>
-        Schedule is a cron expression that defines when the monitor should be
+        Schedule is a cron expression that defines when the check should be
         executed.
         <br />
         You can also use <code>@every [interval]</code> where interval is a
@@ -44,7 +44,7 @@
       </p>
       <label for="script">Script</label>
       <textarea required id="script" name="script" class="h-96">
-{{ ScriptUnescapeString .Monitor.Script }}</textarea
+{{ ScriptUnescapeString .Check.Script }}</textarea
       >
       <div
         id="editor"
@@ -65,13 +65,13 @@
     <section class="p-5 flex-1">
       <h2 class="mb-2 flex flex-row gap-2">
         Status
-        {{ if eq .Monitor.Status "ACTIVE" }}
+        {{ if eq .Check.Status "ACTIVE" }}
           <span
             class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
           >
             ACTIVE
           </span>
-        {{ else if eq .Monitor.Status "PAUSED" }}
+        {{ else if eq .Check.Status "PAUSED" }}
           <span
             class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
           >
@@ -80,19 +80,19 @@
         {{ end }}
       </h2>
       <p class="text-sm mb-2">
-        Pausing the monitor will stop it from executing. This can be useful in
-        cases of expected downtime. Or when the monitor is not needed anymore.
+        Pausing the check will stop it from executing. This can be useful in
+        cases of expected downtime. Or when the check is not needed anymore.
       </p>
-      {{ if eq .Monitor.Status "ACTIVE" }}
+      {{ if eq .Check.Status "ACTIVE" }}
         <a
           class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
-          href="/settings/monitors/{{ .Monitor.Id }}/disable"
+          href="/settings/checks/{{ .Check.Id }}/disable"
           >Pause</a
         >
-      {{ else if eq .Monitor.Status "PAUSED" }}
+      {{ else if eq .Check.Status "PAUSED" }}
         <a
           class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
-          href="/settings/monitors/{{ .Monitor.Id }}/enable"
+          href="/settings/checks/{{ .Check.Id }}/enable"
           >Resume</a
         >
       {{ end }}
@@ -100,10 +100,10 @@
 
     <section class="p-2 flex-1 border-4 border-red-300">
       <h2 class="mb-2">Danger Zone</h2>
-      <p class="text-sm mb-2">Permanently delete this monitor.</p>
+      <p class="text-sm mb-2">Permanently delete this check.</p>
       <a
         class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-        href="/settings/monitors/{{ .Monitor.Id }}/delete"
+        href="/settings/checks/{{ .Check.Id }}/delete"
         >Delete</a
       >
     </section>
@@ -113,7 +113,7 @@
     <table>
       <caption>
         History
-        <p>Last 10 executions of monitor script.</p>
+        <p>Last 10 executions of check script.</p>
       </caption>
       <thead>
         <tr>
@@ -172,7 +172,7 @@
     var doc = new DOMParser().parseFromString(input, "text/html");
     return doc.documentElement.textContent;
   }
-  script = htmlDecode("{{ .Monitor.Script }}")
+  script = htmlDecode("{{ .Check.Script }}")
 
   require.config({ paths: { vs: '/static/monaco/vs' } });
   require(['vs/editor/editor.main'], function () {

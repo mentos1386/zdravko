@@ -23,7 +23,7 @@ func NewTemporalConfig() *TemporalConfig {
 	v := newViper()
 
 	// Set defaults
-	v.SetDefault("databasepath", GetEnvOrDefault("TEMPORAL_DATABASE_PATH", "temporal.db"))
+	v.SetDefault("databasepath", GetEnvOrDefault("TEMPORAL_DATABASE_PATH", "store/temporal.db"))
 	v.SetDefault("listenaddress", GetEnvOrDefault("TEMPORAL_LISTEN_ADDRESS", "0.0.0.0"))
 	v.SetDefault("jwt.publickey", os.Getenv("JWT_PUBLIC_KEY"))
 

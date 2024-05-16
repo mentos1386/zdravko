@@ -18,12 +18,12 @@ type HealtcheckParam struct {
 	Script string
 }
 
-type MonitorResult struct {
+type CheckResult struct {
 	Success bool
 	Note    string
 }
 
-func (a *Activities) Monitor(ctx context.Context, param HealtcheckParam) (*MonitorResult, error) {
+func (a *Activities) Check(ctx context.Context, param HealtcheckParam) (*CheckResult, error) {
 	execution := k6.NewExecution(slog.Default(), script.UnescapeString(param.Script))
 
 	result, err := execution.Run(ctx)
@@ -31,23 +31,23 @@ func (a *Activities) Monitor(ctx context.Context, param HealtcheckParam) (*Monit
 		return nil, err
 	}
 
-	return &MonitorResult{Success: result.Success, Note: result.Note}, nil
+	return &CheckResult{Success: result.Success, Note: result.Note}, nil
 }
 
 type HealtcheckAddToHistoryParam struct {
-	MonitorId     string
-	Status        models.MonitorStatus
+	CheckId     string
+	Status        models.CheckStatus
 	Note          string
 	WorkerGroupId string
 }
 
-type MonitorAddToHistoryResult struct {
+type CheckAddToHistoryResult struct {
 }
 
-func (a *Activities) MonitorAddToHistory(ctx context.Context, param HealtcheckAddToHistoryParam) (*MonitorAddToHistoryResult, error) {
-	url := fmt.Sprintf("%s/api/v1/monitors/%s/history", a.config.ApiUrl, param.MonitorId)
+func (a *Activities) CheckAddToHistory(ctx context.Context, param HealtcheckAddToHistoryParam) (*CheckAddToHistoryResult, error) {
+	url := fmt.Sprintf("%s/api/v1/checks/%s/history", a.config.ApiUrl, param.CheckId)
 
-	body := api.ApiV1MonitorsHistoryPOSTBody{
+	body := api.ApiV1ChecksHistoryPOSTBody{
 		Status:        param.Status,
 		Note:          param.Note,
 		WorkerGroupId: param.WorkerGroupId,
@@ -73,5 +73,5 @@ func (a *Activities) MonitorAddToHistory(ctx context.Context, param HealtcheckAd
 		return nil, fmt.Errorf("unexpected status code: %d", response.StatusCode)
 	}
 
-	return &MonitorAddToHistoryResult{}, nil
+	return &CheckAddToHistoryResult{}, nil
 }

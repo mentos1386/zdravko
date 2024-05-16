@@ -48,8 +48,8 @@ func NewServerConfig() *ServerConfig {
 	// Set defaults
 	v.SetDefault("port", GetEnvOrDefault("PORT", "8000"))
 	v.SetDefault("rooturl", GetEnvOrDefault("ROOT_URL", "http://localhost:8000"))
-	v.SetDefault("sqlitedatabasepath", GetEnvOrDefault("SQLITE_DATABASE_PATH", "zdravko.db"))
-	v.SetDefault("keyvaluedatabasepath", GetEnvOrDefault("KEYVALUE_DATABASE_PATH", "zdravko_kv.db"))
+	v.SetDefault("sqlitedatabasepath", GetEnvOrDefault("SQLITE_DATABASE_PATH", "store/zdravko.db"))
+	v.SetDefault("keyvaluedatabasepath", GetEnvOrDefault("KEYVALUE_DATABASE_PATH", "store/zdravko_kv.db"))
 	v.SetDefault("sessionsecret", os.Getenv("SESSION_SECRET"))
 	v.SetDefault("temporal.uihost", GetEnvOrDefault("TEMPORAL_UI_HOST", "127.0.0.1:8223"))
 	v.SetDefault("temporal.serverhost", GetEnvOrDefault("TEMPORAL_SERVER_HOST", "127.0.0.1:7233"))

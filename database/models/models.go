@@ -45,16 +45,16 @@ type OAuth2State struct {
 	ExpiresAt *Time  `db:"expires_at"`
 }
 
-type MonitorStatus string
+type CheckStatus string
 
 const (
-	MonitorSuccess MonitorStatus = "SUCCESS"
-	MonitorFailure MonitorStatus = "FAILURE"
-	MonitorError   MonitorStatus = "ERROR"
-	MonitorUnknown MonitorStatus = "UNKNOWN"
+	CheckSuccess CheckStatus = "SUCCESS"
+	CheckFailure CheckStatus = "FAILURE"
+	CheckError   CheckStatus = "ERROR"
+	CheckUnknown CheckStatus = "UNKNOWN"
 )
 
-type Monitor struct {
+type Check struct {
 	CreatedAt *Time `db:"created_at"`
 	UpdatedAt *Time `db:"updated_at"`
 
@@ -66,18 +66,18 @@ type Monitor struct {
 	Script   string `db:"script"`
 }
 
-type MonitorWithWorkerGroups struct {
-	Monitor
+type CheckWithWorkerGroups struct {
+	Check
 
 	// List of worker group names
 	WorkerGroups []string
 }
 
-type MonitorHistory struct {
+type CheckHistory struct {
 	CreatedAt *Time `db:"created_at"`
 
-	MonitorId string        `db:"monitor_id"`
-	Status    MonitorStatus `db:"status"`
+	CheckId string        `db:"check_id"`
+	Status    CheckStatus `db:"status"`
 	Note      string        `db:"note"`
 
 	WorkerGroupId   string `db:"worker_group_id"`
@@ -92,11 +92,11 @@ type WorkerGroup struct {
 	Name string `db:"name"`
 }
 
-type WorkerGroupWithMonitors struct {
+type WorkerGroupWithChecks struct {
 	WorkerGroup
 
 	// List of worker group names
-	Monitors []string
+	Checks []string
 }
 
 type TriggerStatus string

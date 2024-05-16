@@ -72,14 +72,16 @@ func Routes(
 	//settings.GET("/targets/:id/disable", h.SettingsTargetsDisableGET)
 	//settings.GET("/targets/:id/enable", h.SettingsTargetsEnableGET)
 
-	settings.GET("/monitors", h.SettingsMonitorsGET)
-	settings.GET("/monitors/create", h.SettingsMonitorsCreateGET)
-	settings.POST("/monitors/create", h.SettingsMonitorsCreatePOST)
-	settings.GET("/monitors/:id", h.SettingsMonitorsDescribeGET)
-	settings.POST("/monitors/:id", h.SettingsMonitorsDescribePOST)
-	settings.GET("/monitors/:id/delete", h.SettingsMonitorsDescribeDELETE)
-	settings.GET("/monitors/:id/disable", h.SettingsMonitorsDisableGET)
-	settings.GET("/monitors/:id/enable", h.SettingsMonitorsEnableGET)
+	settings.GET("/incidents", h.SettingsIncidentsGET)
+
+	settings.GET("/checks", h.SettingsChecksGET)
+	settings.GET("/checks/create", h.SettingsChecksCreateGET)
+	settings.POST("/checks/create", h.SettingsChecksCreatePOST)
+	settings.GET("/checks/:id", h.SettingsChecksDescribeGET)
+	settings.POST("/checks/:id", h.SettingsChecksDescribePOST)
+	settings.GET("/checks/:id/delete", h.SettingsChecksDescribeDELETE)
+	settings.GET("/checks/:id/disable", h.SettingsChecksDisableGET)
+	settings.GET("/checks/:id/enable", h.SettingsChecksEnableGET)
 
 	settings.GET("/notifications", h.SettingsNotificationsGET)
 
@@ -101,7 +103,6 @@ func Routes(
 	apiv1 := e.Group("/api/v1")
 	apiv1.Use(h.Authenticated)
 	apiv1.GET("/workers/connect", h.ApiV1WorkersConnectGET)
-	apiv1.POST("/monitors/:id/history", h.ApiV1MonitorsHistoryPOST)
 
 	// Error handler
 	e.HTTPErrorHandler = func(err error, c echo.Context) {

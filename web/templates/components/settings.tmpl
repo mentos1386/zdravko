@@ -10,15 +10,17 @@
   <div
     class="md:px-4 lg:px-8 mx-auto mt-8 w-full max-w-screen-xl lg:mt-20 grid grid-cols-1 lg:grid-cols-[min-content_minmax(0,1fr)] gap-8"
   >
-    <ul class="sidebar gap-4">
+    <ul
+      class="sidebar gap-2 flex flex-row flex-wrap justify-center lg:flex-col lg:w-48 h-fit text-sm font-medium text-gray-900"
+    >
       {{ range .SettingsSidebar }}
-        <li>
+        <li class="flex items-center gap-1 lg:flex-col lg:items-start">
           <p
-            class="mb-2 text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            class="text-xs font-semibold text-gray-600 uppercase tracking-wider"
           >
             {{ .Group }}
           </p>
-          <ul>
+          <ul class="flex flex-row flex-wrap gap-1 lg:flex-col">
             {{ range .Pages }}
               <li>
                 <a
@@ -38,6 +40,9 @@
                     <span class="text-slate-400">(3)</span>
                   {{ end }}
                   {{ if eq .Title "Checks" }}
+                    <span class="text-slate-400">(3)</span>
+                  {{ end }}
+                  {{ if eq .Title "Hooks" }}
                     <span class="text-slate-400">(3)</span>
                   {{ end }}
                   {{ if eq .Title "Triggers" }}

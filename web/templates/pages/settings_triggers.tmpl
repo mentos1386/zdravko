@@ -1,5 +1,5 @@
 {{ define "settings" }}
-  {{ $description := "Triggers process monitor outcomes and determine if an incident should be created, updated or closed." }}
+  {{ $description := "Triggers process check outcomes and determine if an incident should be created, updated or closed." }}
 
   {{ $length := len .Triggers }}
   {{ if eq $length 0 }}

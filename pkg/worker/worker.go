@@ -92,11 +92,11 @@ func (w *Worker) Start() error {
 	workerWorkflows := workflows.NewWorkflows(workerActivities)
 
 	// Register Workflows
-	w.worker.RegisterWorkflow(workerWorkflows.MonitorWorkflowDefinition)
+	w.worker.RegisterWorkflow(workerWorkflows.CheckWorkflowDefinition)
 
 	// Register Activities
-	w.worker.RegisterActivity(workerActivities.Monitor)
-	w.worker.RegisterActivity(workerActivities.MonitorAddToHistory)
+	w.worker.RegisterActivity(workerActivities.Check)
+	w.worker.RegisterActivity(workerActivities.CheckAddToHistory)
 
 	return w.worker.Run(worker.InterruptCh())
 }

@@ -13,21 +13,21 @@ import (
 
 type IndexData struct {
 	*components.Base
-	Monitors       map[string]MonitorsAndStatus
-	MonitorsLength int
+	Checks       map[string]ChecksAndStatus
+	ChecksLength int
 	TimeRange      string
-	Status         models.MonitorStatus
+	Status         models.CheckStatus
 }
 
-type Monitor struct {
+type Check struct {
 	Name    string
 	Group   string
-	Status  models.MonitorStatus
+	Status  models.CheckStatus
 	History *History
 }
 
 type HistoryItem struct {
-	Status models.MonitorStatus
+	Status models.CheckStatus
 	Date   time.Time
 }
 
@@ -36,23 +36,23 @@ type History struct {
 	Uptime int
 }
 
-type MonitorsAndStatus struct {
-	Status   models.MonitorStatus
-	Monitors []*Monitor
+type ChecksAndStatus struct {
+	Status   models.CheckStatus
+	Checks []*Check
 }
 
 func getDateString(date time.Time) string {
 	return date.UTC().Format("2006-01-02T15:04:05")
 }
 
-func getHistory(history []*models.MonitorHistory, period time.Duration, buckets int) *History {
-	historyMap := map[string]models.MonitorStatus{}
+func getHistory(history []*models.CheckHistory, period time.Duration, buckets int) *History {
+	historyMap := map[string]models.CheckStatus{}
 	numOfSuccess := 0
 	numTotal := 0
 
 	for i := 0; i < buckets; i++ {
 		dateString := getDateString(time.Now().Add(period * time.Duration(-i)).Truncate(period))
-		historyMap[dateString] = models.MonitorUnknown
+		historyMap[dateString] = models.CheckUnknown
 	}
 
 	for _, _history := range history {
@@ -64,12 +64,12 @@ func getHistory(history []*models.MonitorHistory, period time.Duration, buckets 
 		}
 
 		numTotal++
-		if _history.Status == models.MonitorSuccess {
+		if _history.Status == models.CheckSuccess {
 			numOfSuccess++
 		}
 
 		// skip if it is already set to failure
-		if historyMap[dateString] == models.MonitorFailure {
+		if historyMap[dateString] == models.CheckFailure {
 			continue
 		}
 
@@ -101,7 +101,7 @@ func getHistory(history []*models.MonitorHistory, period time.Duration, buckets 
 
 func (h *BaseHandler) Index(c echo.Context) error {
 	ctx := context.Background()
-	monitors, err := services.GetMonitors(ctx, h.db)
+	checks, err := services.GetChecks(ctx, h.db)
 	if err != nil {
 		return err
 	}
@@ -111,12 +111,12 @@ func (h *BaseHandler) Index(c echo.Context) error {
 		timeRange = "90days"
 	}
 
-	overallStatus := models.MonitorUnknown
-	statusByGroup := make(map[string]models.MonitorStatus)
+	overallStatus := models.CheckUnknown
+	statusByGroup := make(map[string]models.CheckStatus)
 
-	monitorsWithHistory := make([]*Monitor, len(monitors))
-	for i, monitor := range monitors {
-		history, err := services.GetMonitorHistoryForMonitor(ctx, h.db, monitor.Id)
+	checksWithHistory := make([]*Check, len(checks))
+	for i, check := range checks {
+		history, err := services.GetCheckHistoryForCheck(ctx, h.db, check.Id)
 		if err != nil {
 			return err
 		}
@@ -131,37 +131,37 @@ func (h *BaseHandler) Index(c echo.Context) error {
 			historyResult = getHistory(history, time.Minute, 90)
 		}
 
-		if statusByGroup[monitor.Group] == "" {
-			statusByGroup[monitor.Group] = models.MonitorUnknown
+		if statusByGroup[check.Group] == "" {
+			statusByGroup[check.Group] = models.CheckUnknown
 		}
 
 		status := historyResult.List[len(historyResult.List)-1]
-		if status.Status == models.MonitorSuccess {
-			if overallStatus == models.MonitorUnknown {
+		if status.Status == models.CheckSuccess {
+			if overallStatus == models.CheckUnknown {
 				overallStatus = status.Status
 			}
-			if statusByGroup[monitor.Group] == models.MonitorUnknown {
-				statusByGroup[monitor.Group] = status.Status
+			if statusByGroup[check.Group] == models.CheckUnknown {
+				statusByGroup[check.Group] = status.Status
 			}
 		}
-		if status.Status != models.MonitorSuccess && status.Status != models.MonitorUnknown {
+		if status.Status != models.CheckSuccess && status.Status != models.CheckUnknown {
 			overallStatus = status.Status
-			statusByGroup[monitor.Group] = status.Status
+			statusByGroup[check.Group] = status.Status
 		}
 
-		monitorsWithHistory[i] = &Monitor{
-			Name:    monitor.Name,
-			Group:   monitor.Group,
+		checksWithHistory[i] = &Check{
+			Name:    check.Name,
+			Group:   check.Group,
 			Status:  status.Status,
 			History: historyResult,
 		}
 	}
 
-	monitorsByGroup := map[string]MonitorsAndStatus{}
-	for _, monitor := range monitorsWithHistory {
-		monitorsByGroup[monitor.Group] = MonitorsAndStatus{
-			Status:   statusByGroup[monitor.Group],
-			Monitors: append(monitorsByGroup[monitor.Group].Monitors, monitor),
+	checksByGroup := map[string]ChecksAndStatus{}
+	for _, check := range checksWithHistory {
+		checksByGroup[check.Group] = ChecksAndStatus{
+			Status:   statusByGroup[check.Group],
+			Checks: append(checksByGroup[check.Group].Checks, check),
 		}
 	}
 
@@ -172,7 +172,7 @@ func (h *BaseHandler) Index(c echo.Context) error {
 			NavbarActive: GetPageByTitle(Pages, "Status"),
 			Navbar:       Pages,
 		},
-		Monitors:  monitorsByGroup,
+		Checks:  checksByGroup,
 		TimeRange: timeRange,
 		Status:    overallStatus,
 	})

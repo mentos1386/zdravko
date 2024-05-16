@@ -7,7 +7,7 @@
     </h1>
     <p class="mb-8 text-l font-normal text-gray-500 lg:text-l sm:px-8 md:px-40">
       Welcome to the settings page. Here you can manage your worker groups,
-      monitors, and notifications.
+      checks, and notifications.
     </p>
   </div>
 
@@ -16,15 +16,15 @@
       class="inline-block bg-white rounded-lg shadow p-5 text-center sm:text-left"
     >
       <h3 class="text-sm leading-6 font-medium text-gray-400">Total Targets</h3>
-      <p class="text-3xl font-bold text-black">{{ .MonitorsCount }}</p>
+      <p class="text-3xl font-bold text-black">{{ .ChecksCount }}</p>
     </div>
     <div
       class="inline-block bg-white rounded-lg shadow p-5 text-center sm:text-left"
     >
       <h3 class="text-sm leading-6 font-medium text-gray-400">
-        Total Monitors
+        Total Checks
       </h3>
-      <p class="text-3xl font-bold text-black">{{ .MonitorsCount }}</p>
+      <p class="text-3xl font-bold text-black">{{ .ChecksCount }}</p>
     </div>
     <div
       class="inline-block bg-white rounded-lg shadow p-5 text-center sm:text-left"
@@ -48,11 +48,11 @@
     <table>
       <caption>
         Execution History
-        <p>Last 10 executions for all monitors and worker groups.</p>
+        <p>Last 10 executions for all checks and worker groups.</p>
       </caption>
       <thead>
         <tr>
-          <th>Monitor</th>
+          <th>Check</th>
           <th>Worker Group</th>
           <th>Status</th>
           <th>Executed At</th>
@@ -65,8 +65,8 @@
             <th>
               <a
                 class="underline hover:text-blue-600"
-                href="/settings/monitors/{{ .MonitorId }}"
-                >{{ .MonitorName }}</a
+                href="/settings/checks/{{ .CheckId }}"
+                >{{ .CheckName }}</a
               >
             </th>
             <td>

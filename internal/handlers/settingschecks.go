@@ -17,7 +17,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type CreateMonitor struct {
+type CreateCheck struct {
 	Name         string `validate:"required"`
 	Group        string `validate:"required"`
 	WorkerGroups string `validate:"required"`
@@ -25,96 +25,96 @@ type CreateMonitor struct {
 	Script       string `validate:"required"`
 }
 
-type UpdateMonitor struct {
+type UpdateCheck struct {
 	Group        string `validate:"required"`
 	WorkerGroups string `validate:"required"`
 	Schedule     string `validate:"required,cron"`
 	Script       string `validate:"required"`
 }
 
-type MonitorWithWorkerGroupsAndStatus struct {
-	*models.MonitorWithWorkerGroups
-	Status services.MonitorStatus
+type CheckWithWorkerGroupsAndStatus struct {
+	*models.CheckWithWorkerGroups
+	Status services.CheckStatus
 }
 
-type SettingsMonitors struct {
+type SettingsChecks struct {
 	*Settings
-	Monitors      map[string][]*MonitorWithWorkerGroupsAndStatus
-	MonitorGroups []string
+	Checks      map[string][]*CheckWithWorkerGroupsAndStatus
+	CheckGroups []string
 }
 
-type SettingsMonitor struct {
+type SettingsCheck struct {
 	*Settings
-	Monitor *MonitorWithWorkerGroupsAndStatus
-	History []*models.MonitorHistory
+	Check *CheckWithWorkerGroupsAndStatus
+	History []*models.CheckHistory
 }
 
-type SettingsMonitorCreate struct {
+type SettingsCheckCreate struct {
 	*Settings
 	Example string
 }
 
-func (h *BaseHandler) SettingsMonitorsGET(c echo.Context) error {
+func (h *BaseHandler) SettingsChecksGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
-	monitors, err := services.GetMonitorsWithWorkerGroups(context.Background(), h.db)
+	checks, err := services.GetChecksWithWorkerGroups(context.Background(), h.db)
 	if err != nil {
 		return err
 	}
 
-	monitorsWithStatus := make([]*MonitorWithWorkerGroupsAndStatus, len(monitors))
-	for i, monitor := range monitors {
-		status, err := services.GetMonitorStatus(context.Background(), h.temporal, monitor.Id)
+	checksWithStatus := make([]*CheckWithWorkerGroupsAndStatus, len(checks))
+	for i, check := range checks {
+		status, err := services.GetCheckStatus(context.Background(), h.temporal, check.Id)
 		if err != nil {
 			return err
 		}
-		monitorsWithStatus[i] = &MonitorWithWorkerGroupsAndStatus{
-			MonitorWithWorkerGroups: monitor,
+		checksWithStatus[i] = &CheckWithWorkerGroupsAndStatus{
+			CheckWithWorkerGroups: check,
 			Status:                  status,
 		}
 	}
 
-	monitorGroups := []string{}
-	monitorsByGroup := map[string][]*MonitorWithWorkerGroupsAndStatus{}
-	for _, monitor := range monitorsWithStatus {
-		monitorsByGroup[monitor.Group] = append(monitorsByGroup[monitor.Group], monitor)
-		if slices.Contains(monitorGroups, monitor.Group) == false {
-			monitorGroups = append(monitorGroups, monitor.Group)
+	checkGroups := []string{}
+	checksByGroup := map[string][]*CheckWithWorkerGroupsAndStatus{}
+	for _, check := range checksWithStatus {
+		checksByGroup[check.Group] = append(checksByGroup[check.Group], check)
+		if slices.Contains(checkGroups, check.Group) == false {
+			checkGroups = append(checkGroups, check.Group)
 		}
 	}
 
-	return c.Render(http.StatusOK, "settings_monitors.tmpl", &SettingsMonitors{
+	return c.Render(http.StatusOK, "settings_checks.tmpl", &SettingsChecks{
 		Settings: NewSettings(
 			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Checks"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Checks")},
 		),
-		Monitors:      monitorsByGroup,
-		MonitorGroups: monitorGroups,
+		Checks:      checksByGroup,
+		CheckGroups: checkGroups,
 	})
 }
 
-func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
+func (h *BaseHandler) SettingsChecksDescribeGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
 	slug := c.Param("id")
 
-	monitor, err := services.GetMonitorWithWorkerGroups(context.Background(), h.db, slug)
+	check, err := services.GetCheckWithWorkerGroups(context.Background(), h.db, slug)
 	if err != nil {
 		return err
 	}
 
-	status, err := services.GetMonitorStatus(context.Background(), h.temporal, monitor.Id)
+	status, err := services.GetCheckStatus(context.Background(), h.temporal, check.Id)
 	if err != nil {
 		return err
 	}
 
-	monitorWithStatus := &MonitorWithWorkerGroupsAndStatus{
-		MonitorWithWorkerGroups: monitor,
+	checkWithStatus := &CheckWithWorkerGroupsAndStatus{
+		CheckWithWorkerGroups: check,
 		Status:                  status,
 	}
 
-	history, err := services.GetMonitorHistoryForMonitor(context.Background(), h.db, slug)
+	history, err := services.GetCheckHistoryForCheck(context.Background(), h.db, slug)
 	if err != nil {
 		return err
 	}
@@ -124,76 +124,76 @@ func (h *BaseHandler) SettingsMonitorsDescribeGET(c echo.Context) error {
 		maxElements = len(history)
 	}
 
-	return c.Render(http.StatusOK, "settings_monitors_describe.tmpl", &SettingsMonitor{
+	return c.Render(http.StatusOK, "settings_checks_describe.tmpl", &SettingsCheck{
 		Settings: NewSettings(
 			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Checks"),
 			[]*components.Page{
 				GetPageByTitle(SettingsPages, "Checks"),
 				{
-					Path:       fmt.Sprintf("/settings/monitors/%s", slug),
+					Path:       fmt.Sprintf("/settings/checks/%s", slug),
 					Title:      "Describe",
-					Breadcrumb: monitor.Name,
+					Breadcrumb: check.Name,
 				},
 			}),
-		Monitor: monitorWithStatus,
+		Check: checkWithStatus,
 		History: history[:maxElements],
 	})
 }
 
-func (h *BaseHandler) SettingsMonitorsDescribeDELETE(c echo.Context) error {
+func (h *BaseHandler) SettingsChecksDescribeDELETE(c echo.Context) error {
 	slug := c.Param("id")
 
-	err := services.DeleteMonitor(context.Background(), h.db, slug)
+	err := services.DeleteCheck(context.Background(), h.db, slug)
 	if err != nil {
 		return err
 	}
 
-	err = services.DeleteMonitorSchedule(context.Background(), h.temporal, slug)
+	err = services.DeleteCheckSchedule(context.Background(), h.temporal, slug)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, "/settings/monitors")
+	return c.Redirect(http.StatusSeeOther, "/settings/checks")
 }
 
-func (h *BaseHandler) SettingsMonitorsDisableGET(c echo.Context) error {
+func (h *BaseHandler) SettingsChecksDisableGET(c echo.Context) error {
 	slug := c.Param("id")
 
-	monitor, err := services.GetMonitor(context.Background(), h.db, slug)
+	check, err := services.GetCheck(context.Background(), h.db, slug)
 	if err != nil {
 		return err
 	}
 
-	err = services.SetMonitorStatus(context.Background(), h.temporal, monitor.Id, services.MonitorStatusPaused)
+	err = services.SetCheckStatus(context.Background(), h.temporal, check.Id, services.CheckStatusPaused)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", slug))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/checks/%s", slug))
 }
 
-func (h *BaseHandler) SettingsMonitorsEnableGET(c echo.Context) error {
+func (h *BaseHandler) SettingsChecksEnableGET(c echo.Context) error {
 	slug := c.Param("id")
 
-	monitor, err := services.GetMonitor(context.Background(), h.db, slug)
+	check, err := services.GetCheck(context.Background(), h.db, slug)
 	if err != nil {
 		return err
 	}
 
-	err = services.SetMonitorStatus(context.Background(), h.temporal, monitor.Id, services.MonitorStatusActive)
+	err = services.SetCheckStatus(context.Background(), h.temporal, check.Id, services.CheckStatusActive)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", slug))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/checks/%s", slug))
 }
 
-func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
+func (h *BaseHandler) SettingsChecksDescribePOST(c echo.Context) error {
 	ctx := context.Background()
-	monitorId := c.Param("id")
+	checkId := c.Param("id")
 
-	update := UpdateMonitor{
+	update := UpdateCheck{
 		Group:        strings.ToLower(c.FormValue("group")),
 		WorkerGroups: strings.ToLower(strings.TrimSpace(c.FormValue("workergroups"))),
 		Schedule:     c.FormValue("schedule"),
@@ -204,18 +204,18 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 		return err
 	}
 
-	monitor, err := services.GetMonitor(ctx, h.db, monitorId)
+	check, err := services.GetCheck(ctx, h.db, checkId)
 	if err != nil {
 		return err
 	}
-	monitor.Group = update.Group
-	monitor.Schedule = update.Schedule
-	monitor.Script = update.Script
+	check.Group = update.Group
+	check.Schedule = update.Schedule
+	check.Script = update.Script
 
-	err = services.UpdateMonitor(
+	err = services.UpdateCheck(
 		ctx,
 		h.db,
-		monitor,
+		check,
 	)
 	if err != nil {
 		return err
@@ -241,23 +241,23 @@ func (h *BaseHandler) SettingsMonitorsDescribePOST(c echo.Context) error {
 		workerGroups = append(workerGroups, workerGroup)
 	}
 
-	err = services.UpdateMonitorWorkerGroups(ctx, h.db, monitor, workerGroups)
+	err = services.UpdateCheckWorkerGroups(ctx, h.db, check, workerGroups)
 	if err != nil {
 		return err
 	}
 
-	err = services.CreateOrUpdateMonitorSchedule(ctx, h.temporal, monitor, workerGroups)
+	err = services.CreateOrUpdateCheckSchedule(ctx, h.temporal, check, workerGroups)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/monitors/%s", monitorId))
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/settings/checks/%s", checkId))
 }
 
-func (h *BaseHandler) SettingsMonitorsCreateGET(c echo.Context) error {
+func (h *BaseHandler) SettingsChecksCreateGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
-	return c.Render(http.StatusOK, "settings_monitors_create.tmpl", &SettingsMonitorCreate{
+	return c.Render(http.StatusOK, "settings_checks_create.tmpl", &SettingsCheckCreate{
 		Settings: NewSettings(
 			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Checks"),
@@ -266,15 +266,15 @@ func (h *BaseHandler) SettingsMonitorsCreateGET(c echo.Context) error {
 				GetPageByTitle(SettingsPages, "Checks Create"),
 			},
 		),
-		Example: h.examples.Monitor,
+		Example: h.examples.Check,
 	})
 }
 
-func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
+func (h *BaseHandler) SettingsChecksCreatePOST(c echo.Context) error {
 	ctx := context.Background()
-	monitorId := slug.Make(c.FormValue("name"))
+	checkId := slug.Make(c.FormValue("name"))
 
-	create := CreateMonitor{
+	create := CreateCheck{
 		Name:         c.FormValue("name"),
 		Group:        strings.ToLower(c.FormValue("group")),
 		WorkerGroups: strings.ToLower(strings.TrimSpace(c.FormValue("workergroups"))),
@@ -306,32 +306,32 @@ func (h *BaseHandler) SettingsMonitorsCreatePOST(c echo.Context) error {
 		workerGroups = append(workerGroups, workerGroup)
 	}
 
-	monitor := &models.Monitor{
+	check := &models.Check{
 		Name:     create.Name,
 		Group:    create.Group,
-		Id:       monitorId,
+		Id:       checkId,
 		Schedule: create.Schedule,
 		Script:   create.Script,
 	}
 
-	err = services.CreateMonitor(
+	err = services.CreateCheck(
 		ctx,
 		h.db,
-		monitor,
+		check,
 	)
 	if err != nil {
 		return err
 	}
 
-	err = services.UpdateMonitorWorkerGroups(ctx, h.db, monitor, workerGroups)
+	err = services.UpdateCheckWorkerGroups(ctx, h.db, check, workerGroups)
 	if err != nil {
 		return err
 	}
 
-	err = services.CreateOrUpdateMonitorSchedule(ctx, h.temporal, monitor, workerGroups)
+	err = services.CreateOrUpdateCheckSchedule(ctx, h.temporal, check, workerGroups)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect(http.StatusSeeOther, "/settings/monitors")
+	return c.Redirect(http.StatusSeeOther, "/settings/checks")
 }

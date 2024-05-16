@@ -1,13 +1,13 @@
 {{ define "settings" }}
-  {{ $description := "Monitors are constantly determining if targets are healthy or not." }}
+  {{ $description := "Checks are constantly determining if targets are healthy or not." }}
 
-  {{ $length := len .Monitors }}
+  {{ $length := len .Checks }}
   {{ if eq $length 0 }}
     <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
       <h1
         class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl"
       >
-        There are no monitors yet.
+        There are no checks yet.
       </h1>
       <p
         class="mb-8 text-l font-normal text-gray-700 lg:text-l sm:px-8 lg:px-40"
@@ -16,10 +16,10 @@
       </p>
       <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
         <a
-          href="/settings/monitors/create"
+          href="/settings/checks/create"
           class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
         >
-          Create First Monitor
+          Create First Check
           <svg class="feather ml-1 h-5 w-5 overflow-visible">
             <use href="/static/icons/feather-sprite.svg#plus" />
           </svg>
@@ -30,13 +30,13 @@
     <section>
       <table>
         <caption>
-          List of Monitors
+          List of Checks
           <div class="mt-1 gap-4 grid grid-cols-1 md:grid-cols-[1fr,20%]">
             <p>
               {{ $description }}
             </p>
             <a
-              href="/settings/monitors/create"
+              href="/settings/checks/create"
               class="h-min inline-flex justify-center items-center py-2 px-4 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
             >
               Create New
@@ -48,7 +48,7 @@
         </caption>
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col">Monitor Group</th>
+            <th scope="col">Check Group</th>
             <th scope="col">Name</th>
             <th scope="col">Visibility</th>
             <th scope="col">Worker Groups</th>
@@ -58,7 +58,7 @@
           </tr>
         </thead>
         <tbody>
-          {{ range .MonitorGroups }}
+          {{ range .CheckGroups }}
             {{ $currentGroup := . }}
             <tr class="row-special">
               <th scope="row">
@@ -71,9 +71,9 @@
               <td></td>
               <td></td>
             </tr>
-            {{ range $group, $monitors := $.Monitors }}
+            {{ range $group, $checks := $.Checks }}
               {{ if eq $group $currentGroup }}
-                {{ range $monitors }}
+                {{ range $checks }}
                   <tr>
                     <th scope="row">└─</th>
                     <th scope="row">
@@ -125,7 +125,7 @@
                       {{ .Schedule }}
                     </td>
                     <td>
-                      <a href="/settings/monitors/{{ .Id }}" class="link"
+                      <a href="/settings/checks/{{ .Id }}" class="link"
                         >Details</a
                       >
                     </td>

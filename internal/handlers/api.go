@@ -40,26 +40,26 @@ func (h *BaseHandler) ApiV1WorkersConnectGET(c echo.Context) error {
 // TODO: Can we instead get this from the Workflow outcome?
 //
 //	To somehow listen for the outcomes and then store them automatically.
-func (h *BaseHandler) ApiV1MonitorsHistoryPOST(c echo.Context) error {
+func (h *BaseHandler) ApiV1ChecksHistoryPOST(c echo.Context) error {
 	ctx := context.Background()
 	id := c.Param("id")
 
-	var body api.ApiV1MonitorsHistoryPOSTBody
+	var body api.ApiV1ChecksHistoryPOSTBody
 	err := (&echo.DefaultBinder{}).BindBody(c, &body)
 	if err != nil {
 		return err
 	}
 
-	_, err = services.GetMonitor(ctx, h.db, id)
+	_, err = services.GetCheck(ctx, h.db, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return echo.NewHTTPError(http.StatusNotFound, "Monitor not found")
+			return echo.NewHTTPError(http.StatusNotFound, "Check not found")
 		}
 		return err
 	}
 
-	err = services.AddHistoryForMonitor(ctx, h.db, &models.MonitorHistory{
-		MonitorId:     id,
+	err = services.AddHistoryForCheck(ctx, h.db, &models.CheckHistory{
+		CheckId:     id,
 		WorkerGroupId: body.WorkerGroupId,
 		Status:        body.Status,
 		Note:          body.Note,

@@ -18,7 +18,7 @@ import (
 var examplesYaml embed.FS
 
 type examples struct {
-	Monitor string `yaml:"monitor"`
+	Check string `yaml:"check"`
 	Trigger string `yaml:"trigger"`
 }
 
@@ -63,7 +63,7 @@ func NewBaseHandler(db *sqlx.DB, kvStore kv.KeyValueStore, temporal client.Clien
 		panic(err)
 	}
 
-	examples.Monitor = script.EscapeString(examples.Monitor)
+	examples.Check = script.EscapeString(examples.Check)
 	examples.Trigger = script.EscapeString(examples.Trigger)
 
 	return &BaseHandler{

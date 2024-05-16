@@ -51,13 +51,14 @@ func NewTemplates() *Templates {
 			"settings_triggers_create.tmpl":        loadSettings("pages/settings_triggers_create.tmpl"),
 			"settings_triggers_describe.tmpl":      loadSettings("pages/settings_triggers_describe.tmpl"),
 			"settings_targets.tmpl":                loadSettings("pages/settings_targets.tmpl"),
+			"settings_incidents.tmpl":              loadSettings("pages/settings_incidents.tmpl"),
 			"settings_notifications.tmpl":          loadSettings("pages/settings_notifications.tmpl"),
 			"settings_worker_groups.tmpl":          loadSettings("pages/settings_worker_groups.tmpl"),
 			"settings_worker_groups_create.tmpl":   loadSettings("pages/settings_worker_groups_create.tmpl"),
 			"settings_worker_groups_describe.tmpl": loadSettings("pages/settings_worker_groups_describe.tmpl"),
-			"settings_monitors.tmpl":               loadSettings("pages/settings_monitors.tmpl"),
-			"settings_monitors_create.tmpl":        loadSettings("pages/settings_monitors_create.tmpl"),
-			"settings_monitors_describe.tmpl":      loadSettings("pages/settings_monitors_describe.tmpl"),
+			"settings_checks.tmpl":                 loadSettings("pages/settings_checks.tmpl"),
+			"settings_checks_create.tmpl":          loadSettings("pages/settings_checks_create.tmpl"),
+			"settings_checks_describe.tmpl":        loadSettings("pages/settings_checks_describe.tmpl"),
 		},
 	}
 }

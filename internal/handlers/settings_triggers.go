@@ -14,13 +14,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Incident struct{}
-
-type SettingsIncidents struct {
-	*Settings
-	Incidents []*Incident
-}
-
 type CreateTrigger struct {
 	Name   string `validate:"required"`
 	Script string `validate:"required"`

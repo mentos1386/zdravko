@@ -1,26 +1,26 @@
 {{ define "main" }}
   <div class="container max-w-screen-md flex flex-col mt-20 gap-20">
-    {{ $length := len .Monitors }}
+    {{ $length := len .Checks }}
     {{ if eq $length 0 }}
       <section>
         <div class="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16">
           <h1
             class="mb-4 text-2xl font-extrabold tracking-tight leading-none text-gray-900 md:text-3xl lg:text-4xl"
           >
-            There are no monitors yet.
+            There are no checks yet.
           </h1>
           <p
             class="mb-8 text-l font-normal text-gray-700 lg:text-l sm:px-8 lg:px-40"
           >
-            Create a monitor to monitor your services and get notified when they
+            Create a check to check your services and get notified when they
             are down.
           </p>
           <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <a
-              href="/settings/monitors/create"
+              href="/settings/checks/create"
               class="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300"
             >
-              Create First Monitor
+              Create First Check
               <svg class="feather ml-1 h-5 w-5 overflow-visible">
                 <use href="/static/icons/feather-sprite.svg#plus" />
               </svg>
@@ -69,7 +69,7 @@
           </p>
         </div>
       {{ end }}
-      <div class="monitors flex flex-col gap-4">
+      <div class="checks flex flex-col gap-4">
         <div
           class="inline-flex gap-1 justify-center md:justify-end time-range"
           role="group"
@@ -93,7 +93,7 @@
             >90 Minutes</a
           >
         </div>
-        {{ range $group, $monitorsAndStatus := .Monitors }}
+        {{ range $group, $checksAndStatus := .Checks }}
           <details
             open
             class="bg-white shadow-md rounded-lg p-6 py-4 gap-2 [&_svg]:open:rotate-90"
@@ -101,11 +101,11 @@
             <summary
               class="flex flex-row gap-2 p-3 py-2 -mx-3 cursor-pointer hover:bg-blue-50 rounded-lg"
             >
-              {{ if eq $monitorsAndStatus.Status "SUCCESS" }}
+              {{ if eq $checksAndStatus.Status "SUCCESS" }}
                 <span
                   class="flex w-3 h-3 bg-green-400 rounded-full self-center"
                 ></span>
-              {{ else if eq $monitorsAndStatus.Status "FAILURE" }}
+              {{ else if eq $checksAndStatus.Status "FAILURE" }}
                 <span
                   class="flex w-3 h-3 bg-red-400 rounded-full self-center"
                 ></span>
@@ -123,7 +123,7 @@
                 <use href="/static/icons/feather-sprite.svg#chevron-right" />
               </svg>
             </summary>
-            {{ range $monitorsAndStatus.Monitors }}
+            {{ range $checksAndStatus.Checks }}
               <div
                 class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 pb-2 border-b last-of-type:pb-0 last-of-type:border-0 border-gray-100"
               >

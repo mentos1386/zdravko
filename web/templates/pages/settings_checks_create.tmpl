@@ -1,10 +1,10 @@
 {{ define "settings" }}
   <section class="p-5">
-    <form action="/settings/monitors/create" method="post">
+    <form action="/settings/checks/create" method="post">
       <label for="name">Name</label>
       <input type="text" name="name" id="name" placeholder="Github.com" />
-      <p>Name of the monitor can be anything.</p>
-      <label list="existing-groups" for="group">Monitor Group</label>
+      <p>Name of the check can be anything.</p>
+      <label list="existing-groups" for="group">Check Group</label>
       <input
         type="text"
         name="group"
@@ -17,7 +17,7 @@
         <option value="default"></option>
       </datalist>
       <p>
-        Group monitors together. This affects how they are presented on the
+        Group checks together. This affects how they are presented on the
         homepage.
       </p>
       <label for="workergroups">Worker Groups</label>
@@ -29,7 +29,7 @@
         required
       />
       <p>
-        Worker groups are used to distribute the monitor to specific workers.
+        Worker groups are used to distribute the check to specific workers.
       </p>
       <label for="schedule">Schedule</label>
       <input
@@ -41,7 +41,7 @@
         required
       />
       <p>
-        Schedule is a cron expression that defines when the monitor should be
+        Schedule is a cron expression that defines when the check should be
         executed.
         <br />
         You can also use <code>@every [interval]</code> where interval is a

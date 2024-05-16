@@ -22,7 +22,7 @@ type WorkerWithTokenAndActiveWorkers struct {
 }
 
 type WorkerGroupWithActiveWorkers struct {
-	*models.WorkerGroupWithMonitors
+	*models.WorkerGroupWithChecks
 	ActiveWorkers []string
 }
 
@@ -39,7 +39,7 @@ type SettingsWorker struct {
 func (h *BaseHandler) SettingsWorkerGroupsGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 
-	workerGroups, err := services.GetWorkerGroupsWithMonitors(context.Background(), h.db)
+	workerGroups, err := services.GetWorkerGroupsWithChecks(context.Background(), h.db)
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func (h *BaseHandler) SettingsWorkerGroupsGET(c echo.Context) error {
 			return err
 		}
 		workerGroupsWithActiveWorkers[i] = &WorkerGroupWithActiveWorkers{
-			WorkerGroupWithMonitors: workerGroup,
+			WorkerGroupWithChecks: workerGroup,
 			ActiveWorkers:           activeWorkers,
 		}
 	}
