@@ -1404,7 +1404,7 @@ code {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.monitors .time-range > a {
+.checks .time-range > a {
   border-radius: 0.5rem;
   padding-left: 0.625rem;
   padding-right: 0.625rem;
@@ -1419,12 +1419,12 @@ code {
   color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
-.monitors .time-range > a:hover {
+.checks .time-range > a:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(209 213 219 / var(--tw-bg-opacity));
 }
 
-.monitors .time-range > a:focus {
+.checks .time-range > a:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
@@ -1434,7 +1434,7 @@ code {
   --tw-ring-color: rgb(156 163 175 / var(--tw-ring-opacity));
 }
 
-.monitors .time-range > a.active {
+.checks .time-range > a.active {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
   --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
@@ -1442,7 +1442,7 @@ code {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.monitors .time-range > a.active:hover {
+.checks .time-range > a.active:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(209 213 219 / var(--tw-bg-opacity));
 }
@@ -1770,6 +1770,17 @@ code {
 .focus\:ring-red-300:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(252 165 165 / var(--tw-ring-opacity));
+}
+
+.has-\[\.active\]\:bg-white:has(.active) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+.has-\[\.active\]\:shadow-md:has(.active) {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 @media (min-width: 640px) {

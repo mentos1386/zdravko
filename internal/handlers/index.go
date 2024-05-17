@@ -15,8 +15,8 @@ type IndexData struct {
 	*components.Base
 	Checks       map[string]ChecksAndStatus
 	ChecksLength int
-	TimeRange      string
-	Status         models.CheckStatus
+	TimeRange    string
+	Status       models.CheckStatus
 }
 
 type Check struct {
@@ -33,11 +33,11 @@ type HistoryItem struct {
 
 type History struct {
 	List   []HistoryItem
-	Uptime int
+	Uptime float64
 }
 
 type ChecksAndStatus struct {
-	Status   models.CheckStatus
+	Status models.CheckStatus
 	Checks []*Check
 }
 
@@ -47,8 +47,8 @@ func getDateString(date time.Time) string {
 
 func getHistory(history []*models.CheckHistory, period time.Duration, buckets int) *History {
 	historyMap := map[string]models.CheckStatus{}
-	numOfSuccess := 0
-	numTotal := 0
+	numOfSuccess := 0.0
+	numTotal := 0.0
 
 	for i := 0; i < buckets; i++ {
 		dateString := getDateString(time.Now().Add(period * time.Duration(-i)).Truncate(period))
@@ -88,9 +88,9 @@ func getHistory(history []*models.CheckHistory, period time.Duration, buckets in
 		}
 	}
 
-	uptime := 0
+	uptime := 0.0
 	if numTotal > 0 {
-		uptime = 100 * numOfSuccess / numTotal
+		uptime = 100.0 * numOfSuccess / numTotal
 	}
 
 	return &History{
@@ -160,7 +160,7 @@ func (h *BaseHandler) Index(c echo.Context) error {
 	checksByGroup := map[string]ChecksAndStatus{}
 	for _, check := range checksWithHistory {
 		checksByGroup[check.Group] = ChecksAndStatus{
-			Status:   statusByGroup[check.Group],
+			Status: statusByGroup[check.Group],
 			Checks: append(checksByGroup[check.Group].Checks, check),
 		}
 	}
@@ -172,7 +172,7 @@ func (h *BaseHandler) Index(c echo.Context) error {
 			NavbarActive: GetPageByTitle(Pages, "Status"),
 			Navbar:       Pages,
 		},
-		Checks:  checksByGroup,
+		Checks:    checksByGroup,
 		TimeRange: timeRange,
 		Status:    overallStatus,
 	})

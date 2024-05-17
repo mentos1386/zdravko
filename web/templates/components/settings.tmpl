@@ -14,13 +14,15 @@
       class="sidebar gap-2 flex flex-row flex-wrap justify-center lg:flex-col lg:w-48 h-fit text-sm font-medium text-gray-900"
     >
       {{ range .SettingsSidebar }}
-        <li class="flex items-center gap-1 lg:flex-col lg:items-start">
+        <li
+          class="flex items-center gap-2 p-2 lg:flex-col lg:items-start rounded-lg has-[.active]:shadow-md has-[.active]:bg-white"
+        >
           <p
             class="text-xs font-semibold text-gray-600 uppercase tracking-wider"
           >
             {{ .Group }}
           </p>
-          <ul class="flex flex-row flex-wrap gap-1 lg:flex-col">
+          <ul class="flex flex-row flex-wrap gap-1 lg:flex-col w-full">
             {{ range .Pages }}
               <li>
                 <a
@@ -67,6 +69,19 @@
         class="mx-8 lg:mx-0 grid justify-center lg:justify-start"
       >
         <ol class="inline-flex items-center">
+          <li class="inline-flex items-center">
+            <p
+              class="inline-flex items-center text-sm font-medium text-gray-700"
+            >
+              {{ .SettingsGroupName }}
+              <svg
+                aria-hidden="true"
+                class="feather h-4 w-4 mx-1 text-gray-400 overflow-visible"
+              >
+                <use href="/static/icons/feather-sprite.svg#chevron-right" />
+              </svg>
+            </p>
+          </li>
           {{ range .SettingsBreadcrumbs }}
             <li class="inline-flex items-center">
               <a

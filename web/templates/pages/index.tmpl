@@ -12,8 +12,8 @@
           <p
             class="mb-8 text-l font-normal text-gray-700 lg:text-l sm:px-8 lg:px-40"
           >
-            Create a check to check your services and get notified when they
-            are down.
+            Create a check to check your services and get notified when they are
+            down.
           </p>
           <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <a
@@ -138,7 +138,7 @@
                   <h4>{{ .Name }}</h4>
                 </div>
                 <div class="justify-self-end text-sm">
-                  {{ .History.Uptime }}% uptime
+                  {{ printf "%.2f" .History.Uptime }}% uptime
                 </div>
                 <div
                   class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden"

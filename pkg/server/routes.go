@@ -52,7 +52,7 @@ func Routes(
 	// Settings
 	settings := e.Group("/settings")
 	settings.Use(h.Authenticated)
-	settings.GET("", h.SettingsOverviewGET)
+	settings.GET("", h.SettingsHomeGET)
 
 	settings.GET("/triggers", h.SettingsTriggersGET)
 	settings.GET("/triggers/:id", h.SettingsTriggersDescribeGET)

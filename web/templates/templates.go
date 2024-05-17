@@ -46,7 +46,7 @@ func NewTemplates() *Templates {
 			"404.tmpl":                             load("pages/404.tmpl"),
 			"index.tmpl":                           load("pages/index.tmpl"),
 			"incidents.tmpl":                       load("pages/incidents.tmpl"),
-			"settings_overview.tmpl":               loadSettings("pages/settings_overview.tmpl"),
+			"settings_home.tmpl":                   loadSettings("pages/settings_home.tmpl"),
 			"settings_triggers.tmpl":               loadSettings("pages/settings_triggers.tmpl"),
 			"settings_triggers_create.tmpl":        loadSettings("pages/settings_triggers_create.tmpl"),
 			"settings_triggers_describe.tmpl":      loadSettings("pages/settings_triggers_describe.tmpl"),

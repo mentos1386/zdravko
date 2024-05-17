@@ -15,18 +15,37 @@ type SettingsSidebarGroup struct {
 
 type Settings struct {
 	*components.Base
+	SettingsGroupName     string
 	SettingsSidebarActive *components.Page
 	SettingsSidebar       []SettingsSidebarGroup
 	User                  *AuthenticatedUser
 	SettingsBreadcrumbs   []*components.Page
 }
 
+func findGroupForPage(groups []SettingsSidebarGroup, page *components.Page) *SettingsSidebarGroup {
+	for _, group := range groups {
+		for _, p := range group.Pages {
+			if p == page {
+				return &group
+			}
+		}
+	}
+	return nil
+}
+
 func NewSettings(user *AuthenticatedUser, page *components.Page, breadCrumbs []*components.Page) *Settings {
+	groupName := ""
+	group := findGroupForPage(SettingsSidebar, page)
+	if group != nil {
+		groupName = group.Group
+	}
+
 	return &Settings{
 		Base: &components.Base{
 			NavbarActive: GetPageByTitle(Pages, "Settings"),
 			Navbar:       Pages,
 		},
+		SettingsGroupName:     groupName,
 		SettingsSidebarActive: page,
 		SettingsSidebar:       SettingsSidebar,
 		SettingsBreadcrumbs:   breadCrumbs,
@@ -35,7 +54,7 @@ func NewSettings(user *AuthenticatedUser, page *components.Page, breadCrumbs []*
 }
 
 var SettingsPages = []*components.Page{
-	{Path: "/settings", Title: "Overview", Breadcrumb: "Overview"},
+	{Path: "/settings", Title: "Home", Breadcrumb: "Home"},
 	{Path: "/settings/incidents", Title: "Incidents", Breadcrumb: "Incidents"},
 	{Path: "/settings/targets", Title: "Targets", Breadcrumb: "Targets"},
 	{Path: "/settings/targets/create", Title: "Targets Create", Breadcrumb: "Create"},
@@ -57,7 +76,7 @@ var SettingsSidebar = []SettingsSidebarGroup{
 	{
 		Group: "Overview",
 		Pages: []*components.Page{
-			GetPageByTitle(SettingsPages, "Overview"),
+			GetPageByTitle(SettingsPages, "Home"),
 		},
 	},
 	{
@@ -91,7 +110,7 @@ var SettingsSidebar = []SettingsSidebarGroup{
 	},
 }
 
-type SettingsOverview struct {
+type SettingsHome struct {
 	*Settings
 	WorkerGroupsCount  int
 	ChecksCount        int
@@ -99,7 +118,7 @@ type SettingsOverview struct {
 	History            []*services.CheckHistoryWithCheck
 }
 
-func (h *BaseHandler) SettingsOverviewGET(c echo.Context) error {
+func (h *BaseHandler) SettingsHomeGET(c echo.Context) error {
 	cc := c.(AuthenticatedContext)
 	ctx := c.Request().Context()
 
@@ -118,11 +137,11 @@ func (h *BaseHandler) SettingsOverviewGET(c echo.Context) error {
 		return err
 	}
 
-	return c.Render(http.StatusOK, "settings_overview.tmpl", SettingsOverview{
+	return c.Render(http.StatusOK, "settings_home.tmpl", SettingsHome{
 		Settings: NewSettings(
 			cc.Principal.User,
-			GetPageByTitle(SettingsPages, "Overview"),
-			[]*components.Page{GetPageByTitle(SettingsPages, "Overview")},
+			GetPageByTitle(SettingsPages, "Home"),
+			[]*components.Page{GetPageByTitle(SettingsPages, "Home")},
 		),
 		WorkerGroupsCount:  workerGroups,
 		ChecksCount:        checks,
