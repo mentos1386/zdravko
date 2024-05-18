@@ -7,12 +7,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const (
-	TriggerStatusUnknown models.TriggerStatus = "UNKNOWN"
-	TriggerStatusPaused  models.TriggerStatus = "PAUSED"
-	TriggerStatusActive  models.TriggerStatus = "ACTIVE"
-)
-
 func CountTriggers(ctx context.Context, db *sqlx.DB) (int, error) {
 	var count int
 	err := db.GetContext(ctx, &count, "SELECT COUNT(*) FROM triggers")
@@ -21,7 +15,7 @@ func CountTriggers(ctx context.Context, db *sqlx.DB) (int, error) {
 
 func CreateTrigger(ctx context.Context, db *sqlx.DB, trigger *models.Trigger) error {
 	_, err := db.NamedExecContext(ctx,
-		`INSERT INTO triggers (id, name, status, script) VALUES (:id, :name, :status, :script)`,
+		`INSERT INTO triggers (id, name, script) VALUES (:id, :name, :script)`,
 		trigger,
 	)
 	return err
@@ -29,7 +23,7 @@ func CreateTrigger(ctx context.Context, db *sqlx.DB, trigger *models.Trigger) er
 
 func UpdateTrigger(ctx context.Context, db *sqlx.DB, trigger *models.Trigger) error {
 	_, err := db.NamedExecContext(ctx,
-		`UPDATE triggers SET script=:script, status=:status WHERE id=:id`,
+		`UPDATE triggers SET script=:script WHERE id=:id`,
 		trigger,
 	)
 	return err

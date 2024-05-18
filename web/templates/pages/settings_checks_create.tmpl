@@ -4,7 +4,17 @@
       <label for="name">Name</label>
       <input type="text" name="name" id="name" placeholder="Github.com" />
       <p>Name of the check can be anything.</p>
-      <label list="existing-groups" for="group">Check Group</label>
+      <label for="visibility">Visibility</label>
+      <select name="visibility" id="visibility" required>
+        <option value="PUBLIC">Public</option>
+        <option value="PRIVATE">Private</option>
+      </select>
+      <p>
+        Visibility determines who can see the check. If set to
+        <code>public</code>, it will be visible to everyone on the homepage.
+        Otherwise it will be only visible to signed in users.
+      </p>
+      <label for="group">Check Group</label>
       <input
         type="text"
         name="group"
@@ -13,9 +23,6 @@
         value="default"
         required
       />
-      <datalist id="existing-groups">
-        <option value="default"></option>
-      </datalist>
       <p>
         Group checks together. This affects how they are presented on the
         homepage.
@@ -28,9 +35,7 @@
         placeholder="NA EU"
         required
       />
-      <p>
-        Worker groups are used to distribute the check to specific workers.
-      </p>
+      <p>Worker groups are used to distribute the check to specific workers.</p>
       <label for="schedule">Schedule</label>
       <input
         type="text"
@@ -92,6 +97,7 @@
         minimap: { enabled: false },
         codeLens: false,
         contextmenu: false,
+        scrollBeyondLastLine: false,
       });
 
       const divElem = document.getElementById("editor");

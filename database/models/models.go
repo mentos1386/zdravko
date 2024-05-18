@@ -48,19 +48,36 @@ type OAuth2State struct {
 type CheckStatus string
 
 const (
-	CheckSuccess CheckStatus = "SUCCESS"
-	CheckFailure CheckStatus = "FAILURE"
-	CheckError   CheckStatus = "ERROR"
-	CheckUnknown CheckStatus = "UNKNOWN"
+	CheckStatusSuccess CheckStatus = "SUCCESS"
+	CheckStatusFailure CheckStatus = "FAILURE"
+	CheckStatusError   CheckStatus = "ERROR"
+	CheckStatusUnknown CheckStatus = "UNKNOWN"
+)
+
+type CheckState string
+
+const (
+	CheckStateActive  CheckState = "ACTIVE"
+	CheckStatePaused  CheckState = "PAUSED"
+	CheckStateUnknown CheckState = "UNKNOWN"
+)
+
+type CheckVisibility string
+
+const (
+	CheckVisibilityPublic  CheckVisibility = "PUBLIC"
+	CheckVisibilityPrivate CheckVisibility = "PRIVATE"
+	CheckVisibilityUnknown CheckVisibility = "UNKNOWN"
 )
 
 type Check struct {
 	CreatedAt *Time `db:"created_at"`
 	UpdatedAt *Time `db:"updated_at"`
 
-	Id    string `db:"id"`
-	Name  string `db:"name"`
-	Group string `db:"group"`
+	Id         string          `db:"id"`
+	Name       string          `db:"name"`
+	Group      string          `db:"group"`
+	Visibility CheckVisibility `db:"visibility"`
 
 	Schedule string `db:"schedule"`
 	Script   string `db:"script"`
@@ -76,9 +93,9 @@ type CheckWithWorkerGroups struct {
 type CheckHistory struct {
 	CreatedAt *Time `db:"created_at"`
 
-	CheckId string        `db:"check_id"`
-	Status    CheckStatus `db:"status"`
-	Note      string        `db:"note"`
+	CheckId string      `db:"check_id"`
+	Status  CheckStatus `db:"status"`
+	Note    string      `db:"note"`
 
 	WorkerGroupId   string `db:"worker_group_id"`
 	WorkerGroupName string `db:"worker_group_name"`
@@ -102,20 +119,35 @@ type WorkerGroupWithChecks struct {
 type TriggerStatus string
 
 const (
-	TriggerSuccess TriggerStatus = "SUCCESS"
-	TriggerFailure TriggerStatus = "FAILURE"
-	TriggerError   TriggerStatus = "ERROR"
-	TriggerUnknown TriggerStatus = "UNKNOWN"
+	TriggerStatusSuccess TriggerStatus = "SUCCESS"
+	TriggerStatusFailure TriggerStatus = "FAILURE"
+	TriggerStatusError   TriggerStatus = "ERROR"
+	TriggerStatusUnknown TriggerStatus = "UNKNOWN"
+)
+
+type TriggerState string
+
+const (
+	TriggerStateActive  TriggerState = "ACTIVE"
+	TriggerStatePaused  TriggerState = "PAUSED"
+	TriggerStateUnknown TriggerState = "UNKNOWN"
+)
+
+type TriggerVisibility string
+
+const (
+	TriggerVisibilityPublic  TriggerVisibility = "PUBLIC"
+	TriggerVisibilityPrivate TriggerVisibility = "PRIVATE"
+	TriggerVisibilityUnknown TriggerVisibility = "UNKNOWN"
 )
 
 type Trigger struct {
 	CreatedAt *Time `db:"created_at"`
 	UpdatedAt *Time `db:"updated_at"`
 
-	Id     string        `db:"id"`
-	Name   string        `db:"name"`
-	Script string        `db:"script"`
-	Status TriggerStatus `db:"status"`
+	Id     string `db:"id"`
+	Name   string `db:"name"`
+	Script string `db:"script"`
 }
 
 type TriggerHistory struct {

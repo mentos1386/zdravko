@@ -9,9 +9,11 @@ CREATE TABLE oauth2_states  (
 CREATE TABLE checks (
   id TEXT NOT NULL,
   name TEXT NOT NULL,
-  "group" TEXT NOT NULL DEFAULT 'default',
+  "group" TEXT NOT NULL,
   schedule TEXT NOT NULL,
   script TEXT NOT NULL,
+
+  visibility TEXT NOT NULL,
 
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ')),
   updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ')),
@@ -21,9 +23,11 @@ CREATE TABLE checks (
 ) STRICT;
 
 
---CREATE TRIGGER checks_updated_timestamp AFTER UPDATE ON checks BEGIN
---  update checks set updated_at = strftime('%Y-%m-%dT%H:%M:%fZ') where id = new.id;
---END;
+-- +migrate StatementBegin
+CREATE TRIGGER checks_updated_timestamp AFTER UPDATE ON checks BEGIN
+  UPDATE checks SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ') WHERE id = NEW.id;
+END;
+-- +migrate StatementEnd
 
 CREATE TABLE worker_groups  (
   id TEXT NOT NULL,
@@ -36,9 +40,11 @@ CREATE TABLE worker_groups  (
   CONSTRAINT unique_worker_groups_name UNIQUE (name)
 ) STRICT;
 
---CREATE TRIGGER worker_groups_updated_timestamp AFTER UPDATE ON worker_groups BEGIN
---  update worker_groups set updated_at = strftime('%Y-%m-%dT%H:%M:%fZ') where id = new.id;
---END;
+-- +migrate StatementBegin
+CREATE TRIGGER worker_groups_updated_timestamp AFTER UPDATE ON worker_groups BEGIN
+  UPDATE worker_groups SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ') WHERE id = NEW.id;
+END;
+-- +migrate StatementEnd
 
 CREATE TABLE check_worker_groups (
   worker_group_id TEXT NOT NULL,
@@ -67,7 +73,6 @@ CREATE TABLE triggers (
   id TEXT NOT NULL,
   name TEXT NOT NULL,
   script TEXT NOT NULL,
-  status TEXT NOT NULL,
 
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ')),
   updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ')),
@@ -75,6 +80,13 @@ CREATE TABLE triggers (
   PRIMARY KEY (id),
   CONSTRAINT unique_triggers_name UNIQUE (name)
 ) STRICT;
+
+
+-- +migrate StatementBegin
+CREATE TRIGGER triggers_updated_timestamp AFTER UPDATE ON triggers BEGIN
+  UPDATE triggers SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ') WHERE id = NEW.id;
+END;
+-- +migrate StatementEnd
 
 CREATE TABLE trigger_histories  (
   trigger_id TEXT NOT NULL,
@@ -92,7 +104,10 @@ CREATE TABLE trigger_histories  (
 DROP TABLE oauth2_states;
 DROP TABLE check_worker_groups;
 DROP TABLE worker_groups;
+DROP TRIGGER worker_groups_updated_timestamp;
 DROP TABLE check_histories;
 DROP TABLE checks;
+DROP TRIGGER checks_updated_timestamp;
 DROP TABLE triggers;
 DROP TABLE trigger_histories;
+DROP TRIGGER triggers_updated_timestamp;

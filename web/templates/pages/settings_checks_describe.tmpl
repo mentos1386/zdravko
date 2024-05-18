@@ -2,6 +2,26 @@
   <section class="p-5">
     <form action="/settings/checks/{{ .Check.Id }}" method="post">
       <h2>Configuration</h2>
+      <label for="visibility">Visibility</label>
+      <select name="visibility" id="visibility" required>
+        <option
+          {{ if eq .Check.Visibility "PUBLIC" }}selected="selected"{{ end }}
+          value="PUBLIC"
+        >
+          Public
+        </option>
+        <option
+          {{ if eq .Check.Visibility "PRIVATE" }}selected="selected"{{ end }}
+          value="PRIVATE"
+        >
+          Private
+        </option>
+      </select>
+      <p>
+        Visibility determines who can see the check. If set to
+        <code>public</code>, it will be visible to everyone on the homepage.
+        Otherwise it will be only visible to signed in users.
+      </p>
       <label for="group">Check Group</label>
       <input
         type="text"
@@ -22,9 +42,7 @@
         value="{{ range .Check.WorkerGroups }}{{ . }}{{ end }}"
         required
       />
-      <p>
-        Worker groups are used to distribute the check to specific workers.
-      </p>
+      <p>Worker groups are used to distribute the check to specific workers.</p>
       <label for="schedule">Schedule</label>
       <input
         type="text"
@@ -64,14 +82,14 @@
   <div class="flex md:flex-row flex-col gap-4 h-min">
     <section class="p-5 flex-1">
       <h2 class="mb-2 flex flex-row gap-2">
-        Status
-        {{ if eq .Check.Status "ACTIVE" }}
+        State
+        {{ if eq .Check.State "ACTIVE" }}
           <span
             class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
           >
             ACTIVE
           </span>
-        {{ else if eq .Check.Status "PAUSED" }}
+        {{ else if eq .Check.State "PAUSED" }}
           <span
             class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
           >
@@ -83,13 +101,13 @@
         Pausing the check will stop it from executing. This can be useful in
         cases of expected downtime. Or when the check is not needed anymore.
       </p>
-      {{ if eq .Check.Status "ACTIVE" }}
+      {{ if eq .Check.State "ACTIVE" }}
         <a
           class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
           href="/settings/checks/{{ .Check.Id }}/disable"
           >Pause</a
         >
-      {{ else if eq .Check.Status "PAUSED" }}
+      {{ else if eq .Check.State "PAUSED" }}
         <a
           class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
           href="/settings/checks/{{ .Check.Id }}/enable"
@@ -182,6 +200,7 @@
       minimap: { enabled: false },
       codeLens: false,
       contextmenu: false,
+      scrollBeyondLastLine: false,
     });
 
     const divElem = document.getElementById('editor');

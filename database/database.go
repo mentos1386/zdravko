@@ -7,6 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 )
 
@@ -26,7 +27,7 @@ func ConnectToDatabase(logger *slog.Logger, path string) (*sqlx.DB, error) {
 	}
 	n, err := migrate.Exec(db.DB, "sqlite3", migrations, migrate.Up)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to run migrations")
 	}
 	logger.Info("Applied migrations", "number", n)
 

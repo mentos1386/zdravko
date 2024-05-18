@@ -11,11 +11,11 @@
         class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden hidden"
       ></div>
       <p>
-        Script is what determines the status of a service. You can read more
-        about it on
-        <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/"
-          >k6 documentation</a
-        >.
+        The trigger script executes for every matching <code>target</code>'s
+        execution of <code>trigger</code>. The outcome of that
+        <code>trigger</code> is passed to the script as a
+        <code>outcome</code> object. Based on that the trigger script should
+        decide if an incident should either be created or closed.
       </p>
       <button type="submit" onclick="save()">Save</button>
     </form>
@@ -25,13 +25,13 @@
     <section class="p-5 flex-1">
       <h2 class="mb-2 flex flex-row gap-2">
         Status
-        {{ if eq .Trigger.Status "ACTIVE" }}
+        {{ if eq .Trigger.State "ACTIVE" }}
           <span
             class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
           >
             ACTIVE
           </span>
-        {{ else if eq .Trigger.Status "PAUSED" }}
+        {{ else if eq .Trigger.State "PAUSED" }}
           <span
             class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
           >
@@ -43,13 +43,13 @@
         Pausing the trigger will stop it from executing. This can be useful in
         cases of expected downtime. Or when the trigger is not needed anymore.
       </p>
-      {{ if eq .Trigger.Status "ACTIVE" }}
+      {{ if eq .Trigger.State "ACTIVE" }}
         <a
           class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
           href="/settings/triggers/{{ .Trigger.Id }}/disable"
           >Pause</a
         >
-      {{ else if eq .Trigger.Status "PAUSED" }}
+      {{ else if eq .Trigger.State "PAUSED" }}
         <a
           class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
           href="/settings/triggers/{{ .Trigger.Id }}/enable"
@@ -134,6 +134,7 @@
       minimap: { enabled: false },
       codeLens: false,
       contextmenu: false,
+      scrollBeyondLastLine: false,
     });
 
     const divElem = document.getElementById('editor');

@@ -11,7 +11,7 @@ import (
 
 type CheckWorkflowParam struct {
 	Script         string
-	CheckId      string
+	CheckId        string
 	WorkerGroupIds []string
 }
 
@@ -32,16 +32,16 @@ func (w *Workflows) CheckWorkflowDefinition(ctx workflow.Context, param CheckWor
 		var checkResult *activities.CheckResult
 		err := workflow.ExecuteActivity(ctx, w.activities.Check, heatlcheckParam).Get(ctx, &checkResult)
 		if err != nil {
-			return models.CheckUnknown, err
+			return models.CheckStatusUnknown, err
 		}
 
-		status := models.CheckFailure
+		status := models.CheckStatusFailure
 		if checkResult.Success {
-			status = models.CheckSuccess
+			status = models.CheckStatusSuccess
 		}
 
 		historyParam := activities.HealtcheckAddToHistoryParam{
-			CheckId:     param.CheckId,
+			CheckId:       param.CheckId,
 			Status:        status,
 			Note:          checkResult.Note,
 			WorkerGroupId: workerGroupId,
@@ -50,9 +50,9 @@ func (w *Workflows) CheckWorkflowDefinition(ctx workflow.Context, param CheckWor
 		var historyResult *activities.CheckAddToHistoryResult
 		err = workflow.ExecuteActivity(ctx, w.activities.CheckAddToHistory, historyParam).Get(ctx, &historyResult)
 		if err != nil {
-			return models.CheckUnknown, err
+			return models.CheckStatusUnknown, err
 		}
 	}
 
-	return models.CheckSuccess, nil
+	return models.CheckStatusSuccess, nil
 }

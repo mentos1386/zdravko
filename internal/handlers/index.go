@@ -20,10 +20,11 @@ type IndexData struct {
 }
 
 type Check struct {
-	Name    string
-	Group   string
-	Status  models.CheckStatus
-	History *History
+	Name       string
+	Visibility models.CheckVisibility
+	Group      string
+	Status     models.CheckStatus
+	History    *History
 }
 
 type HistoryItem struct {
@@ -52,7 +53,7 @@ func getHistory(history []*models.CheckHistory, period time.Duration, buckets in
 
 	for i := 0; i < buckets; i++ {
 		dateString := getDateString(time.Now().Add(period * time.Duration(-i)).Truncate(period))
-		historyMap[dateString] = models.CheckUnknown
+		historyMap[dateString] = models.CheckStatusUnknown
 	}
 
 	for _, _history := range history {
@@ -64,12 +65,12 @@ func getHistory(history []*models.CheckHistory, period time.Duration, buckets in
 		}
 
 		numTotal++
-		if _history.Status == models.CheckSuccess {
+		if _history.Status == models.CheckStatusSuccess {
 			numOfSuccess++
 		}
 
 		// skip if it is already set to failure
-		if historyMap[dateString] == models.CheckFailure {
+		if historyMap[dateString] == models.CheckStatusFailure {
 			continue
 		}
 
@@ -111,7 +112,7 @@ func (h *BaseHandler) Index(c echo.Context) error {
 		timeRange = "90days"
 	}
 
-	overallStatus := models.CheckUnknown
+	overallStatus := models.CheckStatusUnknown
 	statusByGroup := make(map[string]models.CheckStatus)
 
 	checksWithHistory := make([]*Check, len(checks))
@@ -132,28 +133,29 @@ func (h *BaseHandler) Index(c echo.Context) error {
 		}
 
 		if statusByGroup[check.Group] == "" {
-			statusByGroup[check.Group] = models.CheckUnknown
+			statusByGroup[check.Group] = models.CheckStatusUnknown
 		}
 
 		status := historyResult.List[len(historyResult.List)-1]
-		if status.Status == models.CheckSuccess {
-			if overallStatus == models.CheckUnknown {
+		if status.Status == models.CheckStatusSuccess {
+			if overallStatus == models.CheckStatusUnknown {
 				overallStatus = status.Status
 			}
-			if statusByGroup[check.Group] == models.CheckUnknown {
+			if statusByGroup[check.Group] == models.CheckStatusUnknown {
 				statusByGroup[check.Group] = status.Status
 			}
 		}
-		if status.Status != models.CheckSuccess && status.Status != models.CheckUnknown {
+		if status.Status != models.CheckStatusSuccess && status.Status != models.CheckStatusUnknown {
 			overallStatus = status.Status
 			statusByGroup[check.Group] = status.Status
 		}
 
 		checksWithHistory[i] = &Check{
-			Name:    check.Name,
-			Group:   check.Group,
-			Status:  status.Status,
-			History: historyResult,
+			Name:       check.Name,
+			Visibility: check.Visibility,
+			Group:      check.Group,
+			Status:     status.Status,
+			History:    historyResult,
 		}
 	}
 

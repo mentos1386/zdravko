@@ -23,14 +23,19 @@ type UpdateTrigger struct {
 	Script string `validate:"required"`
 }
 
+type TriggerWithState struct {
+	*models.Trigger
+	State models.TriggerState
+}
+
 type SettingsTriggers struct {
 	*Settings
-	Triggers []*models.Trigger
+	Triggers []*TriggerWithState
 }
 
 type SettingsTrigger struct {
 	*Settings
-	Trigger *models.Trigger
+	Trigger *TriggerWithState
 	History []*models.TriggerHistory
 }
 
@@ -46,13 +51,22 @@ func (h *BaseHandler) SettingsTriggersGET(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+
+	triggersWithState := make([]*TriggerWithState, 0, len(triggers))
+	for _, trigger := range triggers {
+		triggersWithState = append(triggersWithState, &TriggerWithState{
+			Trigger: trigger,
+			State:   models.TriggerStateActive,
+		})
+	}
+
 	return c.Render(http.StatusOK, "settings_triggers.tmpl", &SettingsTriggers{
 		Settings: NewSettings(
 			cc.Principal.User,
 			GetPageByTitle(SettingsPages, "Triggers"),
 			[]*components.Page{GetPageByTitle(SettingsPages, "Triggers")},
 		),
-		Triggers: triggers,
+		Triggers: triggersWithState,
 	})
 }
 
@@ -64,6 +78,11 @@ func (h *BaseHandler) SettingsTriggersDescribeGET(c echo.Context) error {
 	trigger, err := services.GetTrigger(context.Background(), h.db, slug)
 	if err != nil {
 		return err
+	}
+
+	triggerWithState := &TriggerWithState{
+		Trigger: trigger,
+		State:   models.TriggerStateActive,
 	}
 
 	return c.Render(http.StatusOK, "settings_triggers_describe.tmpl", &SettingsTrigger{
@@ -78,7 +97,7 @@ func (h *BaseHandler) SettingsTriggersDescribeGET(c echo.Context) error {
 					Breadcrumb: trigger.Name,
 				},
 			}),
-		Trigger: trigger,
+		Trigger: triggerWithState,
 	})
 }
 
@@ -101,7 +120,6 @@ func (h *BaseHandler) SettingsTriggersDisableGET(c echo.Context) error {
 		return err
 	}
 
-	trigger.Status = services.TriggerStatusPaused
 	err = services.UpdateTrigger(context.Background(), h.db, trigger)
 	if err != nil {
 		return err
@@ -118,7 +136,6 @@ func (h *BaseHandler) SettingsTriggersEnableGET(c echo.Context) error {
 		return err
 	}
 
-	trigger.Status = services.TriggerStatusActive
 	err = services.UpdateTrigger(context.Background(), h.db, trigger)
 	if err != nil {
 		return err
@@ -190,7 +207,6 @@ func (h *BaseHandler) SettingsTriggersCreatePOST(c echo.Context) error {
 		Name:   create.Name,
 		Id:     triggerId,
 		Script: create.Script,
-		Status: services.TriggerStatusActive,
 	}
 
 	err = services.CreateTrigger(

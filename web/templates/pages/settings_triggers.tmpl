@@ -48,8 +48,9 @@
         </caption>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Action</th>
+            <th scope="col">Name</th>
+            <th scope="col">State</th>
+            <th scope="col">Action</th>
           </tr>
         </thead>
         {{ range .Triggers }}
@@ -58,6 +59,27 @@
               <th scope="row">
                 {{ .Name }}
               </th>
+              <td>
+                {{ if eq .State "ACTIVE" }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                  >
+                    ACTIVE
+                  </span>
+                {{ else if eq .State "PAUSED" }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                  >
+                    PAUSED
+                  </span>
+                {{ else }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
+                  >
+                    UNKNOWN
+                  </span>
+                {{ end }}
+              </td>
               <td>
                 <a href="/settings/triggers/{{ .Id }}" class="link">Details</a>
               </td>

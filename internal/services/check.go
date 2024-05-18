@@ -14,14 +14,6 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-type CheckStatus string
-
-const (
-	CheckStatusUnknown CheckStatus = "UNKNOWN"
-	CheckStatusPaused  CheckStatus = "PAUSED"
-	CheckStatusActive  CheckStatus = "ACTIVE"
-)
-
 func getScheduleId(id string) string {
 	return "check-" + id
 }
@@ -32,29 +24,29 @@ func CountChecks(ctx context.Context, db *sqlx.DB) (int, error) {
 	return count, err
 }
 
-func GetCheckStatus(ctx context.Context, temporal client.Client, id string) (CheckStatus, error) {
+func GetCheckState(ctx context.Context, temporal client.Client, id string) (models.CheckState, error) {
 	schedule := temporal.ScheduleClient().GetHandle(ctx, getScheduleId(id))
 
 	description, err := schedule.Describe(ctx)
 	if err != nil {
-		return CheckStatusUnknown, err
+		return models.CheckStateUnknown, err
 	}
 
 	if description.Schedule.State.Paused {
-		return CheckStatusPaused, nil
+		return models.CheckStatePaused, nil
 	}
 
-	return CheckStatusActive, nil
+	return models.CheckStateActive, nil
 }
 
-func SetCheckStatus(ctx context.Context, temporal client.Client, id string, status CheckStatus) error {
+func SetCheckState(ctx context.Context, temporal client.Client, id string, state models.CheckState) error {
 	schedule := temporal.ScheduleClient().GetHandle(ctx, getScheduleId(id))
 
-	if status == CheckStatusActive {
+	if state == models.CheckStateActive {
 		return schedule.Unpause(ctx, client.ScheduleUnpauseOptions{Note: "Unpaused by user"})
 	}
 
-	if status == CheckStatusPaused {
+	if state == models.CheckStatePaused {
 		return schedule.Pause(ctx, client.SchedulePauseOptions{Note: "Paused by user"})
 	}
 
@@ -63,7 +55,8 @@ func SetCheckStatus(ctx context.Context, temporal client.Client, id string, stat
 
 func CreateCheck(ctx context.Context, db *sqlx.DB, check *models.Check) error {
 	_, err := db.NamedExecContext(ctx,
-		`INSERT INTO checks (id, name, "group", script, schedule) VALUES (:id, :name, :group, :script, :schedule)`,
+		`INSERT INTO checks (id, name, visibility, "group", script, schedule)
+    VALUES (:id, :name, :visibility, :group, :script, :schedule)`,
 		check,
 	)
 	return err
@@ -71,7 +64,7 @@ func CreateCheck(ctx context.Context, db *sqlx.DB, check *models.Check) error {
 
 func UpdateCheck(ctx context.Context, db *sqlx.DB, check *models.Check) error {
 	_, err := db.NamedExecContext(ctx,
-		`UPDATE checks SET "group"=:group, script=:script, schedule=:schedule WHERE id=:id`,
+		`UPDATE checks SET visibility=:visibility, "group"=:group, script=:script, schedule=:schedule WHERE id=:id`,
 		check,
 	)
 	return err
@@ -127,6 +120,7 @@ func GetCheckWithWorkerGroups(ctx context.Context, db *sqlx.DB, id string) (*mod
 SELECT
   checks.id,
   checks.name,
+  checks.visibility,
   checks."group",
   checks.script,
   checks.schedule,
@@ -153,6 +147,7 @@ ORDER BY checks.name
 		err = rows.Scan(
 			&check.Id,
 			&check.Name,
+			&check.Visibility,
 			&check.Group,
 			&check.Script,
 			&check.Schedule,
@@ -185,6 +180,7 @@ func GetChecksWithWorkerGroups(ctx context.Context, db *sqlx.DB) ([]*models.Chec
 SELECT
   checks.id,
   checks.name,
+  checks.visibility,
   checks."group",
   checks.script,
   checks.schedule,
@@ -210,6 +206,7 @@ ORDER BY checks.name
 		err = rows.Scan(
 			&check.Id,
 			&check.Name,
+			&check.Visibility,
 			&check.Group,
 			&check.Script,
 			&check.Schedule,
@@ -259,7 +256,7 @@ func CreateOrUpdateCheckSchedule(
 	args := make([]interface{}, 1)
 	args[0] = workflows.CheckWorkflowParam{
 		Script:         check.Script,
-		CheckId:      check.Id,
+		CheckId:        check.Id,
 		WorkerGroupIds: workerGroupStrings,
 	}
 

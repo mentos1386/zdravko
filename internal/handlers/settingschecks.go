@@ -23,6 +23,7 @@ type CreateCheck struct {
 	WorkerGroups string `validate:"required"`
 	Schedule     string `validate:"required,cron"`
 	Script       string `validate:"required"`
+	Visibility   string `validate:"required,oneof=PUBLIC PRIVATE"`
 }
 
 type UpdateCheck struct {
@@ -30,22 +31,23 @@ type UpdateCheck struct {
 	WorkerGroups string `validate:"required"`
 	Schedule     string `validate:"required,cron"`
 	Script       string `validate:"required"`
+	Visibility   string `validate:"required,oneof=PUBLIC PRIVATE"`
 }
 
-type CheckWithWorkerGroupsAndStatus struct {
+type CheckWithWorkerGroupsAndState struct {
 	*models.CheckWithWorkerGroups
-	Status services.CheckStatus
+	State models.CheckState
 }
 
 type SettingsChecks struct {
 	*Settings
-	Checks      map[string][]*CheckWithWorkerGroupsAndStatus
+	Checks      map[string][]*CheckWithWorkerGroupsAndState
 	CheckGroups []string
 }
 
 type SettingsCheck struct {
 	*Settings
-	Check *CheckWithWorkerGroupsAndStatus
+	Check   *CheckWithWorkerGroupsAndState
 	History []*models.CheckHistory
 }
 
@@ -62,23 +64,23 @@ func (h *BaseHandler) SettingsChecksGET(c echo.Context) error {
 		return err
 	}
 
-	checksWithStatus := make([]*CheckWithWorkerGroupsAndStatus, len(checks))
+	checksWithState := make([]*CheckWithWorkerGroupsAndState, len(checks))
 	for i, check := range checks {
-		status, err := services.GetCheckStatus(context.Background(), h.temporal, check.Id)
+		state, err := services.GetCheckState(context.Background(), h.temporal, check.Id)
 		if err != nil {
 			return err
 		}
-		checksWithStatus[i] = &CheckWithWorkerGroupsAndStatus{
+		checksWithState[i] = &CheckWithWorkerGroupsAndState{
 			CheckWithWorkerGroups: check,
-			Status:                  status,
+			State:                 state,
 		}
 	}
 
 	checkGroups := []string{}
-	checksByGroup := map[string][]*CheckWithWorkerGroupsAndStatus{}
-	for _, check := range checksWithStatus {
+	checksByGroup := map[string][]*CheckWithWorkerGroupsAndState{}
+	for _, check := range checksWithState {
 		checksByGroup[check.Group] = append(checksByGroup[check.Group], check)
-		if slices.Contains(checkGroups, check.Group) == false {
+		if !slices.Contains(checkGroups, check.Group) {
 			checkGroups = append(checkGroups, check.Group)
 		}
 	}
@@ -104,14 +106,14 @@ func (h *BaseHandler) SettingsChecksDescribeGET(c echo.Context) error {
 		return err
 	}
 
-	status, err := services.GetCheckStatus(context.Background(), h.temporal, check.Id)
+	status, err := services.GetCheckState(context.Background(), h.temporal, check.Id)
 	if err != nil {
 		return err
 	}
 
-	checkWithStatus := &CheckWithWorkerGroupsAndStatus{
+	checkWithStatus := &CheckWithWorkerGroupsAndState{
 		CheckWithWorkerGroups: check,
-		Status:                  status,
+		State:                 status,
 	}
 
 	history, err := services.GetCheckHistoryForCheck(context.Background(), h.db, slug)
@@ -136,7 +138,7 @@ func (h *BaseHandler) SettingsChecksDescribeGET(c echo.Context) error {
 					Breadcrumb: check.Name,
 				},
 			}),
-		Check: checkWithStatus,
+		Check:   checkWithStatus,
 		History: history[:maxElements],
 	})
 }
@@ -165,7 +167,7 @@ func (h *BaseHandler) SettingsChecksDisableGET(c echo.Context) error {
 		return err
 	}
 
-	err = services.SetCheckStatus(context.Background(), h.temporal, check.Id, services.CheckStatusPaused)
+	err = services.SetCheckState(context.Background(), h.temporal, check.Id, models.CheckStatePaused)
 	if err != nil {
 		return err
 	}
@@ -181,7 +183,7 @@ func (h *BaseHandler) SettingsChecksEnableGET(c echo.Context) error {
 		return err
 	}
 
-	err = services.SetCheckStatus(context.Background(), h.temporal, check.Id, services.CheckStatusActive)
+	err = services.SetCheckState(context.Background(), h.temporal, check.Id, models.CheckStateActive)
 	if err != nil {
 		return err
 	}
@@ -198,6 +200,7 @@ func (h *BaseHandler) SettingsChecksDescribePOST(c echo.Context) error {
 		WorkerGroups: strings.ToLower(strings.TrimSpace(c.FormValue("workergroups"))),
 		Schedule:     c.FormValue("schedule"),
 		Script:       script.EscapeString(c.FormValue("script")),
+		Visibility:   c.FormValue("visibility"),
 	}
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(update)
 	if err != nil {
@@ -211,6 +214,7 @@ func (h *BaseHandler) SettingsChecksDescribePOST(c echo.Context) error {
 	check.Group = update.Group
 	check.Schedule = update.Schedule
 	check.Script = update.Script
+	check.Visibility = models.CheckVisibility(update.Visibility)
 
 	err = services.UpdateCheck(
 		ctx,
@@ -280,6 +284,7 @@ func (h *BaseHandler) SettingsChecksCreatePOST(c echo.Context) error {
 		WorkerGroups: strings.ToLower(strings.TrimSpace(c.FormValue("workergroups"))),
 		Schedule:     c.FormValue("schedule"),
 		Script:       script.EscapeString(c.FormValue("script")),
+		Visibility:   c.FormValue("visibility"),
 	}
 	err := validator.New(validator.WithRequiredStructEnabled()).Struct(create)
 	if err != nil {
@@ -307,11 +312,12 @@ func (h *BaseHandler) SettingsChecksCreatePOST(c echo.Context) error {
 	}
 
 	check := &models.Check{
-		Name:     create.Name,
-		Group:    create.Group,
-		Id:       checkId,
-		Schedule: create.Schedule,
-		Script:   create.Script,
+		Name:       create.Name,
+		Group:      create.Group,
+		Id:         checkId,
+		Schedule:   create.Schedule,
+		Script:     create.Script,
+		Visibility: models.CheckVisibility(create.Visibility),
 	}
 
 	err = services.CreateCheck(

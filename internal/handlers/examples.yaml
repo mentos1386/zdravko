@@ -1,22 +1,62 @@
 # Example trigger code
 trigger: |
   import kv from 'zdravko/kv';
-  import slack from 'zdravko/notify/slack';
+  import incidents, { severity } from 'zdravko/incidents';
 
-  export default function (monitor, outcome) {
-    // If the outcome is not failure, we can reset the counter.
+  // Only execute on this specific targets.
+  export function filter(target) {
+    return target.tags.kind === 'http';
+  }
+
+  const getMinute = (date) => {
+    return Math.floor(date.getTime() / 1000 / 60);
+  }
+
+  const get5LastMinutes = (date) => {
+    const currentMinute = getMinute(date);
+    return Array.from({ length: 5 }, (_, i) => {
+      const minute = currentMinute - i;
+      if (minute < 0) {
+        return 60 - minute;
+      }
+      return minute;
+    });
+  }
+
+  // This trigger will check if there were more than 5 issues in last
+  // 5 minutes, if so it will create a critical incident.
+  export default function (target, monitor, outcome) {
+    // If the outcome is not failure, we close any potential incidents.
     if (outcome.status !== 'FAILURE') {
-      return kv.delete(`${monitor.name}:issues:5min`);
+      incidents.close(target, monitor);
+      return;
     }
 
-    const count = kv.get(`${monitor.name}:issues:5min`) || 0;
+    const date = new Date();
 
-    if (count > 5) {
-      slack.notify(`${monitor.name} has had more than 5 issues in the last 5 minutes`);
+    let total = 0;
+    for (const minute of get5LastMinutes(date)) {
+      const count = kv.get(`${monitor.name}:issues:${minute}`) || 0;
+      total += count;
+    }
+
+    // If there are more than 5 issues in the last 5 minutes, create a critical incident.
+    if (total > 5) {
+      incidents.create(
+        target,
+        monitor,
+        severity.CRITICAL,
+        `More than 5 issues in the last 5 minutes.`,
+        { special: "tags" }
+      );
+    // Else we would close any potential incidents. If non exist, that's ok.
+    } else {
+      incidents.close(target, monitor);
     }
 
     // Increment and set TTL to 5 minutes
-    kv.increment(`${monitor.name}:issues:5min`, count + 1);
+    const minute = getMinute(date);
+    kv.increment(`${monitor.name}:issues:${minute}`, 5 * 60);
   }
 
 # Example monitor code
@@ -30,6 +70,12 @@ check: |
     },
   };
 
-  export default function () {
-    http.get('https://example.com');
+  // Filter out only HTTP targets.
+  export function filter(target) {
+    return target.tags.kind === "http";
+  };
+
+  // Execute the check on the targets.
+  export default function (target) {
+    http.get(target.url);
   }

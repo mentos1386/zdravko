@@ -602,6 +602,10 @@ video {
   }
 }
 
+.visible {
+  visibility: visible;
+}
+
 .absolute {
   position: absolute;
 }
@@ -1496,6 +1500,7 @@ code {
   }
 }
 
+.settings section form select,
 .settings section form input {
   display: block;
   height: -moz-min-content;
@@ -1514,6 +1519,7 @@ code {
   color: rgb(17 24 39 / var(--tw-text-opacity));
 }
 
+.settings section form select:focus,
 .settings section form input:focus {
   --tw-border-opacity: 1;
   border-color: rgb(59 130 246 / var(--tw-border-opacity));

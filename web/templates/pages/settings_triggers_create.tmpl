@@ -18,11 +18,11 @@
         class="hidden block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
       ></div>
       <p>
-        Script is what determines the status of a service. You can read more
-        about it on
-        <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/"
-          >k6 documentation</a
-        >.
+        The trigger script executes for every matching <code>target</code>'s
+        execution of <code>trigger</code>. The outcome of that
+        <code>trigger</code> is passed to the script as a
+        <code>outcome</code> object. Based on that the trigger script should
+        decide if an incident should either be created or closed.
       </p>
       <button type="submit" onclick="save()">Create</button>
     </form>
@@ -52,6 +52,7 @@
         minimap: { enabled: false },
         codeLens: false,
         contextmenu: false,
+        scrollBeyondLastLine: false,
       });
 
       const divElem = document.getElementById("editor");
