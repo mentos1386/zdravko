@@ -43,14 +43,8 @@ test:
 
 # Generates new jwt key pair
 generate-jwt-key:
-  @openssl genrsa -out jwt.private.pem 2048 > /dev/null 2>&1
-  @openssl rsa -pubout -in jwt.private.pem -out jwt.public.pem > /dev/null 2>&1
-  @echo "Private key:"
-  @cat jwt.private.pem | sed -z 's/\n/\\n/g'
-  @echo
-  @echo "Public key:"
-  @cat jwt.public.pem | sed -z 's/\n/\\n/g'
-  @echo
+  openssl genrsa -out jwt.private.pem 2048
+  openssl rsa -pubout -in jwt.private.pem -out jwt.public.pem
 
 # Deploy the application to fly.io
 deploy-fly:
@@ -109,7 +103,7 @@ migration-new name:
   echo "Created migration file: $FILENAME"
 
 # Generate and download all external dependencies.
-generate:
+generate: _tailwindcss-build _htmx-download _monaco-download _feather-icons-download
   go generate ./...
 
 _tailwindcss-build:
