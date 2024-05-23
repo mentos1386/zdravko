@@ -3,17 +3,17 @@ package worker
 import (
 	"encoding/json"
 	"io"
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 
-	"code.tjo.space/mentos1386/zdravko/internal/activities"
-	"code.tjo.space/mentos1386/zdravko/internal/config"
-	"code.tjo.space/mentos1386/zdravko/internal/temporal"
-	"code.tjo.space/mentos1386/zdravko/internal/workflows"
-	"code.tjo.space/mentos1386/zdravko/pkg/api"
-	"code.tjo.space/mentos1386/zdravko/pkg/retry"
+	"github.com/mentos1386/zdravko/internal/config"
+	"github.com/mentos1386/zdravko/internal/temporal"
+	"github.com/mentos1386/zdravko/internal/worker/activities"
+	"github.com/mentos1386/zdravko/pkg/api"
+	"github.com/mentos1386/zdravko/pkg/retry"
 	"github.com/pkg/errors"
+	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/worker"
 )
 
@@ -60,11 +60,13 @@ func getConnectionConfig(token string, apiUrl string) (*ConnectionConfig, error)
 type Worker struct {
 	worker worker.Worker
 	cfg    *config.WorkerConfig
+	logger *slog.Logger
 }
 
 func NewWorker(cfg *config.WorkerConfig) (*Worker, error) {
 	return &Worker{
-		cfg: cfg,
+		cfg:    cfg,
+		logger: slog.Default().WithGroup("worker"),
 	}, nil
 }
 
@@ -78,7 +80,7 @@ func (w *Worker) Start() error {
 		return err
 	}
 
-	log.Println("Worker Group:", config.Group)
+	w.logger.Info("Worker Starting", "group", config.Group)
 
 	temporalClient, err := temporal.ConnectWorkerToTemporal(w.cfg.Token, config.Endpoint)
 	if err != nil {
@@ -88,15 +90,10 @@ func (w *Worker) Start() error {
 	// Create a new Worker
 	w.worker = worker.New(temporalClient, config.Group, worker.Options{})
 
-	workerActivities := activities.NewActivities(w.cfg)
-	workerWorkflows := workflows.NewWorkflows(workerActivities)
-
-	// Register Workflows
-	w.worker.RegisterWorkflow(workerWorkflows.CheckWorkflowDefinition)
+	workerActivities := activities.NewActivities(w.cfg, w.logger)
 
 	// Register Activities
-	w.worker.RegisterActivity(workerActivities.Check)
-	w.worker.RegisterActivity(workerActivities.CheckAddToHistory)
+	w.worker.RegisterActivityWithOptions(workerActivities.Check, activity.RegisterOptions{Name: temporal.ActivityCheckName})
 
 	return w.worker.Run(worker.InterruptCh())
 }

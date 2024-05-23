@@ -1,4 +1,4 @@
-module code.tjo.space/mentos1386/zdravko
+module github.com/mentos1386/zdravko
 
 go 1.21.6
 

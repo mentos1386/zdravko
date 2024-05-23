@@ -7,7 +7,7 @@
 {{ ScriptUnescapeString .Trigger.Script }}</textarea
       >
       <div
-        id="editor"
+        id="editor-script"
         class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden hidden"
       ></div>
       <p>
@@ -111,37 +111,40 @@
   </section>
 
   <script src="/static/monaco/vs/loader.js"></script>
-<script>
-  document.getElementById("editor").classList.remove("hidden");
-  document.getElementById("script").hidden = true;
+  <script>
+    const items = [{ name: "script", language: "javascript" }];
 
-  function save() {
-    const script = window.editor.getValue();
-    document.getElementById('script').value = script;
-  }
+    function save() {
+      for (const { name } of items) {
+        const elem = window.editors[name].getValue();
+        document.getElementById(name).value = elem;
+      }
+    }
 
-  function htmlDecode(input) {
-    var doc = new DOMParser().parseFromString(input, "text/html");
-    return doc.documentElement.textContent;
-  }
-  script = htmlDecode("{{ .Trigger.Script }}")
+    window.editors = {};
+    for (const { name, language } of items) {
+      const textarea = document.getElementById(name);
+      const editor = document.getElementById("editor-" + name);
 
-  require.config({ paths: { vs: '/static/monaco/vs' } });
-  require(['vs/editor/editor.main'], function () {
-    window.editor = monaco.editor.create(document.getElementById('editor'), {
-      value: script,
-      language: 'javascript',
-      minimap: { enabled: false },
-      codeLens: false,
-      contextmenu: false,
-      scrollBeyondLastLine: false,
-    });
+      editor.classList.remove("hidden");
+      textarea.hidden = true;
 
-    const divElem = document.getElementById('editor');
-    const resizeObserver = new ResizeObserver(entries => {
-        window.editor.layout();
-    });
-    resizeObserver.observe(divElem);
-  });
-</script>
+      require.config({ paths: { vs: "/static/monaco/vs" } });
+      require(["vs/editor/editor.main"], function () {
+        window.editors[name] = monaco.editor.create(editor, {
+          value: textarea.value,
+          language: language,
+          minimap: { enabled: false },
+          codeLens: false,
+          contextmenu: false,
+          scrollBeyondLastLine: false,
+        });
+
+        const resizeObserver = new ResizeObserver((entries) => {
+          window.editors[name].layout();
+        });
+        resizeObserver.observe(editor);
+      });
+    }
+  </script>
 {{ end }}

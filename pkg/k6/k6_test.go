@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"os"
 	"testing"
+
+	"github.com/mentos1386/zdravko/pkg/k6/zdravko"
 )
 
 func getLogger() *slog.Logger {
@@ -18,12 +20,12 @@ func getLogger() *slog.Logger {
 }
 
 func TestK6Success(t *testing.T) {
-	ctx := context.Background()
 	logger := getLogger()
 
 	script := `
 import http from 'k6/http';
 import { sleep } from 'k6';
+import { getTarget } from 'k6/x/zdravko';
 
 export const options = {
   vus: 10,
@@ -31,12 +33,22 @@ export const options = {
 };
 
 export default function () {
+  const target = getTarget();
+  console.log('Target:', target);
   http.get('https://test.k6.io');
   sleep(1);
 }
 `
 
 	execution := NewExecution(logger, script)
+
+	ctx := zdravko.WithZdravkoContext(context.Background(), zdravko.Context{Target: zdravko.Target{
+		Name:  "Test",
+		Group: "Test",
+		Metadata: map[string]interface{}{
+			"Kind": "Test",
+		},
+	}})
 
 	result, err := execution.Run(ctx)
 	if err != nil {

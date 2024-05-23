@@ -21,9 +21,7 @@
     <div
       class="inline-block bg-white rounded-lg shadow p-5 text-center sm:text-left"
     >
-      <h3 class="text-sm leading-6 font-medium text-gray-400">
-        Total Checks
-      </h3>
+      <h3 class="text-sm leading-6 font-medium text-gray-400">Total Checks</h3>
       <p class="text-3xl font-bold text-black">{{ .ChecksCount }}</p>
     </div>
     <div
@@ -66,14 +64,14 @@
               <a
                 class="underline hover:text-blue-600"
                 href="/settings/checks/{{ .CheckId }}"
-                >{{ .CheckName }}</a
+                >{{ .CheckId }}</a
               >
             </th>
             <td>
               <span
                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
               >
-                {{ .WorkerGroupName }}
+                { .WorkerGroupName }
               </span>
             </td>
             <td>
@@ -87,12 +85,8 @@
                 {{ .Status }}
               </span>
             </td>
-            <td>
-              {{ .CreatedAt.Time.Format "2006-01-02 15:04:05" }}
-            </td>
-            <td class="whitespace-normal">
-              {{ .Note }}
-            </td>
+            <td>{ .CreatedAt.Time.Format "2006-01-02 15:04:05" }</td>
+            <td class="whitespace-normal">{ .Note }</td>
           </tr>
         {{ end }}
       </tbody>

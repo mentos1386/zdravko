@@ -43,8 +43,14 @@ test:
 
 # Generates new jwt key pair
 generate-jwt-key:
-  openssl genrsa -out jwt.private.pem 2048
-  openssl rsa -pubout -in jwt.private.pem -out jwt.public.pem
+  @openssl genrsa -out jwt.private.pem 2048 > /dev/null 2>&1
+  @openssl rsa -pubout -in jwt.private.pem -out jwt.public.pem > /dev/null 2>&1
+  @echo "Private key:"
+  @cat jwt.private.pem | sed -z 's/\n/\\n/g'
+  @echo
+  @echo "Public key:"
+  @cat jwt.public.pem | sed -z 's/\n/\\n/g'
+  @echo
 
 # Deploy the application to fly.io
 deploy-fly:
@@ -119,11 +125,12 @@ _monaco-download:
   mv node_modules/monaco-editor/min {{STATIC_DIR}}/monaco
   rm -rf node_modules
 
-  # We onlt care about javascript language
+  # We only care about javascript language
   find {{STATIC_DIR}}/monaco/vs/basic-languages/ \
     -type d \
     -not -name 'javascript' \
     -not -name 'typescript' \
+    -not -name 'yaml' \
     -not -name 'basic-languages' \
     -prune -exec rm -rf {} \;
 

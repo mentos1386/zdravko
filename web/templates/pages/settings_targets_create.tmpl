@@ -1,0 +1,86 @@
+{{ define "settings" }}
+  <section class="p-5">
+    <form action="/settings/targets/create" method="post">
+      <label for="name">Name</label>
+      <input type="text" name="name" id="name" placeholder="Github.com" />
+      <p>Name of the target can be anything.</p>
+      <label for="visibility">Visibility</label>
+      <select name="visibility" id="visibility" required>
+        <option value="PUBLIC">Public</option>
+        <option value="PRIVATE">Private</option>
+      </select>
+      <p>
+        Visibility determines who can see the target. If set to
+        <code>public</code>, it will be visible to everyone on the homepage.
+        Otherwise it will be only visible to signed in users.
+      </p>
+      <label for="group">Target Group</label>
+      <input
+        type="text"
+        name="group"
+        id="group"
+        placeholder="default"
+        value="default"
+        required
+      />
+      <p>
+        Group targets together. This affects how they are presented on the
+        homepage.
+      </p>
+      <label for="metadata">Metadata</label>
+      <textarea required id="metadata" name="metadata" class="h-96">
+{{ ScriptUnescapeString .Example }}</textarea
+      >
+      <div
+        id="editor-metadata"
+        class="hidden block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+      ></div>
+      <p>
+        Metadata is a YAML object that contains the configuration for the
+        target. This configuration can be then used for <code>Checks</code> to
+        filter the targets to act on as well as by using
+        <code>getTarget()</code>
+        function to fetch target metadata.
+      </p>
+      <button type="submit" onclick="save()">Create</button>
+    </form>
+  </section>
+
+  <script src="/static/monaco/vs/loader.js"></script>
+  <script>
+    const items = [{ name: "metadata", language: "yaml" }];
+
+    function save() {
+      for (const { name } of items) {
+        const elem = window.editors[name].getValue();
+        document.getElementById(name).value = elem;
+      }
+    }
+
+    window.editors = {};
+    for (const { name, language } of items) {
+      const textarea = document.getElementById(name);
+      const editor = document.getElementById("editor-" + name);
+
+      editor.classList.remove("hidden");
+      textarea.hidden = true;
+
+      require.config({ paths: { vs: "/static/monaco/vs" } });
+      require(["vs/editor/editor.main"], function () {
+        window.editors[name] = monaco.editor.create(editor, {
+          value: textarea.value,
+          language: language,
+          minimap: { enabled: false },
+          codeLens: false,
+          contextmenu: false,
+          scrollBeyondLastLine: false,
+        });
+
+        const resizeObserver = new ResizeObserver((entries) => {
+          window.editors[name].layout();
+        });
+        resizeObserver.observe(editor);
+      });
+    }
+  </script>
+{{ end }}

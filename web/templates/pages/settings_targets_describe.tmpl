@@ -1,0 +1,190 @@
+{{ define "settings" }}
+  <section class="p-5">
+    <form action="/settings/targets/{{ .Target.Id }}" method="post">
+      <h2>Configuration</h2>
+      <label for="visibility">Visibility</label>
+      <select name="visibility" id="visibility" required>
+        <option
+          {{ if eq .Target.Visibility "PUBLIC" }}selected="selected"{{ end }}
+          value="PUBLIC"
+        >
+          Public
+        </option>
+        <option
+          {{ if eq .Target.Visibility "PRIVATE" }}selected="selected"{{ end }}
+          value="PRIVATE"
+        >
+          Private
+        </option>
+      </select>
+      <p>
+        Visibility determines who can see the target. If set to
+        <code>public</code>, it will be visible to everyone on the homepage.
+        Otherwise it will be only visible to signed in users.
+      </p>
+      <label for="group">Target Group</label>
+      <input
+        type="text"
+        name="group"
+        id="group"
+        value="{{ .Target.Group }}"
+        required
+      />
+      <p>
+        Group targets together. This affects how they are presented on the
+        homepage.
+      </p>
+      <label for="metadata">Metadata</label>
+      <textarea required id="metadata" name="metadata" class="h-96">
+{{ ScriptUnescapeString .Target.Metadata }}</textarea
+      >
+      <div
+        id="editor-metadata"
+        class="hidden block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+      ></div>
+      <p>
+        Metadata is a YAML object that contains the configuration for the
+        target. This configuration can be then used for <code>Targets</code> to
+        filter the targets to act on as well as by using
+        <code>getTarget()</code>
+        function to fetch target metadata.
+      </p>
+      <button type="submit" onclick="save()">Save</button>
+    </form>
+  </section>
+
+  <div class="flex md:flex-row flex-col gap-4 h-min">
+    <section class="p-5 flex-1">
+      <h2 class="mb-2 flex flex-row gap-2">
+        State
+        {{ if eq .Target.State "ACTIVE" }}
+          <span
+            class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+          >
+            ACTIVE
+          </span>
+        {{ else if eq .Target.State "PAUSED" }}
+          <span
+            class="self-center h-fit w-fit px-2 text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+          >
+            PAUSED
+          </span>
+        {{ end }}
+      </h2>
+      <p class="text-sm mb-2">
+        Pausing the target will stop it from executing. This can be useful in
+        cases of expected downtime. Or when the target is not needed anymore.
+      </p>
+      {{ if eq .Target.State "ACTIVE" }}
+        <a
+          class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
+          href="/settings/targets/{{ .Target.Id }}/disable"
+          >Pause</a
+        >
+      {{ else if eq .Target.State "PAUSED" }}
+        <a
+          class="block text-center py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100"
+          href="/settings/targets/{{ .Target.Id }}/enable"
+          >Resume</a
+        >
+      {{ end }}
+    </section>
+
+    <section class="p-2 flex-1 border-4 border-red-300">
+      <h2 class="mb-2">Danger Zone</h2>
+      <p class="text-sm mb-2">Permanently delete this target.</p>
+      <a
+        class="block text-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
+        href="/settings/targets/{{ .Target.Id }}/delete"
+        >Delete</a
+      >
+    </section>
+  </div>
+
+  <section>
+    <table>
+      <caption>
+        History
+        <p>Last 10 executions of the targets.</p>
+      </caption>
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Worker Group</th>
+          <th>Created At</th>
+          <th>Duration</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .History }}
+          <tr>
+            <td>
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ if eq .Status "SUCCESS" }}
+                  bg-green-100 text-green-800
+                {{ else }}
+                  bg-red-100 text-red-800
+                {{ end }}"
+              >
+                {{ .Status }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+              >
+                {{ .WorkerGroupName }}
+              </span>
+            </td>
+            <td>
+              {{ .CreatedAt.Time.Format "2006-01-02 15:04:05" }}
+            </td>
+            <td>{ .Duration }</td>
+            <td class="whitespace-normal">
+              {{ .Note }}
+            </td>
+          </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </section>
+
+  <script src="/static/monaco/vs/loader.js"></script>
+  <script>
+    const items = [{ name: "metadata", language: "yaml" }];
+
+    function save() {
+      for (const { name } of items) {
+        const elem = window.editors[name].getValue();
+        document.getElementById(name).value = elem;
+      }
+    }
+
+    window.editors = {};
+    for (const { name, language } of items) {
+      const textarea = document.getElementById(name);
+      const editor = document.getElementById("editor-" + name);
+
+      editor.classList.remove("hidden");
+      textarea.hidden = true;
+
+      require.config({ paths: { vs: "/static/monaco/vs" } });
+      require(["vs/editor/editor.main"], function () {
+        window.editors[name] = monaco.editor.create(editor, {
+          value: textarea.value,
+          language: language,
+          minimap: { enabled: false },
+          codeLens: false,
+          contextmenu: false,
+          scrollBeyondLastLine: false,
+        });
+
+        const resizeObserver = new ResizeObserver((entries) => {
+          window.editors[name].layout();
+        });
+        resizeObserver.observe(editor);
+      });
+    }
+  </script>
+{{ end }}

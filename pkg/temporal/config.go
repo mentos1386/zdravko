@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	internal "code.tjo.space/mentos1386/zdravko/internal/config"
-	"code.tjo.space/mentos1386/zdravko/internal/jwt"
+	internal "github.com/mentos1386/zdravko/internal/config"
+	"github.com/mentos1386/zdravko/pkg/jwt"
 	"go.temporal.io/server/common/cluster"
 	"go.temporal.io/server/common/config"
 	"go.temporal.io/server/common/persistence/sql/sqlplugin/sqlite"

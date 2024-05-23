@@ -1,9 +1,15 @@
 package api
 
-import "code.tjo.space/mentos1386/zdravko/database/models"
+type CheckStatus string
+
+const (
+	CheckStatusSuccess CheckStatus = "SUCCESS"
+	CheckStatusFailure CheckStatus = "FAILURE"
+	CheckStatusUnknown CheckStatus = "UNKNOWN"
+)
 
 type ApiV1ChecksHistoryPOSTBody struct {
-	Status        models.CheckStatus `json:"status"`
-	Note          string               `json:"note"`
-	WorkerGroupId string               `json:"worker_group"`
+	Status        CheckStatus `json:"status"`
+	Note          string      `json:"note"`
+	WorkerGroupId string      `json:"worker_group"`
 }

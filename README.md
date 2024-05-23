@@ -2,8 +2,6 @@
 
 Golang selfhosted Status/Healthcheck monitoring app.
 
-Mostly just a project to test [temporal.io](https://temporal.io/).
-
 ### Roadmap
  - [x] SSO Support for authentication.
  - [x] SQLite for database.
@@ -37,9 +35,12 @@ Demo is available at https://zdravko.mnts.dev.
 
 ```sh
 # Configure
+# You will need to configure an SSO provider
+# This can be github for example.
 cp example.env .env
 
 # Generate JWT key
+# Copy the values to your .env
 just generate-jwt-key
 
 # Start development environment
