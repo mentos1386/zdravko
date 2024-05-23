@@ -27,6 +27,7 @@ Mostly just a project to test [temporal.io](https://temporal.io/).
  - [ ] Stable Release (2025)
 
 ![Screenshot](docs/screenshot.png)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmentos1386%2Fzdravko.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmentos1386%2Fzdravko?ref=badge_shield)
 Demo is available at https://zdravko.mnts.dev.
 
 # Development
@@ -48,3 +49,6 @@ just run
 
 ### License
 Under AGPL, see [LICENSE](LICENSE) file.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmentos1386%2Fzdravko.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmentos1386%2Fzdravko?ref=badge_large)
