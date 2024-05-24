@@ -6,6 +6,7 @@ import (
 
 	"github.com/mentos1386/zdravko/internal/temporal"
 	"github.com/mentos1386/zdravko/pkg/k6"
+	_ "github.com/mentos1386/zdravko/pkg/k6/zdravko"
 	"github.com/mentos1386/zdravko/pkg/script"
 )
 

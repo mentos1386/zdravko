@@ -81,7 +81,7 @@ check: |
   }
 
 filter: |
-  kind="Http" and metadata.spec.url!=""
+  target.metadata.kind == "Http" && target.metadata.spec.url != ""
 
 target: |
   kind: Http

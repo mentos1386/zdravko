@@ -37,14 +37,8 @@
         class="hidden block w-full h-12 rounded-lg border border-gray-300 overflow-hidden"
       ></div>
       <p>
-        With filter we specify what targets the check will run on. For whole
-        grammar on what the filter query can look like, please read the
-        <a
-          target="_blank"
-          href="https://github.com/hashicorp/mql/blob/main/GRAMMAR.md"
-          >MQL Grammar</a
-        >
-        documentation.
+        With filter we specify what targets the check will run on. The must be a
+        javascript expression that returns a boolean.
       </p>
       <label for="script">Script</label>
       <textarea required id="script" name="script" class="h-96">
@@ -190,7 +184,7 @@
   <script src="/static/monaco/vs/loader.js"></script>
   <script>
     const items = [
-      { name: "filter", language: "" },
+      { name: "filter", language: "javascript" },
       { name: "script", language: "javascript" },
     ];
 
