@@ -6,12 +6,20 @@ import (
 
 	"github.com/mentos1386/zdravko/internal/temporal"
 	"github.com/mentos1386/zdravko/pkg/k6"
-	_ "github.com/mentos1386/zdravko/pkg/k6/zdravko"
+	"github.com/mentos1386/zdravko/pkg/k6/zdravko"
 	"github.com/mentos1386/zdravko/pkg/script"
 )
 
 func (a *Activities) Check(ctx context.Context, param temporal.ActivityCheckParam) (*temporal.ActivityCheckResult, error) {
 	execution := k6.NewExecution(slog.Default(), script.UnescapeString(param.Script))
+
+	ctx = zdravko.WithZdravkoContext(ctx, zdravko.Context{
+		Target: zdravko.Target{
+			Name:  param.Target.Name,
+			Group: param.Target.Group,
+			//Metadata: param.Target.Metadata,
+		},
+	})
 
 	result, err := execution.Run(ctx)
 	if err != nil {
