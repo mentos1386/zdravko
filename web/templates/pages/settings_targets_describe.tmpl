@@ -116,6 +116,7 @@
         <tr>
           <th>Status</th>
           <th>Worker Group</th>
+          <th>Check</th>
           <th>Created At</th>
           <th>Duration</th>
           <th>Note</th>
@@ -140,6 +141,13 @@
                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
               >
                 {{ .WorkerGroupName }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+              >
+                {{ .CheckName }}
               </span>
             </td>
             <td>

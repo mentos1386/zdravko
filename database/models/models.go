@@ -142,7 +142,10 @@ const (
 type TargetHistory struct {
 	CreatedAt *Time `db:"created_at"`
 
-	TargetId string       `db:"target_id"`
-	Status   TargetStatus `db:"status"`
-	Note     string       `db:"note"`
+	TargetId      string `db:"target_id"`
+	WorkerGroupId string `db:"worker_group_id"`
+	CheckId       string `db:"check_id"`
+
+	Status TargetStatus `db:"status"`
+	Note   string       `db:"note"`
 }

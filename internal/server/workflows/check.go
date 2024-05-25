@@ -1,7 +1,6 @@
 package workflows
 
 import (
-	"log/slog"
 	"sort"
 	"time"
 
@@ -9,7 +8,7 @@ import (
 	"go.temporal.io/sdk/workflow"
 )
 
-func (w *Workflows) CheckWorkflowDefinition(ctx workflow.Context, param temporal.WorkflowCheckParam) error {
+func (w *Workflows) CheckWorkflowDefinition(ctx workflow.Context, param temporal.WorkflowCheckParam) (*temporal.WorkflowCheckResult, error) {
 	workerGroupIds := param.WorkerGroupIds
 	sort.Strings(workerGroupIds)
 
@@ -25,7 +24,7 @@ func (w *Workflows) CheckWorkflowDefinition(ctx workflow.Context, param temporal
 		},
 	).Get(ctx, &targetsFilterResult)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, target := range targetsFilterResult.Targets {
@@ -43,7 +42,7 @@ func (w *Workflows) CheckWorkflowDefinition(ctx workflow.Context, param temporal
 				},
 			).Get(ctx, &checkResult)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			status := temporal.AddTargetHistoryStatusFailure
@@ -59,18 +58,20 @@ func (w *Workflows) CheckWorkflowDefinition(ctx workflow.Context, param temporal
 				}),
 				temporal.ActivityAddTargetHistoryName,
 				&temporal.ActivityAddTargetHistoryParam{
-					Target: target,
-					Status: status,
-					Note:   checkResult.Note,
+					Target:        target,
+					WorkerGroupId: workerGroupId,
+					CheckId:       param.CheckId,
+					Status:        status,
+					Note:          checkResult.Note,
 				},
 			).Get(ctx, &addTargetHistoryResult)
 			if err != nil {
-				return err
+				return nil, err
 			}
-
-			slog.Info("Check %s status: %s", param.CheckId, status)
 		}
 	}
 
-	return nil
+	return &temporal.WorkflowCheckResult{
+		Note: "Check workflow completed",
+	}, nil
 }

@@ -92,15 +92,19 @@ END;
 -- +migrate StatementEnd
 
 CREATE TABLE target_histories  (
-  target_id TEXT NOT NULL,
+  target_id       TEXT NOT NULL,
+  worker_group_id TEXT NOT NULL,
+  check_id        TEXT NOT NULL,
 
   status       TEXT NOT NULL,
   note         TEXT NOT NULL,
 
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ')),
 
-  PRIMARY KEY (target_id, created_at),
-  CONSTRAINT fk_target_histories_target FOREIGN KEY (target_id) REFERENCES targets(id) ON DELETE CASCADE
+  PRIMARY KEY (target_id, worker_group_id, check_id, created_at),
+  CONSTRAINT fk_target_histories_target FOREIGN KEY (target_id) REFERENCES targets(id) ON DELETE CASCADE,
+  CONSTRAINT fk_target_histories_worker_group FOREIGN KEY (worker_group_id) REFERENCES worker_groups(id) ON DELETE CASCADE,
+  CONSTRAINT fk_target_histories_check FOREIGN KEY (check_id) REFERENCES checks(id) ON DELETE CASCADE
 ) STRICT;
 
 -- +migrate Down

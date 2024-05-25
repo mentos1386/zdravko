@@ -19,9 +19,11 @@ func (a *Activities) AddTargetHistory(ctx context.Context, param temporal.Activi
 	}
 
 	err := services.AddHistoryForTarget(ctx, a.db, &models.TargetHistory{
-		TargetId: param.Target.Id,
-		Status:   status,
-		Note:     param.Note,
+		TargetId:      param.Target.Id,
+		WorkerGroupId: param.WorkerGroupId,
+		CheckId:       param.CheckId,
+		Status:        status,
+		Note:          param.Note,
 	})
 
 	return &temporal.ActivityAddTargetHistoryResult{}, err

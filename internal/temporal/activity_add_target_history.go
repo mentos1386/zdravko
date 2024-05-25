@@ -9,9 +9,11 @@ const (
 )
 
 type ActivityAddTargetHistoryParam struct {
-	Target *Target
-	Status AddTargetHistoryStatus
-	Note   string
+	Target        *Target
+	WorkerGroupId string
+	CheckId       string
+	Status        AddTargetHistoryStatus
+	Note          string
 }
 
 type ActivityAddTargetHistoryResult struct {

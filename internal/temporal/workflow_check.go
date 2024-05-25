@@ -7,4 +7,8 @@ type WorkflowCheckParam struct {
 	WorkerGroupIds []string
 }
 
+type WorkflowCheckResult struct {
+	Note string
+}
+
 const WorkflowCheckName = "CHECK_WORKFLOW"

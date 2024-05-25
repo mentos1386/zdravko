@@ -71,7 +71,8 @@ func (h *BaseHandler) SettingsChecksGET(c echo.Context) error {
 	for i, check := range checks {
 		state, err := services.GetCheckState(context.Background(), h.temporal, check.Id)
 		if err != nil {
-			return err
+			h.logger.Error("Failed to get check state", "error", err)
+			state = models.CheckStateUnknown
 		}
 		checksWithState[i] = &CheckWithWorkerGroupsAndState{
 			CheckWithWorkerGroups: check,

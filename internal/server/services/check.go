@@ -267,7 +267,7 @@ func CreateOrUpdateCheckSchedule(
 			ID:        getScheduleId(check.Id),
 			Workflow:  internaltemporal.WorkflowCheckName,
 			Args:      args,
-			TaskQueue: "default",
+			TaskQueue: internaltemporal.TEMPORAL_SERVER_QUEUE,
 			RetryPolicy: &temporal.RetryPolicy{
 				MaximumAttempts: 3,
 			},

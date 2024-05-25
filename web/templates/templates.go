@@ -26,6 +26,12 @@ func load(files ...string) *template.Template {
 
 	t := template.New("default").Funcs(
 		template.FuncMap{
+			"DurationRoundSecond": func(d time.Duration) time.Duration {
+				return d.Round(time.Second)
+			},
+			"DurationRoundMillisecond": func(d time.Duration) time.Duration {
+				return d.Round(time.Millisecond)
+			},
 			"StringsJoin":          strings.Join,
 			"Now":                  time.Now,
 			"ScriptUnescapeString": script.UnescapeString,
