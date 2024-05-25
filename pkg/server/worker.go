@@ -1,34 +1,45 @@
 package server
 
 import (
-	"code.tjo.space/mentos1386/zdravko/internal/activities"
-	"code.tjo.space/mentos1386/zdravko/internal/config"
-	"code.tjo.space/mentos1386/zdravko/internal/workflows"
+	"log/slog"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/mentos1386/zdravko/database"
+	"github.com/mentos1386/zdravko/internal/config"
+	"github.com/mentos1386/zdravko/internal/server/activities"
+	"github.com/mentos1386/zdravko/internal/server/workflows"
+	"github.com/mentos1386/zdravko/internal/temporal"
+	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/client"
-	"go.temporal.io/sdk/worker"
+	temporalWorker "go.temporal.io/sdk/worker"
+	"go.temporal.io/sdk/workflow"
 )
 
 type Worker struct {
-	worker worker.Worker
+	worker temporalWorker.Worker
 }
 
-func NewWorker(temporalClient client.Client, cfg *config.ServerConfig) *Worker {
-	w := worker.New(temporalClient, "default", worker.Options{})
+func NewWorker(temporalClient client.Client, cfg *config.ServerConfig, logger *slog.Logger, db *sqlx.DB, kvStore database.KeyValueStore) *Worker {
+	worker := temporalWorker.New(temporalClient, temporal.TEMPORAL_SERVER_QUEUE, temporalWorker.Options{})
 
-	workerActivities := activities.NewActivities(&config.WorkerConfig{})
+	a := activities.NewActivities(cfg, logger, db, kvStore)
 
-	workerWorkflows := workflows.NewWorkflows(workerActivities)
+	w := workflows.NewWorkflows()
 
 	// Register Workflows
-	w.RegisterWorkflow(workerWorkflows.CheckWorkflowDefinition)
+	worker.RegisterWorkflowWithOptions(w.CheckWorkflowDefinition, workflow.RegisterOptions{Name: temporal.WorkflowCheckName})
+
+	// Register Activities
+	worker.RegisterActivityWithOptions(a.TargetsFilter, activity.RegisterOptions{Name: temporal.ActivityTargetsFilterName})
+	worker.RegisterActivityWithOptions(a.AddTargetHistory, activity.RegisterOptions{Name: temporal.ActivityAddTargetHistoryName})
 
 	return &Worker{
-		worker: w,
+		worker: worker,
 	}
 }
 
 func (w *Worker) Start() error {
-	return w.worker.Run(worker.InterruptCh())
+	return w.worker.Run(temporalWorker.InterruptCh())
 }
 
 func (w *Worker) Stop() {

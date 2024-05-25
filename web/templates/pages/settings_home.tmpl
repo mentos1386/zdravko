@@ -21,9 +21,7 @@
     <div
       class="inline-block bg-white rounded-lg shadow p-5 text-center sm:text-left"
     >
-      <h3 class="text-sm leading-6 font-medium text-gray-400">
-        Total Checks
-      </h3>
+      <h3 class="text-sm leading-6 font-medium text-gray-400">Total Checks</h3>
       <p class="text-3xl font-bold text-black">{{ .ChecksCount }}</p>
     </div>
     <div
@@ -44,56 +42,76 @@
     </div>
   </div>
 
-  <section class="mt-4">
+  <section>
     <table>
       <caption>
-        Execution History
-        <p>Last 10 executions for all checks and worker groups.</p>
+        History
+        <p>Last 10 executions.</p>
       </caption>
       <thead>
         <tr>
-          <th>Check</th>
-          <th>Worker Group</th>
+          <th>Check ID</th>
           <th>Status</th>
-          <th>Executed At</th>
+          <th>Worker Group</th>
+          <th>Started At</th>
+          <th>Ended At</th>
+          <th>Duration</th>
           <th>Note</th>
         </tr>
       </thead>
       <tbody>
         {{ range .History }}
-          <tr>
-            <th>
-              <a
-                class="underline hover:text-blue-600"
-                href="/settings/checks/{{ .CheckId }}"
-                >{{ .CheckName }}</a
-              >
-            </th>
-            <td>
-              <span
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
-              >
-                {{ .WorkerGroupName }}
-              </span>
-            </td>
-            <td>
-              <span
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ if eq .Status "SUCCESS" }}
-                  bg-green-100 text-green-800
-                {{ else }}
-                  bg-red-100 text-red-800
-                {{ end }}"
-              >
-                {{ .Status }}
-              </span>
-            </td>
-            <td>
-              {{ .CreatedAt.Time.Format "2006-01-02 15:04:05" }}
-            </td>
-            <td class="whitespace-normal">
-              {{ .Note }}
-            </td>
-          </tr>
+          {{ if eq .Status "Running" }}
+            <tr>
+              <td>{{ .CheckId }}</td>
+              <td>
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                >
+                  {{ .Status }}...
+                </span>
+              </td>
+              <td>
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                >
+                  {{ .WorkerGroupName }}
+                </span>
+              </td>
+              <td>{{ .StartTime.Format "2006-01-02 15:04:05" }}</td>
+              <td></td>
+              <td></td>
+              <td class="whitespace-normal"></td>
+            </tr>
+          {{ else }}
+            <tr>
+              <td>{{ .CheckId }}</td>
+              <td>
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                  {{ if eq .Status "Completed" }}
+                    bg-purple-100 text-purple-800
+                  {{ else }}
+                    bg-red-100 text-red-800
+                  {{ end }}
+                  "
+                >
+                  {{ .Status }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                >
+                  {{ .WorkerGroupName }}
+                </span>
+              </td>
+              <td>{{ .StartTime.Format "2006-01-02 15:04:05" }}</td>
+              <td>{{ .EndTime.Format "2006-01-02 15:04:05" }}</td>
+              <td>{{ DurationRoundMillisecond .Duration }}</td>
+              <td class="whitespace-normal">{{ .Note }}</td>
+            </tr>
+          {{ end }}
         {{ end }}
       </tbody>
     </table>

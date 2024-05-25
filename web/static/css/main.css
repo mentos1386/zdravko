@@ -64,11 +64,11 @@ code {
   @apply bg-blue-700 text-white;
 }
 
-.checks .time-range > a {
+.targets .time-range > a {
   @apply font-medium text-sm px-2.5 py-1 rounded-lg;
   @apply text-black bg-gray-100 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400;
 }
-.checks .time-range > a.active {
+.targets .time-range > a.active {
   @apply bg-white hover:bg-gray-300 shadow;
 }
 

@@ -4,20 +4,20 @@ import (
 	"log/slog"
 	"net/http"
 
-	"code.tjo.space/mentos1386/zdravko/internal/config"
-	"code.tjo.space/mentos1386/zdravko/internal/handlers"
-	"code.tjo.space/mentos1386/zdravko/internal/kv"
-	"code.tjo.space/mentos1386/zdravko/web/static"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mentos1386/zdravko/database"
+	"github.com/mentos1386/zdravko/internal/config"
+	"github.com/mentos1386/zdravko/internal/server/handlers"
+	"github.com/mentos1386/zdravko/web/static"
 	"go.temporal.io/sdk/client"
 )
 
 func Routes(
 	e *echo.Echo,
 	sqlDb *sqlx.DB,
-	kvStore kv.KeyValueStore,
+	kvStore database.KeyValueStore,
 	temporalClient client.Client,
 	cfg *config.ServerConfig,
 	logger *slog.Logger,
@@ -64,13 +64,13 @@ func Routes(
 	settings.GET("/triggers/:id/enable", h.SettingsTriggersEnableGET)
 
 	settings.GET("/targets", h.SettingsTargetsGET)
-	//settings.GET("/targets/create", h.SettingsTargetsCreateGET)
-	//settings.POST("/targets/create", h.SettingsTargetsCreatePOST)
-	//settings.GET("/targets/:id", h.SettingsTargetsDescribeGET)
-	//settings.POST("/targets/:id", h.SettingsTargetsDescribePOST)
-	//settings.GET("/targets/:id/delete", h.SettingsTargetsDescribeDELETE)
-	//settings.GET("/targets/:id/disable", h.SettingsTargetsDisableGET)
-	//settings.GET("/targets/:id/enable", h.SettingsTargetsEnableGET)
+	settings.GET("/targets/create", h.SettingsTargetsCreateGET)
+	settings.POST("/targets/create", h.SettingsTargetsCreatePOST)
+	settings.GET("/targets/:id", h.SettingsTargetsDescribeGET)
+	settings.POST("/targets/:id", h.SettingsTargetsDescribePOST)
+	settings.GET("/targets/:id/delete", h.SettingsTargetsDescribeDELETE)
+	settings.GET("/targets/:id/disable", h.SettingsTargetsDisableGET)
+	settings.GET("/targets/:id/enable", h.SettingsTargetsEnableGET)
 
 	settings.GET("/incidents", h.SettingsIncidentsGET)
 
@@ -103,7 +103,6 @@ func Routes(
 	apiv1 := e.Group("/api/v1")
 	apiv1.Use(h.Authenticated)
 	apiv1.GET("/workers/connect", h.ApiV1WorkersConnectGET)
-	apiv1.POST("/checks/:id/history", h.ApiV1ChecksHistoryPOST)
 
 	// Error handler
 	e.HTTPErrorHandler = func(err error, c echo.Context) {

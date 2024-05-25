@@ -103,7 +103,7 @@ migration-new name:
   echo "Created migration file: $FILENAME"
 
 # Generate and download all external dependencies.
-generate:
+generate: _tailwindcss-build _htmx-download _monaco-download _feather-icons-download
   go generate ./...
 
 _tailwindcss-build:
@@ -119,11 +119,12 @@ _monaco-download:
   mv node_modules/monaco-editor/min {{STATIC_DIR}}/monaco
   rm -rf node_modules
 
-  # We onlt care about javascript language
+  # We only care about javascript language
   find {{STATIC_DIR}}/monaco/vs/basic-languages/ \
     -type d \
     -not -name 'javascript' \
     -not -name 'typescript' \
+    -not -name 'yaml' \
     -not -name 'basic-languages' \
     -prune -exec rm -rf {} \;
 

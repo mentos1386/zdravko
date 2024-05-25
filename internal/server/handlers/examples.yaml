@@ -1,0 +1,94 @@
+# Example trigger code
+trigger: |
+  import kv from 'k6/x/zdravko/kv';
+  import incidents, { severity } from 'k6/x/zdravko/incidents';
+  import { getTarget, getMonitor, getOutcome } from 'k6/x/zdravko';
+
+  const getMinute = (date) => {
+    return Math.floor(date.getTime() / 1000 / 60);
+  }
+
+  const get5LastMinutes = (date) => {
+    const currentMinute = getMinute(date);
+    return Array.from({ length: 5 }, (_, i) => {
+      const minute = currentMinute - i;
+      if (minute < 0) {
+        return 60 - minute;
+      }
+      return minute;
+    });
+  }
+
+  // This trigger will check if there were more than 5 issues in last
+  // 5 minutes, if so it will create a critical incident.
+  export default function () {
+    const target = getTarget();
+    const monitor = getMonitor();
+    const outcome = getOutcome();
+
+    // If the outcome is not failure, we close any potential incidents.
+    if (outcome.status !== 'FAILURE') {
+      incidents.close(target, monitor);
+      return;
+    }
+
+    const date = new Date();
+
+    let total = 0;
+    for (const minute of get5LastMinutes(date)) {
+      const count = kv.get(`${monitor.name}:issues:${minute}`) || 0;
+      total += count;
+    }
+
+    // If there are more than 5 issues in the last 5 minutes, create a critical incident.
+    if (total > 5) {
+      incidents.create(
+        target,
+        monitor,
+        severity.CRITICAL,
+        `More than 5 issues in the last 5 minutes.`,
+        { special: "tags" }
+      );
+    // Else we would close any potential incidents. If non exist, that's ok.
+    } else {
+      incidents.close(target, monitor);
+    }
+
+    // Increment and set TTL to 5 minutes
+    const minute = getMinute(date);
+    kv.increment(`${monitor.name}:issues:${minute}`, 5 * 60);
+  }
+
+# Example monitor code
+check: |
+  import http from 'k6/http';
+  import { getTarget } from 'k6/x/zdravko';
+
+  export const options = {
+    thresholds: {
+      // http errors should be less than 1%
+      http_req_failed: ['rate<0.01'],
+    },
+  };
+
+  // Execute the check on the targets.
+  export default function () {
+    const { name, group, metadata } = getTarget();
+
+    console.log(`Running check for ${group}/${name}`)
+
+    http.get(metadata.spec.url);
+  }
+
+filter: |
+  target.metadata.kind == "Http" && target.metadata.spec.url != ""
+
+target: |
+  kind: Http
+  labels:
+    production: "true"
+  spec:
+    url: "https://test.k6.io"
+    method: "GET"
+    headers:
+      User-Agent: "Zdravko"

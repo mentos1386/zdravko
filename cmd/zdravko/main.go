@@ -8,10 +8,10 @@ import (
 	"sync"
 	"syscall"
 
-	"code.tjo.space/mentos1386/zdravko/internal/config"
-	"code.tjo.space/mentos1386/zdravko/pkg/server"
-	"code.tjo.space/mentos1386/zdravko/pkg/temporal"
-	"code.tjo.space/mentos1386/zdravko/pkg/worker"
+	"github.com/mentos1386/zdravko/internal/config"
+	"github.com/mentos1386/zdravko/pkg/server"
+	"github.com/mentos1386/zdravko/pkg/temporal"
+	"github.com/mentos1386/zdravko/pkg/worker"
 )
 
 type StartableAndStoppable interface {

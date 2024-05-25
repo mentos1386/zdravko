@@ -48,9 +48,8 @@
         </caption>
         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
-            <th scope="col">Check Group</th>
             <th scope="col">Name</th>
-            <th scope="col">Visibility</th>
+            <th scope="col">Targets</th>
             <th scope="col">Worker Groups</th>
             <th scope="col">State</th>
             <th scope="col">Schedule</th>
@@ -58,90 +57,54 @@
           </tr>
         </thead>
         <tbody>
-          {{ range .CheckGroups }}
-            {{ $currentGroup := . }}
-            <tr class="row-special">
-              <th scope="rowgroup">
-                {{ . }}
+          {{ range $checks := .Checks }}
+            <tr>
+              <th scope="row">
+                {{ .Name }}
               </th>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-            {{ range $group, $checks := $.Checks }}
-              {{ if eq $group $currentGroup }}
-                {{ range $checks }}
-                  <tr>
-                    <th scope="row" aria-hidden="true">└─</th>
-                    <th scope="row">
-                      {{ .Name }}
-                    </th>
-                    <td>
-                      {{ if eq .Visibility "PUBLIC" }}
-                        <span
-                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
-                        >
-                          Public
-                        </span>
-                      {{ else if eq .Visibility "PRIVATE" }}
-                        <span
-                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-fuchsia-100 text-fuchsia-800"
-                        >
-                          Private
-                        </span>
-                      {{ else }}
-                        <span
-                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                        >
-                          Unknown
-                        </span>
-                      {{ end }}
-                    </td>
-                    <td>
-                      {{ range .WorkerGroups }}
-                        <span
-                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
-                        >
-                          {{ . }}
-                        </span>
-                      {{ end }}
-                    </td>
-                    <td>
-                      {{ if eq .State "ACTIVE" }}
-                        <span
-                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-                        >
-                          ACTIVE
-                        </span>
-                      {{ else if eq .State "PAUSED" }}
-                        <span
-                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
-                        >
-                          PAUSED
-                        </span>
-                      {{ else }}
-                        <span
-                          class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                        >
-                          UNKNOWN
-                        </span>
-                      {{ end }}
-                    </td>
-                    <td>
-                      {{ .Schedule }}
-                    </td>
-                    <td>
-                      <a href="/settings/checks/{{ .Id }}" class="link"
-                        >Details</a
-                      >
-                    </td>
-                  </tr>
+              <td>
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
+                  >3</span
+                >
+              </td>
+              <td>
+                {{ range .WorkerGroups }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+                  >
+                    {{ . }}
+                  </span>
                 {{ end }}
-              {{ end }}
-            {{ end }}
+              </td>
+              <td>
+                {{ if eq .State "ACTIVE" }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+                  >
+                    ACTIVE
+                  </span>
+                {{ else if eq .State "PAUSED" }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+                  >
+                    PAUSED
+                  </span>
+                {{ else }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
+                  >
+                    UNKNOWN
+                  </span>
+                {{ end }}
+              </td>
+              <td>
+                {{ .Schedule }}
+              </td>
+              <td>
+                <a href="/settings/checks/{{ .Id }}" class="link">Details</a>
+              </td>
+            </tr>
           {{ end }}
         </tbody>
       </table>

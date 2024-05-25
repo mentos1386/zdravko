@@ -1,9 +1,10 @@
-module code.tjo.space/mentos1386/zdravko
+module github.com/mentos1386/zdravko
 
 go 1.21.6
 
 require (
 	github.com/dgraph-io/badger/v4 v4.2.0
+	github.com/dop251/goja v0.0.0-20231027120936-b396bb4c349d
 	github.com/go-playground/validator/v10 v10.18.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/gorilla/sessions v1.2.2
@@ -20,7 +21,7 @@ require (
 	go.temporal.io/api v1.27.0
 	go.temporal.io/sdk v1.26.0-rc.2
 	go.temporal.io/server v1.22.4
-	golang.org/x/exp v0.0.0-20231127185646-65229373498e
+	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842
 	golang.org/x/oauth2 v0.17.0
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -56,7 +57,6 @@ require (
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.9.0 // indirect
-	github.com/dop251/goja v0.0.0-20231027120936-b396bb4c349d // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
@@ -177,14 +177,14 @@ require (
 	go.uber.org/fx v1.20.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
-	golang.org/x/crypto v0.19.0 // indirect
-	golang.org/x/mod v0.15.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/crypto v0.23.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	golang.org/x/tools v0.17.0 // indirect
+	golang.org/x/tools v0.21.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/api v0.155.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect

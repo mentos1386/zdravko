@@ -1,7 +1,7 @@
 package temporal
 
 import (
-	internal "code.tjo.space/mentos1386/zdravko/internal/config"
+	internal "github.com/mentos1386/zdravko/internal/config"
 	"github.com/temporalio/ui-server/v2/server"
 	"github.com/temporalio/ui-server/v2/server/config"
 	"github.com/temporalio/ui-server/v2/server/server_options"

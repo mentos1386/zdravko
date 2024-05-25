@@ -4,13 +4,12 @@ import (
 	"context"
 	"log/slog"
 
-	"code.tjo.space/mentos1386/zdravko/database"
-	"code.tjo.space/mentos1386/zdravko/internal/config"
-	"code.tjo.space/mentos1386/zdravko/internal/kv"
-	"code.tjo.space/mentos1386/zdravko/internal/temporal"
-	"code.tjo.space/mentos1386/zdravko/web/templates"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mentos1386/zdravko/database"
+	"github.com/mentos1386/zdravko/internal/config"
+	"github.com/mentos1386/zdravko/internal/temporal"
+	"github.com/mentos1386/zdravko/web/templates"
 	"github.com/pkg/errors"
 )
 
@@ -45,12 +44,12 @@ func (s *Server) Start() error {
 		return errors.Wrap(err, "failed to connect to temporal")
 	}
 
-	kvStore, err := kv.NewBadgerKeyValueStore(s.cfg.KeyValueDatabasePath)
+	kvStore, err := database.NewBadgerKeyValueStore(s.cfg.KeyValueDatabasePath)
 	if err != nil {
 		return errors.Wrap(err, "failed to open kv store")
 	}
 
-	s.worker = NewWorker(temporalClient, s.cfg)
+	s.worker = NewWorker(temporalClient, s.cfg, s.logger, sqliteDb, kvStore)
 
 	s.echo.Renderer = templates.NewTemplates()
 	s.echo.Use(middleware.Logger())

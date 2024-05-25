@@ -8,8 +8,8 @@ import (
 	"text/template"
 	"time"
 
-	"code.tjo.space/mentos1386/zdravko/internal/script"
 	"github.com/labstack/echo/v4"
+	"github.com/mentos1386/zdravko/pkg/script"
 )
 
 //go:embed *
@@ -26,6 +26,12 @@ func load(files ...string) *template.Template {
 
 	t := template.New("default").Funcs(
 		template.FuncMap{
+			"DurationRoundSecond": func(d time.Duration) time.Duration {
+				return d.Round(time.Second)
+			},
+			"DurationRoundMillisecond": func(d time.Duration) time.Duration {
+				return d.Round(time.Millisecond)
+			},
 			"StringsJoin":          strings.Join,
 			"Now":                  time.Now,
 			"ScriptUnescapeString": script.UnescapeString,
@@ -51,6 +57,8 @@ func NewTemplates() *Templates {
 			"settings_triggers_create.tmpl":        loadSettings("pages/settings_triggers_create.tmpl"),
 			"settings_triggers_describe.tmpl":      loadSettings("pages/settings_triggers_describe.tmpl"),
 			"settings_targets.tmpl":                loadSettings("pages/settings_targets.tmpl"),
+			"settings_targets_create.tmpl":         loadSettings("pages/settings_targets_create.tmpl"),
+			"settings_targets_describe.tmpl":       loadSettings("pages/settings_targets_describe.tmpl"),
 			"settings_incidents.tmpl":              loadSettings("pages/settings_incidents.tmpl"),
 			"settings_notifications.tmpl":          loadSettings("pages/settings_notifications.tmpl"),
 			"settings_worker_groups.tmpl":          loadSettings("pages/settings_worker_groups.tmpl"),

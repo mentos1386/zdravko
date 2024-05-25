@@ -5,12 +5,23 @@ import (
 	"log/slog"
 	"time"
 
-	"code.tjo.space/mentos1386/zdravko/internal/config"
-	"code.tjo.space/mentos1386/zdravko/internal/jwt"
-	"code.tjo.space/mentos1386/zdravko/pkg/retry"
+	"github.com/mentos1386/zdravko/internal/config"
+	"github.com/mentos1386/zdravko/pkg/jwt"
+	"github.com/mentos1386/zdravko/pkg/retry"
 	"github.com/pkg/errors"
 	"go.temporal.io/sdk/client"
 )
+
+type Target struct {
+	Id       string
+	Name     string
+	Group    string
+	Metadata string
+}
+
+// Must be default, as we are also processing
+// some temporal things.
+const TEMPORAL_SERVER_QUEUE = "default"
 
 type AuthHeadersProvider struct {
 	Token string

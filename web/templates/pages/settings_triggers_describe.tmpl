@@ -3,14 +3,14 @@
     <form action="/settings/triggers/{{ .Trigger.Id }}" method="post">
       <h2>Configuration</h2>
       <label for="script">Script</label>
-      <textarea required id="script" name="script" class="h-96">
+      <textarea required id="script" name="script" class="sm:col-span-2 h-96">
 {{ ScriptUnescapeString .Trigger.Script }}</textarea
       >
       <div
-        id="editor"
-        class="block w-full h-96 rounded-lg border border-gray-300 overflow-hidden hidden"
+        id="editor-script"
+        class="hidden sm:col-span-2 block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
       ></div>
-      <p>
+      <p class="sm:col-span-2">
         The trigger script executes for every matching <code>target</code>'s
         execution of <code>trigger</code>. The outcome of that
         <code>trigger</code> is passed to the script as a
@@ -111,37 +111,41 @@
   </section>
 
   <script src="/static/monaco/vs/loader.js"></script>
-<script>
-  document.getElementById("editor").classList.remove("hidden");
-  document.getElementById("script").hidden = true;
+  <script>
+    const items = [{ name: "script", language: "javascript" }];
 
-  function save() {
-    const script = window.editor.getValue();
-    document.getElementById('script').value = script;
-  }
+    function save() {
+      for (const { name } of items) {
+        const elem = window.editors[name].getValue();
+        document.getElementById(name).value = elem;
+      }
+    }
 
-  function htmlDecode(input) {
-    var doc = new DOMParser().parseFromString(input, "text/html");
-    return doc.documentElement.textContent;
-  }
-  script = htmlDecode("{{ .Trigger.Script }}")
+    window.editors = {};
+    for (const { name, language, options = {} } of items) {
+      const textarea = document.getElementById(name);
+      const editor = document.getElementById("editor-" + name);
 
-  require.config({ paths: { vs: '/static/monaco/vs' } });
-  require(['vs/editor/editor.main'], function () {
-    window.editor = monaco.editor.create(document.getElementById('editor'), {
-      value: script,
-      language: 'javascript',
-      minimap: { enabled: false },
-      codeLens: false,
-      contextmenu: false,
-      scrollBeyondLastLine: false,
-    });
+      editor.classList.remove("hidden");
+      textarea.hidden = true;
 
-    const divElem = document.getElementById('editor');
-    const resizeObserver = new ResizeObserver(entries => {
-        window.editor.layout();
-    });
-    resizeObserver.observe(divElem);
-  });
-</script>
+      require.config({ paths: { vs: "/static/monaco/vs" } });
+      require(["vs/editor/editor.main"], function () {
+        window.editors[name] = monaco.editor.create(editor, {
+          value: textarea.value,
+          language: language,
+          minimap: { enabled: false },
+          codeLens: false,
+          contextmenu: false,
+          scrollBeyondLastLine: false,
+          ...options,
+        });
+
+        const resizeObserver = new ResizeObserver((entries) => {
+          window.editors[name].layout();
+        });
+        resizeObserver.observe(editor);
+      });
+    }
+  </script>
 {{ end }}
