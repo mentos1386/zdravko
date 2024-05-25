@@ -11,7 +11,7 @@ import (
 	"github.com/mentos1386/zdravko/pkg/script"
 	"github.com/mentos1386/zdravko/web/templates/components"
 	"go.temporal.io/sdk/client"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 //go:embed examples.yaml
