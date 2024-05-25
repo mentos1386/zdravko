@@ -19,6 +19,45 @@ import (
 	"golang.org/x/oauth2"
 )
 
+const oauth2RedirectSessionName = "zdravko-hey-oauth2"
+
+func (h *BaseHandler) setOAuth2Redirect(c echo.Context, redirect string) error {
+	w := c.Response()
+	r := c.Request()
+
+	session, err := h.store.Get(r, oauth2RedirectSessionName)
+	if err != nil {
+		return err
+	}
+	session.Values["redirect"] = redirect
+	return h.store.Save(r, w, session)
+}
+
+func (h *BaseHandler) getOAuth2Redirect(c echo.Context) (string, error) {
+	r := c.Request()
+
+	session, err := h.store.Get(r, oauth2RedirectSessionName)
+	if err != nil {
+		return "", err
+	}
+	if session.IsNew {
+		return "", nil
+	}
+	return session.Values["redirect"].(string), nil
+}
+
+func (h *BaseHandler) clearOAuth2Redirect(c echo.Context) error {
+	w := c.Response()
+	r := c.Request()
+
+	session, err := h.store.Get(r, oauth2RedirectSessionName)
+	if err != nil {
+		return err
+	}
+	session.Options.MaxAge = -1
+	return h.store.Save(r, w, session)
+}
+
 type UserInfo struct {
 	Id    int    `json:"id"` // FIXME: This might not always be int?
 	Sub   string `json:"sub"`
@@ -97,6 +136,14 @@ func (h *BaseHandler) OAuth2LoginGET(c echo.Context) error {
 
 	url := conf.AuthCodeURL(state, oauth2.AccessTypeOffline)
 
+	redirect := c.QueryParam("redirect")
+	h.logger.Info("OAuth2LoginGET", "redirect", redirect)
+
+	err = h.setOAuth2Redirect(c, redirect)
+	if err != nil {
+		return err
+	}
+
 	return c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
@@ -156,7 +203,21 @@ func (h *BaseHandler) OAuth2CallbackGET(c echo.Context) error {
 		return err
 	}
 
-	return c.Redirect(http.StatusTemporaryRedirect, "/settings")
+	redirect, err := h.getOAuth2Redirect(c)
+	if err != nil {
+		return err
+	}
+	h.logger.Info("OAuth2CallbackGET", "redirect", redirect)
+	if redirect == "" {
+		redirect = "/settings"
+	}
+
+	err = h.clearOAuth2Redirect(c)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect(http.StatusTemporaryRedirect, redirect)
 }
 
 func (h *BaseHandler) OAuth2LogoutGET(c echo.Context) error {

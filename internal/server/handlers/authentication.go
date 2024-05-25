@@ -11,7 +11,7 @@ import (
 	jwtInternal "github.com/mentos1386/zdravko/pkg/jwt"
 )
 
-const sessionName = "zdravko-hey"
+const authenticationSessionName = "zdravko-hey"
 
 type AuthenticatedPrincipal struct {
 	User   *AuthenticatedUser
@@ -48,7 +48,7 @@ func GetUser(ctx context.Context) *AuthenticatedUser {
 }
 
 func (h *BaseHandler) AuthenticateRequestWithCookies(r *http.Request) (*AuthenticatedUser, error) {
-	session, err := h.store.Get(r, sessionName)
+	session, err := h.store.Get(r, authenticationSessionName)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (h *BaseHandler) AuthenticateRequestWithToken(r *http.Request) (*Authentica
 }
 
 func (h *BaseHandler) SetAuthenticatedUserForRequest(w http.ResponseWriter, r *http.Request, user *AuthenticatedUser) error {
-	session, err := h.store.Get(r, sessionName)
+	session, err := h.store.Get(r, authenticationSessionName)
 	if err != nil {
 		return err
 	}
@@ -124,24 +124,16 @@ func (h *BaseHandler) SetAuthenticatedUserForRequest(w http.ResponseWriter, r *h
 	session.Values["oauth2_refresh_token"] = user.OAuth2RefreshToken
 	session.Values["oauth2_token_type"] = user.OAuth2TokenType
 	session.Values["oauth2_expiry"] = user.OAuth2Expiry.Format(time.RFC3339)
-	err = h.store.Save(r, w, session)
-	if err != nil {
-		return err
-	}
-	return nil
+	return h.store.Save(r, w, session)
 }
 
 func (h *BaseHandler) ClearAuthenticatedUserForRequest(w http.ResponseWriter, r *http.Request) error {
-	session, err := h.store.Get(r, sessionName)
+	session, err := h.store.Get(r, authenticationSessionName)
 	if err != nil {
 		return err
 	}
 	session.Options.MaxAge = -1
-	err = h.store.Save(r, w, session)
-	if err != nil {
-		return err
-	}
-	return nil
+	return h.store.Save(r, w, session)
 }
 
 type AuthenticatedHandler func(http.ResponseWriter, *http.Request, *AuthenticatedPrincipal)
@@ -159,7 +151,7 @@ func (h *BaseHandler) Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 			if user.OAuth2Expiry.Before(time.Now()) {
 				user, err = h.RefreshToken(c.Response(), c.Request(), user)
 				if err != nil {
-					return c.Redirect(http.StatusTemporaryRedirect, "/oauth2/login")
+					return c.Redirect(http.StatusTemporaryRedirect, "/oauth2/login?redirect="+c.Request().URL.Path)
 				}
 			}
 
@@ -173,6 +165,6 @@ func (h *BaseHandler) Authenticated(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(cc)
 		}
 
-		return c.Redirect(http.StatusTemporaryRedirect, "/oauth2/login")
+		return c.Redirect(http.StatusTemporaryRedirect, "/oauth2/login?redirect="+c.Request().URL.Path)
 	}
 }
