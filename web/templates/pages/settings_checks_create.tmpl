@@ -35,26 +35,26 @@
         <code>@yearly</code>.
       </p>
       <label for="filter">Filter</label>
-      <textarea required id="filter" name="filter" class="h-12">
+      <textarea required id="filter" name="filter" class="sm:col-span-2 h-12">
 {{ ScriptUnescapeString .ExampleFilter }}</textarea
       >
       <div
         id="editor-filter"
-        class="hidden block w-full h-12 rounded-lg border border-gray-300 overflow-hidden"
+        class="hidden sm:col-span-2 block w-full h-12 rounded-lg border border-gray-300 overflow-hidden"
       ></div>
-      <p>
+      <p class="sm:col-span-2">
         With filter we specify what targets the check will run on. The must be a
         javascript expression that returns a boolean.
       </p>
       <label for="script">Script</label>
-      <textarea required id="script" name="script" class="h-96">
+      <textarea required id="script" name="script" class="sm:col-span-2 h-96">
 {{ ScriptUnescapeString .ExampleScript }}</textarea
       >
       <div
         id="editor-script"
-        class="hidden block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+        class="hidden sm:col-span-2 block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
       ></div>
-      <p>
+      <p class="sm:col-span-2">
         Script is what determines the status of a service. You can read more
         about it on
         <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/"
@@ -68,7 +68,13 @@
   <script src="/static/monaco/vs/loader.js"></script>
   <script>
     const items = [
-      { name: "filter", language: "javascript" },
+      {
+        name: "filter",
+        language: "javascript",
+        options: {
+          quickSuggestions: false,
+        },
+      },
       { name: "script", language: "javascript" },
     ];
 
@@ -80,7 +86,7 @@
     }
 
     window.editors = {};
-    for (const { name, language } of items) {
+    for (const { name, language, options = {} } of items) {
       const textarea = document.getElementById(name);
       const editor = document.getElementById("editor-" + name);
 
@@ -96,6 +102,8 @@
           codeLens: false,
           contextmenu: false,
           scrollBeyondLastLine: false,
+          wordWrap: "on",
+          ...options,
         });
 
         const resizeObserver = new ResizeObserver((entries) => {

@@ -31,7 +31,7 @@ func NewWorker(temporalClient client.Client, cfg *config.ServerConfig, logger *s
 
 	// Register Activities
 	worker.RegisterActivityWithOptions(a.TargetsFilter, activity.RegisterOptions{Name: temporal.ActivityTargetsFilterName})
-	worker.RegisterActivityWithOptions(a.ProcessCheckOutcome, activity.RegisterOptions{Name: temporal.ActivityProcessCheckOutcomeName})
+	worker.RegisterActivityWithOptions(a.AddTargetHistory, activity.RegisterOptions{Name: temporal.ActivityAddTargetHistoryName})
 
 	return &Worker{
 		worker: worker,

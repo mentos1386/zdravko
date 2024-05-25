@@ -10,14 +10,14 @@
       />
       <p>Name of the trigger can be anything.</p>
       <label for="script">Script</label>
-      <textarea required id="script" name="script" class="h-96">
+      <textarea required id="script" name="script" class="sm:col-span-2 h-96">
 {{ ScriptUnescapeString .Example }}</textarea
       >
       <div
         id="editor-script"
-        class="hidden block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+        class="hidden sm:col-span-2 block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
       ></div>
-      <p>
+      <p class="sm:col-span-2">
         The trigger script executes for every matching <code>target</code>'s
         execution of <code>trigger</code>. The outcome of that
         <code>trigger</code> is passed to the script as a
@@ -40,7 +40,7 @@
     }
 
     window.editors = {};
-    for (const { name, language } of items) {
+    for (const { name, language, options = {} } of items) {
       const textarea = document.getElementById(name);
       const editor = document.getElementById("editor-" + name);
 
@@ -56,6 +56,7 @@
           codeLens: false,
           contextmenu: false,
           scrollBeyondLastLine: false,
+          ...options,
         });
 
         const resizeObserver = new ResizeObserver((entries) => {

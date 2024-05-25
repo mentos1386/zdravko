@@ -13,6 +13,7 @@ import (
 )
 
 type Target struct {
+	Id       string
 	Name     string
 	Group    string
 	Metadata string

@@ -35,14 +35,19 @@
         homepage.
       </p>
       <label for="metadata">Metadata</label>
-      <textarea required id="metadata" name="metadata" class="h-96">
+      <textarea
+        required
+        id="metadata"
+        name="metadata"
+        class="sm:col-span-2 h-96"
+      >
 {{ ScriptUnescapeString .Target.Metadata }}</textarea
       >
       <div
         id="editor-metadata"
-        class="hidden block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+        class="hidden sm:col-span-2 block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
       ></div>
-      <p>
+      <p class="sm:col-span-2">
         Metadata is a YAML object that contains the configuration for the
         target. This configuration can be then used for <code>Targets</code> to
         filter the targets to act on as well as by using

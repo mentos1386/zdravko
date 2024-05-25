@@ -37,10 +37,12 @@ func (a *Activities) TargetsFilter(ctx context.Context, param temporal.ActivityT
 		a.logger.Info("TargetsFilter", "target", target)
 
 		targetWithMedatada := &struct {
+			Id       string
 			Name     string
 			Group    string
 			Metadata map[string]interface{}
 		}{
+			Id:       target.Id,
 			Name:     target.Name,
 			Group:    target.Group,
 			Metadata: metadata,
@@ -57,6 +59,7 @@ func (a *Activities) TargetsFilter(ctx context.Context, param temporal.ActivityT
 		}
 		if value.Export().(bool) {
 			filteredTargets = append(filteredTargets, &temporal.Target{
+				Id:       target.Id,
 				Name:     target.Name,
 				Group:    target.Group,
 				Metadata: target.Metadata,

@@ -28,14 +28,19 @@
         homepage.
       </p>
       <label for="metadata">Metadata</label>
-      <textarea required id="metadata" name="metadata" class="h-96">
+      <textarea
+        required
+        id="metadata"
+        name="metadata"
+        class="sm:col-span-2 h-96"
+      >
 {{ ScriptUnescapeString .Example }}</textarea
       >
       <div
         id="editor-metadata"
-        class="hidden block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+        class="hidden sm:col-span-2 block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
       ></div>
-      <p>
+      <p class="sm:col-span-2">
         Metadata is a YAML object that contains the configuration for the
         target. This configuration can be then used for <code>Checks</code> to
         filter the targets to act on as well as by using
@@ -58,7 +63,7 @@
     }
 
     window.editors = {};
-    for (const { name, language } of items) {
+    for (const { name, language, options = {} } of items) {
       const textarea = document.getElementById(name);
       const editor = document.getElementById("editor-" + name);
 
@@ -74,6 +79,7 @@
           codeLens: false,
           contextmenu: false,
           scrollBeyondLastLine: false,
+          ...options,
         });
 
         const resizeObserver = new ResizeObserver((entries) => {

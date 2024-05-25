@@ -85,7 +85,7 @@ filter: |
 
 target: |
   kind: Http
-  tags:
+  labels:
     production: "true"
   spec:
     url: "https://test.k6.io"
