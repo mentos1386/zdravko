@@ -1,6 +1,7 @@
 package zdravko
 
 import (
+	"github.com/dop251/goja"
 	"go.k6.io/k6/js/modules"
 )
 
@@ -41,14 +42,20 @@ func (*RootModule) NewModuleInstance(vu modules.VU) modules.Instance {
 	}
 }
 
-type Zdravko struct {
-	vu      modules.VU
-	Targets []string
+type Target struct {
+	Name     string
+	Group    string
+	Metadata map[string]interface{}
 }
 
-func (z *Zdravko) GetTarget() Target {
+type Zdravko struct {
+	vu      modules.VU
+	Targets []Target
+}
+
+func (z *Zdravko) GetTarget() goja.Value {
 	zdravkoContext := GetZdravkoContext(z.vu.Context())
-	return zdravkoContext.Target
+	return z.vu.Runtime().ToValue(zdravkoContext.Target)
 }
 
 // Exports implements the modules.Instance interface and returns the exported types for the JS module.

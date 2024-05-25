@@ -12,6 +12,12 @@ import (
 	"go.temporal.io/sdk/client"
 )
 
+type Target struct {
+	Name     string
+	Group    string
+	Metadata string
+}
+
 // Must be default, as we are also processing
 // some temporal things.
 const TEMPORAL_SERVER_QUEUE = "default"

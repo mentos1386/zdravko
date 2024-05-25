@@ -4,12 +4,6 @@ import "context"
 
 type zdravkoContextKey string
 
-type Target struct {
-	Name     string
-	Group    string
-	Metadata map[string]interface{}
-}
-
 type Context struct {
 	Target Target
 }

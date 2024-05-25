@@ -8,16 +8,23 @@ import (
 	"github.com/mentos1386/zdravko/pkg/k6"
 	"github.com/mentos1386/zdravko/pkg/k6/zdravko"
 	"github.com/mentos1386/zdravko/pkg/script"
+	"gopkg.in/yaml.v3"
 )
 
 func (a *Activities) Check(ctx context.Context, param temporal.ActivityCheckParam) (*temporal.ActivityCheckResult, error) {
 	execution := k6.NewExecution(slog.Default(), script.UnescapeString(param.Script))
 
+	var metadata map[string]interface{}
+	err := yaml.Unmarshal([]byte(param.Target.Metadata), &metadata)
+	if err != nil {
+		return nil, err
+	}
+
 	ctx = zdravko.WithZdravkoContext(ctx, zdravko.Context{
 		Target: zdravko.Target{
-			Name:  param.Target.Name,
-			Group: param.Target.Group,
-			//Metadata: param.Target.Metadata,
+			Name:     param.Target.Name,
+			Group:    param.Target.Group,
+			Metadata: metadata,
 		},
 	})
 

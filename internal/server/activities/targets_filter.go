@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/dop251/goja"
-	"github.com/mentos1386/zdravko/database/models"
 	"github.com/mentos1386/zdravko/internal/server/services"
 	"github.com/mentos1386/zdravko/internal/temporal"
 	"github.com/mentos1386/zdravko/pkg/script"
+	"gopkg.in/yaml.v3"
 )
 
 func (a *Activities) TargetsFilter(ctx context.Context, param temporal.ActivityTargetsFilterParam) (*temporal.ActivityTargetsFilterResult, error) {
@@ -17,22 +17,50 @@ func (a *Activities) TargetsFilter(ctx context.Context, param temporal.ActivityT
 	if err != nil {
 		return nil, err
 	}
-	filteredTargets := make([]*models.Target, 0)
+	filteredTargets := make([]*temporal.Target, 0)
+
+	program, err := goja.Compile("filter", script.UnescapeString(param.Filter), false)
+	if err != nil {
+		return nil, err
+	}
 
 	for _, target := range allTargets {
 		vm := goja.New()
+		vm.SetFieldNameMapper(goja.UncapFieldNameMapper())
 
-		err = vm.Set("target", target)
+		var metadata map[string]interface{}
+		err := yaml.Unmarshal([]byte(target.Metadata), &metadata)
 		if err != nil {
 			return nil, err
 		}
 
-		value, err := vm.RunString(script.UnescapeString(param.Filter))
+		a.logger.Info("TargetsFilter", "target", target)
+
+		targetWithMedatada := &struct {
+			Name     string
+			Group    string
+			Metadata map[string]interface{}
+		}{
+			Name:     target.Name,
+			Group:    target.Group,
+			Metadata: metadata,
+		}
+
+		err = vm.Set("target", targetWithMedatada)
+		if err != nil {
+			return nil, err
+		}
+
+		value, err := vm.RunProgram(program)
 		if err != nil {
 			return nil, err
 		}
 		if value.Export().(bool) {
-			filteredTargets = append(filteredTargets, target)
+			filteredTargets = append(filteredTargets, &temporal.Target{
+				Name:     target.Name,
+				Group:    target.Group,
+				Metadata: target.Metadata,
+			})
 		}
 	}
 
