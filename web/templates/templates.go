@@ -26,6 +26,12 @@ func load(files ...string) *template.Template {
 
 	t := template.New("default").Funcs(
 		template.FuncMap{
+			"MathDivide": func(a, b int) float64 {
+				if b == 0 {
+					return 0
+				}
+				return float64(a) / float64(b)
+			},
 			"DurationRoundSecond": func(d time.Duration) time.Duration {
 				return d.Round(time.Second)
 			},

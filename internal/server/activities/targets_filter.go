@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/dop251/goja"
+	"github.com/mentos1386/zdravko/database/models"
 	"github.com/mentos1386/zdravko/internal/server/services"
 	"github.com/mentos1386/zdravko/internal/temporal"
 	"github.com/mentos1386/zdravko/pkg/script"
@@ -25,6 +26,10 @@ func (a *Activities) TargetsFilter(ctx context.Context, param temporal.ActivityT
 	}
 
 	for _, target := range allTargets {
+		if target.State == models.TargetStatePaused {
+			continue
+		}
+
 		vm := goja.New()
 		vm.SetFieldNameMapper(goja.UncapFieldNameMapper())
 

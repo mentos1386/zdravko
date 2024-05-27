@@ -101,19 +101,17 @@
             <summary
               class="flex flex-row gap-2 p-3 py-2 -mx-3 cursor-pointer hover:bg-blue-50 rounded-lg"
             >
-              {{ if eq $targetsAndStatus.Status "SUCCESS" }}
-                <span
-                  class="flex w-3 h-3 bg-green-400 rounded-full self-center"
-                ></span>
-              {{ else if eq $targetsAndStatus.Status "FAILURE" }}
-                <span
-                  class="flex w-3 h-3 bg-red-400 rounded-full self-center"
-                ></span>
-              {{ else }}
-                <span
-                  class="flex w-3 h-3 bg-gray-200 rounded-full self-center"
-                ></span>
-              {{ end }}
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                {{ if eq $targetsAndStatus.Status "SUCCESS" }}
+                  bg-green-100 text-green-800
+                {{ else if eq $targetsAndStatus.Status "FAILURE" }}
+                  bg-red-100 text-red-800
+                {{ else }}
+                  bg-gray-100 text-gray-800
+                {{ end }}"
+                >{{ .Status }}</span
+              >
               <h2 class="flex-1 font-semibold capitalize">
                 {{ $group }}
               </h2>
@@ -128,13 +126,17 @@
                 class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 pb-2 border-b last-of-type:pb-0 last-of-type:border-0 border-gray-100"
               >
                 <div class="flex items-center gap-2">
-                  {{ if eq .Status "SUCCESS" }}
-                    <span class="flex w-3 h-3 bg-green-400 rounded-full"></span>
-                  {{ else if eq .Status "FAILURE" }}
-                    <span class="flex w-3 h-3 bg-red-400 rounded-full"></span>
-                  {{ else }}
-                    <span class="flex w-3 h-3 bg-gray-200 rounded-full"></span>
-                  {{ end }}
+                  <span
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                    {{ if eq .Status "SUCCESS" }}
+                      bg-green-100 text-green-800
+                    {{ else if eq .Status "FAILURE" }}
+                      bg-red-100 text-red-800
+                    {{ else }}
+                      bg-gray-100 text-gray-800
+                    {{ end }}"
+                    >{{ .Status }}</span
+                  >
                   <h4>
                     {{ .Name }}
                     {{ if eq .Visibility "PUBLIC" }}
@@ -159,12 +161,12 @@
                   </h4>
                 </div>
                 <div class="justify-self-end text-sm">
-                  {{ printf "%.2f" .History.Uptime }}% uptime
+                  {{ printf "%.2f" .Uptime }}% uptime
                 </div>
                 <div
                   class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden"
                 >
-                  {{ range .History.List }}
+                  {{ range .History }}
                     <div
                       class="has-tooltip [&_.tooltip]:hover:flex [&_.tooltip]:hover:visible flex"
                     >
@@ -182,27 +184,51 @@
                         ></div>
                       {{ end }}
                       <div
-                        class="tooltip gap-2 bg-white border border-gray-200 rounded p-2 shadow-lg hidden z-50 absolute mt-10 -ml-4 flex-row text-xs"
+                        class="tooltip flex flex-col gap-2 bg-white border border-gray-200 rounded p-2 shadow-lg hidden z-50 absolute mt-10 -ml-4 flex-row text-xs"
                       >
-                        {{ if eq .Status "SUCCESS" }}
+                        <div
+                          class="flex flex-row gap-2 justify-between pb-2 border-b border-gray-200"
+                        >
+                          {{ if eq $.TimeRange "90days" }}
+                            {{ .Date.Format "Jan 02" }}
+                          {{ else if eq $.TimeRange "48hours" }}
+                            {{ .Date.Format "Jan 02, 15:00 MST" }}
+                          {{ else if eq $.TimeRange "90minutes" }}
+                            {{ .Date.Format "Jan 02, 15:04 MST" }}
+                          {{ end }}
                           <span
-                            class="flex w-3 h-3 bg-green-400 rounded-full self-center"
-                          ></span>
-                        {{ else if eq .Status "FAILURE" }}
-                          <span
-                            class="flex w-3 h-3 bg-red-400 rounded-full self-center"
-                          ></span>
-                        {{ else }}
-                          <span
-                            class="flex w-3 h-3 bg-gray-200 rounded-full self-center"
-                          ></span>
-                        {{ end }}
-                        {{ if eq $.TimeRange "90days" }}
-                          {{ .Date.Format "Jan 02" }}
-                        {{ else if eq $.TimeRange "48hours" }}
-                          {{ .Date.Format "Jan 02, 15:00 MST" }}
-                        {{ else if eq $.TimeRange "90minutes" }}
-                          {{ .Date.Format "Jan 02, 15:04 MST" }}
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                              {{ if eq .Status "SUCCESS" }}
+                              bg-green-100 text-green-800
+                            {{ else if eq .Status "FAILURE" }}
+                              bg-red-100 text-red-800
+                            {{ else }}
+                              bg-gray-100 text-gray-800
+                            {{ end }}"
+                            >{{ .Status }}
+                            ({{ printf "%.2f" .SuccessRate }}%)
+                          </span>
+                        </div>
+
+                        {{ range .Checks }}
+                          <div class="flex flex-row gap-2 justify-between">
+                            <p>
+                              {{ .Name }} on
+                              {{ .WorkerGroupName }}
+                            </p>
+                            <span
+                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                              {{ if eq .Status "SUCCESS" }}
+                                bg-green-100 text-green-800
+                              {{ else if eq .Status "FAILURE" }}
+                                bg-red-100 text-red-800
+                              {{ else }}
+                                bg-gray-100 text-gray-800
+                              {{ end }}"
+                              >{{ .Status }}
+                              ({{ printf "%.2f" .SuccessRate }}%)
+                            </span>
+                          </div>
                         {{ end }}
                       </div>
                     </div>

@@ -117,8 +117,7 @@
           <th>Status</th>
           <th>Worker Group</th>
           <th>Check</th>
-          <th>Created At</th>
-          <th>Duration</th>
+          <th>Checked At</th>
           <th>Note</th>
         </tr>
       </thead>
@@ -153,7 +152,6 @@
             <td>
               {{ .CreatedAt.Time.Format "2006-01-02 15:04:05" }}
             </td>
-            <td>{ .Duration }</td>
             <td class="whitespace-normal">
               {{ .Note }}
             </td>

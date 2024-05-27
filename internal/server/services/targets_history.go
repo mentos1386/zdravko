@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/mentos1386/zdravko/database/models"
@@ -14,28 +15,30 @@ type TargetHistory struct {
 	CheckName       string `db:"check_name"`
 }
 
-func GetLastNTargetHistory(ctx context.Context, db *sqlx.DB, n int) ([]*TargetHistory, error) {
-	var targetHistory []*TargetHistory
-	err := db.SelectContext(ctx, &targetHistory, `
-    SELECT
-      th.*,
-      t.name AS target_name,
-      wg.name AS worker_group_name,
-      c.name AS check_name
-    FROM target_histories th
-      LEFT JOIN targets t ON th.target_id = t.id
-      LEFT JOIN worker_groups wg ON th.worker_group_id = wg.id
-      LEFT JOIN checks c ON th.check_id = c.id
-    WHERE th.target_id = $1
-    ORDER BY th.created_at DESC
-    LIMIT $1
-    `, n)
-	return targetHistory, err
-}
+type TargetHistoryDateRange string
 
-func GetTargetHistoryForTarget(ctx context.Context, db *sqlx.DB, targetId string) ([]*TargetHistory, error) {
+const (
+	TargetHistoryDateRange90Days    TargetHistoryDateRange = "90_DAYS"
+	TargetHistoryDateRange48Hours   TargetHistoryDateRange = "48_HOURS"
+	TargetHistoryDateRange90Minutes TargetHistoryDateRange = "90_MINUTES"
+)
+
+func GetTargetHistoryForTarget(ctx context.Context, db *sqlx.DB, targetId string, dateRange TargetHistoryDateRange) ([]*TargetHistory, error) {
+	dateRangeFilter := ""
+	switch dateRange {
+	case TargetHistoryDateRange90Days:
+		dateRangeFilter = "AND strftime('%Y-%m-%dT%H:%M:%fZ', th.created_at) >= datetime('now', 'localtime', '-90 days')"
+	case TargetHistoryDateRange48Hours:
+		dateRangeFilter = "AND strftime('%Y-%m-%dT%H:%M:%fZ', th.created_at) >= datetime('now', 'localtime', '-48 hours')"
+	case TargetHistoryDateRange90Minutes:
+		dateRangeFilter = "AND strftime('%Y-%m-%dT%H:%M:%fZ', th.created_at) >= datetime('now', 'localtime', '-90 minutes')"
+	}
+
 	var targetHistory []*TargetHistory
-	err := db.SelectContext(ctx, &targetHistory, `
+	err := db.SelectContext(
+		ctx,
+		&targetHistory,
+		fmt.Sprintf(`
     SELECT
       th.*,
       t.name AS target_name,
@@ -45,9 +48,13 @@ func GetTargetHistoryForTarget(ctx context.Context, db *sqlx.DB, targetId string
       LEFT JOIN targets t ON th.target_id = t.id
       LEFT JOIN worker_groups wg ON th.worker_group_id = wg.id
       LEFT JOIN checks c ON th.check_id = c.id
-    WHERE th.target_id = $1
+    WHERE
+      th.target_id = $1
+      %s
     ORDER BY th.created_at DESC
-  `, targetId)
+  `, dateRangeFilter),
+		targetId,
+	)
 	return targetHistory, err
 }
 
