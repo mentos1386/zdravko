@@ -193,26 +193,26 @@ func (h *BaseHandler) Index(c echo.Context) error {
 	}
 
 	timeRangeQuery := c.QueryParam("time-range")
-	if timeRangeQuery != "48hours" && timeRangeQuery != "90days" && timeRangeQuery != "90minutes" {
-		timeRangeQuery = "90days"
+	if timeRangeQuery != "48hours" && timeRangeQuery != "60days" && timeRangeQuery != "60minutes" {
+		timeRangeQuery = "60days"
 	}
 
 	var timeBuckets int
 	var timeInterval time.Duration
 	var timeRange services.TargetHistoryDateRange
 	switch timeRangeQuery {
-	case "90days":
-		timeRange = services.TargetHistoryDateRange90Days
+	case "60days":
+		timeRange = services.TargetHistoryDateRange60Days
 		timeInterval = time.Hour * 24
-		timeBuckets = 90
+		timeBuckets = 60
 	case "48hours":
 		timeRange = services.TargetHistoryDateRange48Hours
 		timeInterval = time.Hour
 		timeBuckets = 48
-	case "90minutes":
-		timeRange = services.TargetHistoryDateRange90Minutes
+	case "60minutes":
+		timeRange = services.TargetHistoryDateRange60Minutes
 		timeInterval = time.Minute
-		timeBuckets = 90
+		timeBuckets = 60
 	}
 
 	overallOutcome := HistoryOutcomeUnknown

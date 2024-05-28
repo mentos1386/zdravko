@@ -83,7 +83,7 @@ func (h *BaseHandler) SettingsTargetsDescribeGET(c echo.Context) error {
 		return err
 	}
 
-	history, err := services.GetTargetHistoryForTarget(context.Background(), h.db, slug, services.TargetHistoryDateRange90Minutes)
+	history, err := services.GetTargetHistoryForTarget(context.Background(), h.db, slug, services.TargetHistoryDateRange60Minutes)
 	if err != nil {
 		return err
 	}

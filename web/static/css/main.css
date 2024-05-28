@@ -32,23 +32,12 @@ code {
   @apply font-mono text-sm bg-gray-100 rounded-lg p-1;
 }
 
-.navbar {
-  @apply justify-center flex flex-wrap space-x-2 gap-2 mt-10;
-}
 .navbar a {
-  @apply font-bold py-2 px-4 rounded-lg;
-}
-.navbar a:hover {
-  @apply bg-gray-200 shadow-inner;
-}
-.navbar a:focus {
-  @apply outline-none ring-2 ring-blue-700 text-blue-700;
+  @apply font-medium px-5 py-2 rounded-lg;
+  @apply text-center text-black bg-gray-100 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400;
 }
 .navbar a.active {
-  @apply bg-gray-300 text-black shadow;
-}
-.navbar a.active:hover {
-  @apply shadow;
+  @apply bg-white hover:bg-gray-300 shadow;
 }
 
 #page-index .targets .time-range > a {
@@ -75,36 +64,36 @@ code {
   background: repeating-linear-gradient(
     45deg,
     var(--color-red-300),
-    var(--color-red-300) 20%,
-    var(--color-red-400) 20%,
-    var(--color-red-400) 40%
+    var(--color-red-300) 10%,
+    var(--color-red-400) 10%,
+    var(--color-red-400) 20%
   );
 }
 #page-index .history.down:hover > .bar {
   background: repeating-linear-gradient(
     45deg,
     var(--color-red-400),
-    var(--color-red-400) 20%,
-    var(--color-red-500) 20%,
-    var(--color-red-500) 40%
+    var(--color-red-400) 10%,
+    var(--color-red-500) 10%,
+    var(--color-red-500) 20%
   );
 }
 #page-index .history.degraded > .bar {
   background: repeating-linear-gradient(
     0deg,
     var(--color-orange-300),
-    var(--color-orange-300) 20%,
-    var(--color-orange-400) 20%,
-    var(--color-orange-400) 40%
+    var(--color-orange-300) 10%,
+    var(--color-orange-400) 10%,
+    var(--color-orange-400) 20%
   );
 }
 #page-index .history.degraded:hover > .bar {
   background: repeating-linear-gradient(
     0deg,
     var(--color-orange-400),
-    var(--color-orange-400) 20%,
-    var(--color-orange-500) 20%,
-    var(--color-orange-500) 40%
+    var(--color-orange-400) 10%,
+    var(--color-orange-500) 10%,
+    var(--color-orange-500) 20%
   );
 }
 

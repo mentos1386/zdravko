@@ -18,20 +18,20 @@ type TargetHistory struct {
 type TargetHistoryDateRange string
 
 const (
-	TargetHistoryDateRange90Days    TargetHistoryDateRange = "90_DAYS"
+	TargetHistoryDateRange60Days    TargetHistoryDateRange = "60_DAYS"
 	TargetHistoryDateRange48Hours   TargetHistoryDateRange = "48_HOURS"
-	TargetHistoryDateRange90Minutes TargetHistoryDateRange = "90_MINUTES"
+	TargetHistoryDateRange60Minutes TargetHistoryDateRange = "60_MINUTES"
 )
 
 func GetTargetHistoryForTarget(ctx context.Context, db *sqlx.DB, targetId string, dateRange TargetHistoryDateRange) ([]*TargetHistory, error) {
 	dateRangeFilter := ""
 	switch dateRange {
-	case TargetHistoryDateRange90Days:
-		dateRangeFilter = "AND strftime('%Y-%m-%dT%H:%M:%fZ', th.created_at) >= datetime('now', 'localtime', '-90 days')"
+	case TargetHistoryDateRange60Days:
+		dateRangeFilter = "AND strftime('%Y-%m-%dT%H:%M:%fZ', th.created_at) >= datetime('now', 'localtime', '-60 days')"
 	case TargetHistoryDateRange48Hours:
 		dateRangeFilter = "AND strftime('%Y-%m-%dT%H:%M:%fZ', th.created_at) >= datetime('now', 'localtime', '-48 hours')"
-	case TargetHistoryDateRange90Minutes:
-		dateRangeFilter = "AND strftime('%Y-%m-%dT%H:%M:%fZ', th.created_at) >= datetime('now', 'localtime', '-90 minutes')"
+	case TargetHistoryDateRange60Minutes:
+		dateRangeFilter = "AND strftime('%Y-%m-%dT%H:%M:%fZ', th.created_at) >= datetime('now', 'localtime', '-60 minutes')"
 	}
 
 	var targetHistory []*TargetHistory
