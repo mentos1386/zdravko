@@ -1,0 +1,20 @@
+# Deploy the application to fly.io
+deploy-fly:
+  fly deploy --ha=false -c deploy/fly.toml -i {{DOCKER_IMAGE}}
+
+# Read local jwt key and set it as fly secret
+deploy-fly-set-jwt-key-secrets:
+  #!/bin/bash
+  # https://github.com/superfly/flyctl/issues/589
+  cat <<EOF | fly secrets import -c deploy/fly.toml
+  JWT_PRIVATE_KEY="""{{JWT_PRIVATE_KEY}}"""
+  JWT_PUBLIC_KEY="""{{JWT_PUBLIC_KEY}}"""
+  EOF
+
+# Deploy locally with docker compose
+deploy-docker:
+  cd deploy && docker compose up
+
+# Build the application
+build:
+  docker build -f build/Dockerfile -t {{DOCKER_IMAGE}} .

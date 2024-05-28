@@ -4,8 +4,6 @@ import (
 	"embed"
 )
 
-//go:generate just _tailwindcss-build
-//go:generate just _htmx-download
-//go:generate just _feather-icons-download
+//go:generate just static
 //go:embed *
 var Static embed.FS

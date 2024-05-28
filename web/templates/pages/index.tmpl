@@ -1,5 +1,8 @@
 {{ define "main" }}
-  <div class="container max-w-screen-md flex flex-col mt-20 gap-20">
+  <div
+    id="page-index"
+    class="container max-w-screen-md flex flex-col mt-20 gap-20"
+  >
     {{ $length := len .Targets }}
     {{ if eq $length 0 }}
       <section>
@@ -29,7 +32,7 @@
         </div>
       </section>
     {{ else }}
-      {{ if or (eq .Status "UNKNOWN") (eq .Status "SUCCESS") }}
+      {{ if or (eq .Outcome "UNKNOWN") (eq .Outcome "HEALTHY") }}
         <div class="flex flex-col items-center">
           <svg
             class="feather h-20 w-20 rounded-full bg-green-300 p-4 overflow-visible"
@@ -42,27 +45,27 @@
             {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
           </p>
         </div>
-      {{ else if eq .Status "INCIDENT" }}
+      {{ else if eq .Outcome "DOWN" }}
         <div class="flex flex-col items-center">
           <svg
             class="feather h-20 w-20 rounded-full bg-red-300 p-4 overflow-visible"
           >
             <use href="/static/icons/feather-sprite.svg#alert-triangle" />
           </svg>
-          <h1 class="text-gray-700 mt-4">Incident in progress</h1>
+          <h1 class="text-gray-700 mt-4">Some services are down</h1>
           <p class="text-gray-700 text-sm">
             Last updated on
             {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
           </p>
         </div>
-      {{ else }}
+      {{ else if eq .Outcome "DEGRADED" }}
         <div class="flex flex-col items-center">
           <svg
             class="feather h-20 w-20 rounded-full bg-orange-300 p-4 overflow-visible"
           >
             <use href="/static/icons/feather-sprite.svg#alert-triangle" />
           </svg>
-          <h1 class="text-gray-700 mt-4">Degraded performance</h1>
+          <h1 class="text-gray-700 mt-4">Degraded services</h1>
           <p class="text-gray-700 text-sm">
             Last updated on
             {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
@@ -103,14 +106,16 @@
             >
               <span
                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                {{ if eq $targetsAndStatus.Status "SUCCESS" }}
+                {{ if eq $targetsAndStatus.Outcome "HEALTHY" }}
                   bg-green-100 text-green-800
-                {{ else if eq $targetsAndStatus.Status "FAILURE" }}
+                {{ else if eq $targetsAndStatus.Outcome "DOWN" }}
                   bg-red-100 text-red-800
+                {{ else if eq $targetsAndStatus.Outcome "DEGRADED" }}
+                  bg-orange-100 text-orange-800
                 {{ else }}
                   bg-gray-100 text-gray-800
                 {{ end }}"
-                >{{ .Status }}</span
+                >{{ .Outcome }}</span
               >
               <h2 class="flex-1 font-semibold capitalize">
                 {{ $group }}
@@ -128,14 +133,16 @@
                 <div class="flex items-center gap-2">
                   <span
                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                    {{ if eq .Status "SUCCESS" }}
+                    {{ if eq .Outcome "HEALTHY" }}
                       bg-green-100 text-green-800
-                    {{ else if eq .Status "FAILURE" }}
+                    {{ else if eq .Outcome "DOWN" }}
                       bg-red-100 text-red-800
+                    {{ else if eq .Outcome "DEGRADED" }}
+                      bg-orange-100 text-orange-800
                     {{ else }}
                       bg-gray-100 text-gray-800
                     {{ end }}"
-                    >{{ .Status }}</span
+                    >{{ .Outcome }}</span
                   >
                   <h4>
                     {{ .Name }}
@@ -163,32 +170,28 @@
                 <div class="justify-self-end text-sm">
                   {{ printf "%.2f" .Uptime }}% uptime
                 </div>
+
                 <div
                   class="grid gap-px col-span-2 grid-flow-col h-8 rounded overflow-hidden"
                 >
                   {{ range .History }}
                     <div
-                      class="has-tooltip [&_.tooltip]:hover:flex [&_.tooltip]:hover:visible flex"
-                    >
-                      {{ if eq .Status "SUCCESS" }}
-                        <div
-                          class="bg-green-400 hover:bg-green-500 flex-auto"
-                        ></div>
-                      {{ else if eq .Status "FAILURE" }}
-                        <div
-                          class="bg-red-400 hover:bg-red-500 flex-auto"
-                        ></div>
+                      class="has-tooltip [&_.tooltip]:hover:flex [&_.tooltip]:hover:visible flex
+                          {{ if eq .Outcome "HEALTHY" }}
+                        history healthy
+                      {{ else if eq .Outcome "DOWN" }}
+                        history down
+                      {{ else if eq .Outcome "DEGRADED" }}
+                        history degraded
                       {{ else }}
-                        <div
-                          class="bg-gray-200 hover:bg-gray-300 flex-auto"
-                        ></div>
-                      {{ end }}
+                        history unknown
+                      {{ end }}"
+                    >
+                      <div class="flex-auto bar"></div>
                       <div
                         class="tooltip flex flex-col gap-2 bg-white border border-gray-200 rounded p-2 shadow-lg hidden z-50 absolute mt-10 -ml-4 flex-row text-xs"
                       >
-                        <div
-                          class="flex flex-row gap-2 justify-between pb-2 border-b border-gray-200"
-                        >
+                        <div class="flex flex-row gap-2 justify-between">
                           {{ if eq $.TimeRange "90days" }}
                             {{ .Date.Format "Jan 02" }}
                           {{ else if eq $.TimeRange "48hours" }}
@@ -198,42 +201,23 @@
                           {{ end }}
                           <span
                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                              {{ if eq .Status "SUCCESS" }}
+                              {{ if eq .Outcome "HEALTHY" }}
                               bg-green-100 text-green-800
-                            {{ else if eq .Status "FAILURE" }}
+                            {{ else if eq .Outcome "DOWN" }}
                               bg-red-100 text-red-800
+                            {{ else if eq .Outcome "DEGRADED" }}
+                              bg-orange-100 text-orange-800
                             {{ else }}
                               bg-gray-100 text-gray-800
                             {{ end }}"
-                            >{{ .Status }}
-                            ({{ printf "%.2f" .SuccessRate }}%)
+                            >{{ .Outcome }}
                           </span>
                         </div>
-
-                        {{ range .Checks }}
-                          <div class="flex flex-row gap-2 justify-between">
-                            <p>
-                              {{ .Name }} on
-                              {{ .WorkerGroupName }}
-                            </p>
-                            <span
-                              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                              {{ if eq .Status "SUCCESS" }}
-                                bg-green-100 text-green-800
-                              {{ else if eq .Status "FAILURE" }}
-                                bg-red-100 text-red-800
-                              {{ else }}
-                                bg-gray-100 text-gray-800
-                              {{ end }}"
-                              >{{ .Status }}
-                              ({{ printf "%.2f" .SuccessRate }}%)
-                            </span>
-                          </div>
-                        {{ end }}
                       </div>
                     </div>
                   {{ end }}
                 </div>
+
                 <div
                   class="text-slate-500 justify-self-start text-xs tracking-wider"
                 >

@@ -115,46 +115,6 @@
         }
       }
     },
-    "tailwindcss@latest": {
-      "last_modified": "2024-01-27T14:55:31Z",
-      "resolved": "github:NixOS/nixpkgs/160b762eda6d139ac10ae081f8f78d640dd523eb#tailwindcss",
-      "source": "devbox-search",
-      "version": "3.4.1",
-      "systems": {
-        "aarch64-darwin": {
-          "store_path": "/nix/store/dii6r8cwfav7r8kd779f3ma5bs71ny54-tailwindcss-3.4.1"
-        },
-        "aarch64-linux": {
-          "store_path": "/nix/store/b83zqgln5z5wpxiiccrlcmzgvgqj24wq-tailwindcss-3.4.1"
-        },
-        "x86_64-darwin": {
-          "store_path": "/nix/store/lpgbpk0lpiqp8my34l0agcz26qcdlshq-tailwindcss-3.4.1"
-        },
-        "x86_64-linux": {
-          "store_path": "/nix/store/xag8bx7ld2k2ixg52yw5c9knbqw5a3bs-tailwindcss-3.4.1"
-        }
-      }
-    },
-    "temporal-cli@latest": {
-      "last_modified": "2024-02-05T02:15:44Z",
-      "resolved": "github:NixOS/nixpkgs/0a254180b4cad6be45aa46dce896bdb8db5d2930#temporal-cli",
-      "source": "devbox-search",
-      "version": "1.18.0",
-      "systems": {
-        "aarch64-darwin": {
-          "store_path": "/nix/store/6897s8ww6fhkiqvqdwfiji7497gvcxj6-temporal-cli-1.18.0"
-        },
-        "aarch64-linux": {
-          "store_path": "/nix/store/d0lvc4fq5y9cql0fshy32285ldzyvhjz-temporal-cli-1.18.0"
-        },
-        "x86_64-darwin": {
-          "store_path": "/nix/store/dxwlx019wah1pj0hr3j50skrbdlb3x9g-temporal-cli-1.18.0"
-        },
-        "x86_64-linux": {
-          "store_path": "/nix/store/v6z5knwsyxymnsk1gfmlnm51j22gf1df-temporal-cli-1.18.0"
-        }
-      }
-    },
     "watchexec@latest": {
       "last_modified": "2024-01-27T14:55:31Z",
       "resolved": "github:NixOS/nixpkgs/160b762eda6d139ac10ae081f8f78d640dd523eb#watchexec",

@@ -1,9 +1,7 @@
 {
   "packages": [
     "go@1.21",
-    "temporal-cli@latest",
     "watchexec@latest",
-    "tailwindcss@latest",
     "flyctl@latest",
     "just@latest",
     "nodePackages.npm@latest",

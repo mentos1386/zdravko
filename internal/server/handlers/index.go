@@ -12,19 +12,28 @@ import (
 	"github.com/mentos1386/zdravko/web/templates/components"
 )
 
+type HistoryOutcome string
+
+const (
+	HistoryOutcomeHealthy  HistoryOutcome = "HEALTHY"
+	HistoryOutcomeDegraded HistoryOutcome = "DEGRADED"
+	HistoryOutcomeUnknown  HistoryOutcome = "UNKNOWN"
+	HistoryOutcomeDown     HistoryOutcome = "DOWN"
+)
+
 type IndexData struct {
 	*components.Base
 	Targets       map[string]TargetsAndStatus
 	TargetsLength int
 	TimeRange     string
-	Status        models.TargetStatus
+	Outcome       HistoryOutcome
 }
 
 type Target struct {
 	Name       string
 	Visibility models.TargetVisibility
 	Group      string
-	Status     models.TargetStatus
+	Outcome    HistoryOutcome
 	History    []*HistoryItem
 	Uptime     float64
 }
@@ -35,7 +44,7 @@ type History struct {
 }
 
 type HistoryItem struct {
-	Status       models.TargetStatus
+	Outcome      HistoryOutcome
 	StatusCounts map[models.TargetStatus]int
 	Counts       int
 	Date         time.Time
@@ -53,12 +62,23 @@ type HistoryItemCheck struct {
 }
 
 type TargetsAndStatus struct {
-	Status  models.TargetStatus
+	Outcome HistoryOutcome
 	Targets []*Target
 }
 
 func getDateString(date time.Time) string {
 	return date.UTC().Format("2006-01-02T15:04:05")
+}
+
+func TargetStatusToHistoryOutcome(status models.TargetStatus) HistoryOutcome {
+	switch status {
+	case models.TargetStatusSuccess:
+		return HistoryOutcomeHealthy
+	case models.TargetStatusFailure:
+		return HistoryOutcomeDown
+	default:
+		return HistoryOutcomeUnknown
+	}
 }
 
 func getHistory(history []*services.TargetHistory, period time.Duration, buckets int) *History {
@@ -74,7 +94,7 @@ func getHistory(history []*services.TargetHistory, period time.Duration, buckets
 		mapKeys[i] = dateString
 
 		historyMap[dateString] = &HistoryItem{
-			Status:       models.TargetStatusUnknown,
+			Outcome:      HistoryOutcomeUnknown,
 			StatusCounts: map[models.TargetStatus]int{},
 			Date:         date,
 			Checks:       []*HistoryItemCheck{},
@@ -93,15 +113,6 @@ func getHistory(history []*services.TargetHistory, period time.Duration, buckets
 		numTotal++
 		if _history.Status == models.TargetStatusSuccess {
 			numOfSuccess++
-		}
-
-		if entry.Status == models.TargetStatusUnknown {
-			entry.Status = _history.Status
-		}
-
-		// If not yet failure, and failing check. Mark as failing.
-		if _history.Status == models.TargetStatusFailure && entry.Status != models.TargetStatusFailure {
-			entry.Status = models.TargetStatusFailure
 		}
 
 		entry.StatusCounts[_history.Status]++
@@ -144,6 +155,14 @@ func getHistory(history []*services.TargetHistory, period time.Duration, buckets
 				byWorkerGroupName := entry.Checks[i].WorkerGroupName < entry.Checks[j].WorkerGroupName
 				return byName || (entry.Checks[i].Name == entry.Checks[j].Name && byWorkerGroupName)
 			})
+		}
+
+		if entry.SuccessRate == 100.0 {
+			entry.Outcome = HistoryOutcomeHealthy
+		} else if entry.SuccessRate == 0.0 {
+			entry.Outcome = HistoryOutcomeDown
+		} else {
+			entry.Outcome = HistoryOutcomeDegraded
 		}
 
 		historyMap[dateString] = entry
@@ -196,8 +215,8 @@ func (h *BaseHandler) Index(c echo.Context) error {
 		timeBuckets = 90
 	}
 
-	overallStatus := models.TargetStatusUnknown
-	statusByGroup := make(map[string]models.TargetStatus)
+	overallOutcome := HistoryOutcomeUnknown
+	outcomeByGroup := make(map[string]HistoryOutcome)
 
 	targetsWithHistory := make([]*Target, len(targets))
 	for i, target := range targets {
@@ -208,29 +227,29 @@ func (h *BaseHandler) Index(c echo.Context) error {
 
 		historyResult := getHistory(history, timeInterval, timeBuckets)
 
-		if statusByGroup[target.Group] == "" {
-			statusByGroup[target.Group] = models.TargetStatusUnknown
+		if outcomeByGroup[target.Group] == "" {
+			outcomeByGroup[target.Group] = HistoryOutcomeUnknown
 		}
 
 		status := historyResult.List[len(historyResult.List)-1]
-		if status.Status == models.TargetStatusSuccess {
-			if overallStatus == models.TargetStatusUnknown {
-				overallStatus = status.Status
+		if status.Outcome == HistoryOutcomeHealthy {
+			if overallOutcome == HistoryOutcomeUnknown {
+				overallOutcome = status.Outcome
 			}
-			if statusByGroup[target.Group] == models.TargetStatusUnknown {
-				statusByGroup[target.Group] = status.Status
+			if outcomeByGroup[target.Group] == HistoryOutcomeUnknown {
+				outcomeByGroup[target.Group] = status.Outcome
 			}
 		}
-		if status.Status != models.TargetStatusSuccess && status.Status != models.TargetStatusUnknown {
-			overallStatus = status.Status
-			statusByGroup[target.Group] = status.Status
+		if status.Outcome != HistoryOutcomeHealthy && status.Outcome != HistoryOutcomeUnknown {
+			overallOutcome = status.Outcome
+			outcomeByGroup[target.Group] = status.Outcome
 		}
 
 		targetsWithHistory[i] = &Target{
 			Name:       target.Name,
 			Visibility: target.Visibility,
 			Group:      target.Group,
-			Status:     status.Status,
+			Outcome:    status.Outcome,
 			History:    historyResult.List,
 			Uptime:     historyResult.Uptime,
 		}
@@ -239,7 +258,7 @@ func (h *BaseHandler) Index(c echo.Context) error {
 	targetsByGroup := map[string]TargetsAndStatus{}
 	for _, target := range targetsWithHistory {
 		targetsByGroup[target.Group] = TargetsAndStatus{
-			Status:  statusByGroup[target.Group],
+			Outcome: outcomeByGroup[target.Group],
 			Targets: append(targetsByGroup[target.Group].Targets, target),
 		}
 	}
@@ -253,6 +272,6 @@ func (h *BaseHandler) Index(c echo.Context) error {
 		},
 		Targets:   targetsByGroup,
 		TimeRange: timeRangeQuery,
-		Status:    overallStatus,
+		Outcome:   overallOutcome,
 	})
 }

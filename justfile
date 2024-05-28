@@ -3,6 +3,8 @@ set shell := ["devbox", "run"]
 # Load dotenv
 set dotenv-load
 
+import 'deploy.just'
+
 # Load public and private keys
 export JWT_PRIVATE_KEY := `cat jwt.private.pem || echo ""`
 export JWT_PUBLIC_KEY := `cat jwt.public.pem || echo ""`
@@ -16,7 +18,7 @@ _default:
 
 # Run full development environment
 run:
-  watchexec -r -e tmpl,css just _tailwindcss-build | sed -e 's/^/tailwind: /;' &
+  watchexec -r -e tmpl,css just tailwindcss | sed -e 's/^/tailwind: /;' &
   sleep 1
   just run-temporal | sed -e 's/^/temporal: /;' &
   sleep 1
@@ -24,18 +26,15 @@ run:
 
 # Start worker
 run-worker:
-  go build -o dist/zdravko cmd/zdravko/main.go
-  ./dist/zdravko --worker
+  go run cmd/zdravko/main.go --worker
 
 # Start server
 run-server:
-  go build -o dist/zdravko cmd/zdravko/main.go
-  ./dist/zdravko --server
+  go run cmd/zdravko/main.go --server
 
 # Start temporal
 run-temporal:
-  go build -o dist/zdravko cmd/zdravko/main.go
-  ./dist/zdravko --temporal
+  go run cmd/zdravko/main.go --temporal
 
 # Test
 test:
@@ -45,27 +44,6 @@ test:
 generate-jwt-key:
   openssl genrsa -out jwt.private.pem 2048
   openssl rsa -pubout -in jwt.private.pem -out jwt.public.pem
-
-# Deploy the application to fly.io
-deploy-fly:
-  fly deploy --ha=false -c deploy/fly.toml -i {{DOCKER_IMAGE}}
-
-# Read local jwt key and set it as fly secret
-deploy-fly-set-jwt-key-secrets:
-  #!/bin/bash
-  # https://github.com/superfly/flyctl/issues/589
-  cat <<EOF | fly secrets import -c deploy/fly.toml
-  JWT_PRIVATE_KEY="""{{JWT_PRIVATE_KEY}}"""
-  JWT_PUBLIC_KEY="""{{JWT_PUBLIC_KEY}}"""
-  EOF
-
-# Deploy locally with docker compose
-deploy-docker:
-  cd deploy && docker compose up
-
-# Build the application
-build:
-  docker build -f build/Dockerfile -t {{DOCKER_IMAGE}} .
 
 # Run Docker application.
 run-docker:
@@ -103,22 +81,27 @@ migration-new name:
   echo "Created migration file: $FILENAME"
 
 # Generate and download all external dependencies.
-generate: _tailwindcss-build _htmx-download _monaco-download _feather-icons-download
+generate: static
   go generate ./...
 
-_tailwindcss-build:
-  tailwindcss build -c build/tailwind.config.js -i {{STATIC_DIR}}/css/main.css -o {{STATIC_DIR}}/css/tailwind.css
+tailwindcss:
+  mkdir -p {{STATIC_DIR}}/css
+  npx tailwindcss build -c build/tailwind.config.js -i {{STATIC_DIR}}/css/main.css -o {{STATIC_DIR}}/css/tailwind.css
 
-_htmx-download:
-  mkdir -p  {{STATIC_DIR}}/js
-  curl -sLo {{STATIC_DIR}}/js/htmx.min.js https://unpkg.com/htmx.org/dist/htmx.min.js
+static:
+  npm install
+  # Clean up static directory
+  find {{STATIC_DIR}} -type f -not -path '{{STATIC_DIR}}/static.go' -not -path '{{STATIC_DIR}}/css/*' -exec rm -f {} \;
 
-_monaco-download:
-  rm -rf {{STATIC_DIR}}/monaco
-  npm install monaco-editor@0.46.0
-  mv node_modules/monaco-editor/min {{STATIC_DIR}}/monaco
-  rm -rf node_modules
+  # Tailwind CSS
+  just tailwindcss
 
+  # HTMX
+  mkdir -p {{STATIC_DIR}}/js
+  cp node_modules/htmx.org/dist/htmx.min.js {{STATIC_DIR}}/js/htmx.min.js
+
+  # Monaco
+  cp -r node_modules/monaco-editor/min/* {{STATIC_DIR}}/monaco
   # We only care about javascript language
   find {{STATIC_DIR}}/monaco/vs/basic-languages/ \
     -type d \
@@ -128,6 +111,6 @@ _monaco-download:
     -not -name 'basic-languages' \
     -prune -exec rm -rf {} \;
 
-_feather-icons-download:
+  # Feather Icons
   mkdir -p {{STATIC_DIR}}/icons
-  curl -sLo {{STATIC_DIR}}/icons/feather-sprite.svg https://unpkg.com/feather-icons/dist/feather-sprite.svg
+  cp node_modules/feather-icons/dist/feather-sprite.svg {{STATIC_DIR}}/icons/feather-sprite.svg

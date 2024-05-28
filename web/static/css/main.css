@@ -51,81 +51,127 @@ code {
   @apply shadow;
 }
 
-.sidebar a {
-  @apply w-full block rounded-lg px-4 py-2  focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700;
-}
-.sidebar a:focus {
-  @apply outline-none ring-2 ring-blue-700 text-blue-700;
-}
-.sidebar a:hover {
-  @apply shadow-inner bg-gray-200 text-blue-700;
-}
-.sidebar a.active {
-  @apply bg-blue-700 text-white;
-}
-
-.targets .time-range > a {
+#page-index .targets .time-range > a {
   @apply font-medium text-sm px-2.5 py-1 rounded-lg;
   @apply text-black bg-gray-100 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400;
 }
-.targets .time-range > a.active {
+#page-index .targets .time-range > a.active {
   @apply bg-white hover:bg-gray-300 shadow;
 }
 
-.settings {
-  @apply grid grid-cols-1 gap-5 grid-rows-[min-content] h-fit;
+#page-index .history > .bar {
+  @apply h-full self-end;
 }
-.settings section {
+#page-index .history.healthy > .bar {
+  @apply bg-green-400 hover:bg-green-500;
+}
+#page-index .history.unknown > .bar {
+  @apply bg-gray-200 h-1/3;
+}
+#page-index .history.unknown:hover > .bar {
+  @apply h-full bg-gray-300;
+}
+#page-index .history.down > .bar {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-red-300),
+    var(--color-red-300) 20%,
+    var(--color-red-400) 20%,
+    var(--color-red-400) 40%
+  );
+}
+#page-index .history.down:hover > .bar {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-red-400),
+    var(--color-red-400) 20%,
+    var(--color-red-500) 20%,
+    var(--color-red-500) 40%
+  );
+}
+#page-index .history.degraded > .bar {
+  background: repeating-linear-gradient(
+    0deg,
+    var(--color-orange-300),
+    var(--color-orange-300) 20%,
+    var(--color-orange-400) 20%,
+    var(--color-orange-400) 40%
+  );
+}
+#page-index .history.degraded:hover > .bar {
+  background: repeating-linear-gradient(
+    0deg,
+    var(--color-orange-400),
+    var(--color-orange-400) 20%,
+    var(--color-orange-500) 20%,
+    var(--color-orange-500) 40%
+  );
+}
+
+#page-settings .sidebar a {
+  @apply w-full block rounded-lg px-4 py-2  focus:outline-none focus:ring-2 focus:ring-blue-700 focus:text-blue-700;
+}
+#page-settings .sidebar a:focus {
+  @apply outline-none ring-2 ring-blue-700 text-blue-700;
+}
+#page-settings .sidebar a:hover {
+  @apply shadow-inner bg-gray-200 text-blue-700;
+}
+#page-settings .sidebar a.active {
+  @apply bg-blue-700 text-white;
+}
+
+#page-settings section {
   @apply relative overflow-x-auto shadow-md sm:rounded-lg text-gray-700 bg-white h-min;
 }
 
-.settings section h2 {
+#page-settings section h2 {
   @apply text-lg font-semibold text-gray-900;
 }
 
-.settings section form {
+#page-settings section form {
   @apply grid gap-4 grid-cols-1 sm:grid-cols-[2fr_1fr];
 }
-.settings section form select,
-.settings section form input {
+#page-settings section form select,
+#page-settings section form input {
   @apply h-min bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5;
 }
-.settings section form label {
+#page-settings section form label {
   @apply sm:col-span-2 block text-sm font-medium text-gray-900;
 }
-.settings section form p {
+#page-settings section form p {
   @apply text-sm font-normal text-gray-500;
 }
-.settings section form button[type="submit"] {
+#page-settings section form button[type="submit"] {
   @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center;
   @apply sm:col-span-2;
 }
 
-.settings section table {
+#page-settings section table {
   @apply w-full text-sm text-left rtl:text-right text-gray-500;
 }
-.settings section table caption {
+#page-settings section table caption {
   @apply p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white;
 }
-.settings section table caption p {
+#page-settings section table caption p {
   @apply mt-1 text-sm font-normal text-gray-700;
 }
-.settings section table thead {
+#page-settings section table thead {
   @apply text-xs text-gray-700 uppercase bg-gray-50;
 }
-.settings section table thead th {
+#page-settings section table thead th {
   @apply px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider;
 }
-.settings section table tbody tr {
+#page-settings section table tbody tr {
   @apply odd:bg-white even:bg-gray-50;
 }
-.settings section table tbody tr th {
+#page-settings section table tbody tr th {
   @apply px-6 py-4 font-medium text-gray-900 whitespace-nowrap text-center;
 }
-.settings section table tbody tr td {
+#page-settings section table tbody tr td {
   @apply px-6 py-4 text-center whitespace-nowrap;
 }
-.settings section table tbody tr.row-special {
+#page-settings section table tbody tr.row-special {
   @apply bg-gray-100;
   @apply font-semibold text-xs uppercase tracking-wider;
 }
