@@ -30,6 +30,10 @@ EXPOSE 8223
 EXPOSE 7233
 
 # Volume to persist sqlite databases
+#  as well as the keyvalue database.
+ENV SQLITE_DATABASE_PATH=/data/zdravko.db
+ENV TEMPORAL_DATABASE_PATH=/data/temporal.db
+ENV KEYVALUE_DATABASE_PATH=/data/keyvalue.db
 VOLUME /data
 
 ENV DATABASE_PATH=/data/zdravko.db

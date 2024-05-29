@@ -3,7 +3,7 @@ set shell := ["devbox", "run"]
 # Load dotenv
 set dotenv-load
 
-import 'deploy.just'
+import 'deploy/Justfile'
 
 # Load public and private keys
 export JWT_PRIVATE_KEY := `cat jwt.private.pem || echo ""`
