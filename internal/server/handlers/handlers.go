@@ -22,6 +22,7 @@ type examples struct {
 	Filter  string `yaml:"filter"`
 	Trigger string `yaml:"trigger"`
 	Target  string `yaml:"target"`
+	Hook    string `yaml:"hook"`
 }
 
 var Pages = []*components.Page{
@@ -69,6 +70,7 @@ func NewBaseHandler(db *sqlx.DB, kvStore database.KeyValueStore, temporal client
 	examples.Filter = script.EscapeString(examples.Filter)
 	examples.Trigger = script.EscapeString(examples.Trigger)
 	examples.Target = script.EscapeString(examples.Target)
+	examples.Hook = script.EscapeString(examples.Hook)
 
 	return &BaseHandler{
 		db:       db,

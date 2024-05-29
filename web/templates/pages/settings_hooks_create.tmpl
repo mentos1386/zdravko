@@ -1,0 +1,95 @@
+{{ define "settings" }}
+  <section class="p-5">
+    <form action="/settings/hooks/create" method="post">
+      <label for="name">Name</label>
+      <input type="text" name="name" id="name" placeholder="HTTP GET Request" />
+      <p>Name of the hook can be anything.</p>
+      <label for="workergroups">Worker Groups</label>
+      <input
+        type="text"
+        name="workergroups"
+        id="workergroups"
+        placeholder="europe asia"
+        required
+      />
+      <p>
+        Worker groups are used to distribute the hook to specific workers. Space
+        is a separator between groups.
+      </p>
+      <label for="schedule">Schedule</label>
+      <input
+        type="text"
+        name="schedule"
+        id="schedule"
+        placeholder="@every 1m"
+        value="@every 1m"
+        required
+      />
+      <p>
+        Schedule is a cron expression that defines when the hook should be
+        executed.
+        <br />
+        You can also use <code>@every [interval]</code> where interval is a
+        duration like 5m, 1h, 60s. Or use <code>@hourly</code>,
+        <code>@daily</code>, <code>@weekly</code>, <code>@monthly</code>,
+        <code>@yearly</code>.
+      </p>
+      <label for="script">Script</label>
+      <textarea required id="script" name="script" class="sm:col-span-2 h-96">
+{{ ScriptUnescapeString .ExampleScript }}</textarea
+      >
+      <div
+        id="editor-script"
+        class="hidden sm:col-span-2 block w-full h-96 rounded-lg border border-gray-300 overflow-hidden"
+      ></div>
+      <p class="sm:col-span-2">
+        Script is what determines the status of a service. You can read more
+        about it on
+        <a target="_blank" href="https://k6.io/docs/using-k6/http-requests/"
+          >k6 documentation</a
+        >.
+      </p>
+      <button type="submit" onclick="save()">Create</button>
+    </form>
+  </section>
+
+  <script src="/static/monaco/vs/loader.js"></script>
+  <script>
+    const items = [{ name: "script", language: "javascript" }];
+
+    function save() {
+      for (const { name } of items) {
+        const elem = window.editors[name].getValue();
+        document.getElementById(name).value = elem;
+      }
+    }
+
+    window.editors = {};
+    for (const { name, language, options = {} } of items) {
+      const textarea = document.getElementById(name);
+      const editor = document.getElementById("editor-" + name);
+
+      editor.classList.remove("hidden");
+      textarea.hidden = true;
+
+      require.config({ paths: { vs: "/static/monaco/vs" } });
+      require(["vs/editor/editor.main"], function () {
+        window.editors[name] = monaco.editor.create(editor, {
+          value: textarea.value,
+          language: language,
+          minimap: { enabled: false },
+          codeLens: false,
+          contextmenu: false,
+          scrollBeyondLastLine: false,
+          wordWrap: "on",
+          ...options,
+        });
+
+        const resizeObserver = new ResizeObserver((entries) => {
+          window.editors[name].layout();
+        });
+        resizeObserver.observe(editor);
+      });
+    }
+  </script>
+{{ end }}

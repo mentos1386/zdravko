@@ -15,17 +15,20 @@ Golang selfhosted Status/Healthcheck monitoring app.
     - Kinda working atm. ~But look if all the data could be stored/fetched from temporal.~
  - [x] Edit/Delete operations for healthchecks and workers.
  - [ ] CronJob Healthchecks (via webhooks).
+    - Allow CronJob monitoring by checking that there was an event at expected time.
+    - Allow Heartbeat monitoring to alert when events stop coming.
+    - Allow integration with other services by alerting/transforming when events come.
  - [ ] Notifications (webhooks, slack, etc).
  - [ ] Incidents (based on script that is triggered by monitors/crobjobs).
  - [ ] Prepare i18n.
- - [ ] Alpha Version (1H 2024)
+ - [ ] Alpha Version (3Q 2024)
  - [ ] ??
- - [ ] Beta Version (2H 2024)
+ - [ ] Beta Version (4Q 2024)
  - [ ] ??
- - [ ] Stable Release (2025)
+ - [ ] Stable Release (1H 2025)
 
 ![Screenshot](docs/screenshot.png)
-Demo is available at https://zdravko.mnts.dev.
+Demo is available at https://zdravko.mnts.dev. More screenshots in the [docs folder](docs/).
 
 # Development
 

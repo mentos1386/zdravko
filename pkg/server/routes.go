@@ -83,6 +83,15 @@ func Routes(
 	settings.GET("/checks/:id/disable", h.SettingsChecksDisableGET)
 	settings.GET("/checks/:id/enable", h.SettingsChecksEnableGET)
 
+	settings.GET("/hooks", h.SettingsHooksGET)
+	settings.GET("/hooks/create", h.SettingsHooksCreateGET)
+	settings.POST("/hooks/create", h.SettingsHooksCreatePOST)
+	settings.GET("/hooks/:id", h.SettingsHooksDescribeGET)
+	settings.POST("/hooks/:id", h.SettingsHooksDescribePOST)
+	settings.GET("/hooks/:id/delete", h.SettingsHooksDescribeDELETE)
+	settings.GET("/hooks/:id/disable", h.SettingsHooksDisableGET)
+	settings.GET("/hooks/:id/enable", h.SettingsHooksEnableGET)
+
 	settings.GET("/notifications", h.SettingsNotificationsGET)
 
 	settings.GET("/worker-groups", h.SettingsWorkerGroupsGET)
