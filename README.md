@@ -27,7 +27,7 @@ Golang selfhosted Status/Healthcheck monitoring app.
  - [ ] ??
  - [ ] Stable Release (1H 2025)
 
-![Screenshot](docs/screenshot.png)
+![Screenshot](docs/screenshot-index.png)
 Demo is available at https://zdravko.mnts.dev. More screenshots in the [docs folder](docs/).
 
 # Development
@@ -39,7 +39,7 @@ Demo is available at https://zdravko.mnts.dev. More screenshots in the [docs fol
 ```sh
 # Configure
 # You will need to configure an SSO provider
-# This can be github for example.
+# This can be github for example:.
 cp example.env .env
 
 # Generate JWT key
