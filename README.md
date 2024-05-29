@@ -43,7 +43,6 @@ Demo is available at https://zdravko.mnts.dev. More screenshots in the [docs fol
 cp example.env .env
 
 # Generate JWT key
-# Copy the values to your .env
 just generate-jwt-key
 
 # Start development environment
