@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"sync"
@@ -20,7 +20,19 @@ type StartableAndStoppable interface {
 	Stop() error
 }
 
+func setupLogger() {
+	opts := &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, opts))
+
+	slog.SetDefault(logger)
+}
+
 func main() {
+	setupLogger()
+
 	var startServer bool
 	var startWorker bool
 	var startTemporal bool
@@ -28,47 +40,47 @@ func main() {
 	flag.BoolVar(&startServer, "server", false, "Start the server")
 	flag.BoolVar(&startWorker, "worker", false, "Start the worker")
 	flag.BoolVar(&startTemporal, "temporal", false, "Start the temporal")
-
 	flag.Parse()
 
-	println("Starting zdravko...")
-	println("Server:   ", startServer)
-	println("Worker:   ", startWorker)
-	println("Temporal: ", startTemporal)
+	slog.Info("Starting zdravko...", "server", startServer, "worker", startWorker, "temporal", startTemporal)
 
 	if !startServer && !startWorker && !startTemporal {
-		log.Fatal("At least one of the following must be set: --server, --worker, --temporal")
+		slog.Error("At least one of the following must be set: --server, --worker, --temporal")
+		os.Exit(1)
 	}
 
 	var servers [3]StartableAndStoppable
 	var wg sync.WaitGroup
 
 	if startTemporal {
-		log.Println("Setting up Temporal")
+		slog.Info("Setting up Temporal")
 		cfg := config.NewTemporalConfig()
 		temporal, err := temporal.NewTemporal(cfg)
 		if err != nil {
-			log.Fatalf("Unable to create temporal: %v", err)
+			slog.Error("Unable to create temporal", "error", err)
+			os.Exit(1)
 		}
 		servers[0] = temporal
 	}
 
 	if startServer {
-		log.Println("Setting up Server")
+		slog.Info("Setting up Server")
 		cfg := config.NewServerConfig()
 		server, err := server.NewServer(cfg)
 		if err != nil {
-			log.Fatalf("Unable to create server: %v", err)
+			slog.Error("Unable to create server", "error", err)
+			os.Exit(1)
 		}
 		servers[1] = server
 	}
 
 	if startWorker {
-		log.Println("Setting up Worker")
+		slog.Info("Setting up Worker")
 		cfg := config.NewWorkerConfig()
 		worker, err := worker.NewWorker(cfg)
 		if err != nil {
-			log.Fatalf("Unable to create worker: %v", err)
+			slog.Error("Unable to create worker", "error", err)
+			os.Exit(1)
 		}
 		servers[2] = worker
 	}
@@ -79,13 +91,14 @@ func main() {
 			continue
 		}
 
-		println("Starting", srv.Name())
+		slog.Info("Starting", "name", srv.Name())
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			err := srv.Start()
 			if err != nil {
-				log.Fatalf("Unable to start %s: %v", srv.Name(), err)
+				slog.Error("Unable to start", "name", srv.Name(), "error", err)
+				os.Exit(1)
 			}
 		}()
 	}
@@ -94,16 +107,16 @@ func main() {
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		for sig := range c {
-			log.Printf("Received signal: %v", sig)
+			slog.Info("Received signal", "signal", sig)
 			for _, srv := range servers {
 				if srv == nil {
 					continue
 				}
 
-				println("Stopping", srv.Name())
+				slog.Info("Stopping", "name", srv.Name())
 				err := srv.Stop()
 				if err != nil {
-					log.Printf("Unable to stop server %s: %v", srv.Name(), err)
+					slog.Error("Unable to stop server", "name", srv.Name(), "error", err)
 				}
 			}
 		}

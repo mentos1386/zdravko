@@ -3,7 +3,8 @@ package templates
 import (
 	"embed"
 	"io"
-	"log"
+	"io/fs"
+	"log/slog"
 	"strings"
 	"text/template"
 	"time"
@@ -18,6 +19,7 @@ var templates embed.FS
 const base = "components/base.tmpl"
 
 type Templates struct {
+	logger    *slog.Logger
 	templates map[string]*template.Template
 }
 
@@ -52,40 +54,41 @@ func loadSettings(files ...string) *template.Template {
 	return load(files...)
 }
 
-func NewTemplates() *Templates {
-	return &Templates{
-		templates: map[string]*template.Template{
-			"404.tmpl":                             load("pages/404.tmpl"),
-			"index.tmpl":                           load("pages/index.tmpl"),
-			"incidents.tmpl":                       load("pages/incidents.tmpl"),
-			"settings_home.tmpl":                   loadSettings("pages/settings_home.tmpl"),
-			"settings_triggers.tmpl":               loadSettings("pages/settings_triggers.tmpl"),
-			"settings_triggers_create.tmpl":        loadSettings("pages/settings_triggers_create.tmpl"),
-			"settings_triggers_describe.tmpl":      loadSettings("pages/settings_triggers_describe.tmpl"),
-			"settings_targets.tmpl":                loadSettings("pages/settings_targets.tmpl"),
-			"settings_targets_create.tmpl":         loadSettings("pages/settings_targets_create.tmpl"),
-			"settings_targets_describe.tmpl":       loadSettings("pages/settings_targets_describe.tmpl"),
-			"settings_incidents.tmpl":              loadSettings("pages/settings_incidents.tmpl"),
-			"settings_notifications.tmpl":          loadSettings("pages/settings_notifications.tmpl"),
-			"settings_worker_groups.tmpl":          loadSettings("pages/settings_worker_groups.tmpl"),
-			"settings_worker_groups_create.tmpl":   loadSettings("pages/settings_worker_groups_create.tmpl"),
-			"settings_worker_groups_describe.tmpl": loadSettings("pages/settings_worker_groups_describe.tmpl"),
-			"settings_checks.tmpl":                 loadSettings("pages/settings_checks.tmpl"),
-			"settings_checks_create.tmpl":          loadSettings("pages/settings_checks_create.tmpl"),
-			"settings_checks_describe.tmpl":        loadSettings("pages/settings_checks_describe.tmpl"),
-		},
+func NewTemplates(logger *slog.Logger) (*Templates, error) {
+	t := Templates{
+		logger:    logger,
+		templates: map[string]*template.Template{},
 	}
+
+	err := fs.WalkDir(templates, "pages", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if strings.Contains(path, ".tmpl") {
+			t.logger.Debug("Loading template", "path", path)
+			pathWithoutPrefix := strings.TrimPrefix(path, "pages/")
+
+			if strings.Contains(path, "settings") {
+				t.templates[pathWithoutPrefix] = loadSettings(path)
+			} else {
+				t.templates[pathWithoutPrefix] = load(path)
+			}
+		}
+		return nil
+	})
+
+	return &t, err
 }
 
 func (t *Templates) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	if t.templates[name] == nil {
-		log.Printf("template not found: %s", name)
+		t.logger.Error("template not found", "template", name)
 		return echo.ErrNotFound
 	}
 
 	err := t.templates[name].ExecuteTemplate(w, "base", data)
 	if err != nil {
-		log.Printf("error rendering template: %s", err)
+		t.logger.Error("error rendering template", "template", err)
 	}
 
 	return err

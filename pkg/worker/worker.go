@@ -66,7 +66,7 @@ type Worker struct {
 func NewWorker(cfg *config.WorkerConfig) (*Worker, error) {
 	return &Worker{
 		cfg:    cfg,
-		logger: slog.Default().WithGroup("worker"),
+		logger: slog.Default(),
 	}, nil
 }
 

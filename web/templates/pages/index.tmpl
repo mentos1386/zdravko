@@ -1,4 +1,22 @@
 {{ define "main" }}
+  {{ $outcomeText := "All services are online." }}
+  {{ $outcomeIcon := "check" }}
+  {{ $outcomeColor := "bg-green-300" }}
+  {{ if eq .Outcome "DOWN" }}
+    {{ $outcomeText = "Some services are down." }}
+    {{ $outcomeIcon = "alert-circle" }}
+    {{ $outcomeColor = "bg-red-300" }}
+  {{ else if eq .Outcome "DEGRADED" }}
+    {{ $outcomeText = "Some services are degraded." }}
+    {{ $outcomeIcon = "alert-triangle" }}
+    {{ $outcomeColor = "bg-orange-300" }}
+  {{ else }}
+    {{ $outcomeText = "We are unable to determine current status." }}
+    {{ $outcomeIcon = "help-circle" }}
+    {{ $outcomeColor = "bg-gray-300" }}
+  {{ end }}
+
+
   <div
     id="page-index"
     class="container max-w-screen-md flex flex-col mt-20 gap-20"
@@ -32,61 +50,21 @@
         </div>
       </section>
     {{ else }}
-      {{ if eq .Outcome "HEALTHY" }}
-        <div class="flex flex-col items-center">
-          <svg
-            class="feather h-20 w-20 rounded-full bg-green-300 p-4 overflow-visible"
-          >
-            <use href="/static/icons/feather-sprite.svg#check" />
-          </svg>
-          <h1 class="text-gray-700 mt-4 text-lg">All services are online</h1>
-          <p class="text-gray-700 text-sm">
-            Last updated on
-            {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
-          </p>
-        </div>
-      {{ else if eq .Outcome "UNKNOWN" }}
-        <div class="flex flex-col items-center">
-          <svg
-            class="feather h-20 w-20 rounded-full bg-gray-300 p-4 overflow-visible"
-          >
-            <use href="/static/icons/feather-sprite.svg#help-circle" />
-          </svg>
-          <h1 class="text-gray-700 mt-4 text-lg">
-            We are unable to determine current status
-          </h1>
-          <p class="text-gray-700 text-sm">
-            Last updated on
-            {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
-          </p>
-        </div>
-      {{ else if eq .Outcome "DOWN" }}
-        <div class="flex flex-col items-center">
-          <svg
-            class="feather h-20 w-20 rounded-full bg-red-300 p-4 overflow-visible"
-          >
-            <use href="/static/icons/feather-sprite.svg#alert-circle" />
-          </svg>
-          <h1 class="text-gray-700 mt-4 text-lg">Some services are down</h1>
-          <p class="text-gray-700 text-sm">
-            Last updated on
-            {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
-          </p>
-        </div>
-      {{ else if eq .Outcome "DEGRADED" }}
-        <div class="flex flex-col items-center">
-          <svg
-            class="feather h-20 w-20 rounded-full bg-orange-300 p-4 overflow-visible"
-          >
-            <use href="/static/icons/feather-sprite.svg#alert-triangle" />
-          </svg>
-          <h1 class="text-gray-700 mt-4 text-lg">Degraded services</h1>
-          <p class="text-gray-700 text-sm">
-            Last updated on
-            {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
-          </p>
-        </div>
-      {{ end }}
+      <div class="flex flex-col items-center">
+        <svg
+          class="feather h-20 w-20 rounded-full {{ $outcomeColor }} p-4 overflow-visible"
+        >
+          <use href="/static/icons/feather-sprite.svg#{{ $outcomeIcon }}" />
+        </svg>
+        <h1 class="text-gray-800 mt-4 text-xl font-bold">
+          {{ $outcomeText }}
+        </h1>
+        <p class="text-gray-700 text-sm">
+          Last updated on
+          {{ Now.UTC.Format "Jan 02 at 15:04 MST" }}
+        </p>
+      </div>
+
       <div class="targets flex flex-col gap-4">
         <div
           class="inline-flex gap-1 justify-center md:justify-end time-range"

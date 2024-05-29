@@ -17,8 +17,12 @@
       <link rel="stylesheet" href="/static/css/tailwind.css" />
     </head>
     <body class="bg-gray-100 flex flex-col">
-      <header class="flex flex-col sm:flex-row items-center sm:justify-evenly p-4 gap-2">
-        <a href="/" class="text-2xl font-bold">zdravko.mnts.dev</a>
+      <header
+        class="container max-w-screen-md flex flex-col sm:flex-row items-center sm:justify-between p-4 gap-2"
+      >
+        <a href="/" class="hover:underline text-2xl font-bold"
+          >zdravko.mnts.dev</a
+        >
         <nav class="navbar flex sm:flex-row flex-col flex-wrap space-x-2 gap-1">
           {{ range .Navbar }}
             <a
@@ -31,21 +35,28 @@
             </a>
           {{ end }}
         </nav>
-        <img
-          src="https://avatars.githubusercontent.com/u/1910649?v=4"
-          alt="Profile Image"
-          class="rounded-full w-12 h-12"
-          ></img>
       </header>
       {{ template "main" . }}
       <div class="container mx-auto">
         <footer class="text-center text-gray-600 text-xs mt-8 mb-4">
-          &copy; {{ Now.UTC.Year }} Zdravko -
+          Powered by
+          <a class="hover:underline" href="https://zdravko.mnts.dev">Zdravko</a>
+          -
           <a
             class="hover:underline"
             href="https://github.com/mentos1386/zdravko"
             >Open Source</a
           >
+          - Made with <span class="text-red-500">❤</span> by
+          <a class="hover:underline" href="https://mnts.dev/about"
+            >Mentos1386</a
+          >
+          and
+          <a
+            class="hover:underline"
+            href="https://github.com/mentos1386/zdravko/graphs/contributors"
+            >others</a
+          >.
         </footer>
       </div>
       <script src="/static/js/htmx.min.js"></script>

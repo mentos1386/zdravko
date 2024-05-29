@@ -25,7 +25,7 @@ func NewServer(cfg *config.ServerConfig) (*Server, error) {
 	return &Server{
 		cfg:    cfg,
 		echo:   echo.New(),
-		logger: slog.Default().WithGroup("server"),
+		logger: slog.Default(),
 	}, nil
 }
 
@@ -51,7 +51,12 @@ func (s *Server) Start() error {
 
 	s.worker = NewWorker(temporalClient, s.cfg, s.logger, sqliteDb, kvStore)
 
-	s.echo.Renderer = templates.NewTemplates()
+	templates, err := templates.NewTemplates(s.logger)
+	if err != nil {
+		return errors.Wrap(err, "failed to create templates")
+	}
+	s.echo.Renderer = templates
+
 	s.echo.Use(middleware.Logger())
 	s.echo.Use(middleware.Recover())
 	s.echo.Use(middleware.Secure())

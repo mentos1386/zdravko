@@ -82,18 +82,18 @@ code {
   background: repeating-linear-gradient(
     0deg,
     var(--color-orange-300),
-    var(--color-orange-300) 10%,
-    var(--color-orange-400) 10%,
-    var(--color-orange-400) 20%
+    var(--color-orange-300) 33%,
+    var(--color-orange-400) 33%,
+    var(--color-orange-400) 66%
   );
 }
 #page-index .history.degraded:hover > .bar {
   background: repeating-linear-gradient(
     0deg,
     var(--color-orange-400),
-    var(--color-orange-400) 10%,
-    var(--color-orange-500) 10%,
-    var(--color-orange-500) 20%
+    var(--color-orange-400) 33%,
+    var(--color-orange-500) 33%,
+    var(--color-orange-500) 66%
   );
 }
 
