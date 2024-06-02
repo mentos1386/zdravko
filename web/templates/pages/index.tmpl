@@ -10,7 +10,7 @@
     {{ $outcomeText = "Some services are degraded." }}
     {{ $outcomeIcon = "alert-triangle" }}
     {{ $outcomeColor = "bg-orange-300" }}
-  {{ else }}
+  {{ else if eq .Outcome "UNKNOWN" }}
     {{ $outcomeText = "We are unable to determine current status." }}
     {{ $outcomeIcon = "help-circle" }}
     {{ $outcomeColor = "bg-gray-300" }}

@@ -1,11 +1,12 @@
 {
   "packages": [
-    "go@1.21",
     "watchexec@latest",
     "flyctl@latest",
     "just@latest",
     "nodePackages.npm@latest",
     "sqlite@latest",
-    "sqlite-web@latest"
+    "sqlite-web@latest",
+    "go@1.22",
+    "tailwindcss@latest"
   ]
 }

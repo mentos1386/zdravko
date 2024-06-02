@@ -1,0 +1,39 @@
+# Deploy the application to fly.io
+deploy-fly:
+  fly deploy --ha=false -c deploy/fly.toml -i {{DOCKER_IMAGE}}
+
+# Read local jwt key and set it as fly secret
+deploy-fly-set-jwt-key-secrets:
+  #!/bin/bash
+  # https://github.com/superfly/flyctl/issues/589
+  cat <<EOF | fly secrets import -c deploy/fly.toml
+  JWT_PRIVATE_KEY="""{{JWT_PRIVATE_KEY}}"""
+  JWT_PUBLIC_KEY="""{{JWT_PUBLIC_KEY}}"""
+  EOF
+
+# Deploy locally with docker compose
+deploy-docker: build-docker
+  docker compose --file dpeloy/docker-compose.yaml up
+
+# Build the application
+build: build-bin build-docker
+
+# Build multiarch binaries
+build-bin:
+  #!/bin/bash
+  for os in {{OS}}
+  do
+    for arch in {{ARCH}}
+    do
+      echo "Building zdravko for $os $arch..."
+      CGO_ENABLED=0 GOOS=$os GOARCH=$arch go build -o bin/zdravko-$os-$arch cmd/zdravko/main.go
+    done
+  done
+
+# Build docker image
+build-docker: build-bin
+  #!/bin/bash
+  docker buildx build \
+    -f build/Dockerfile \
+    -t {{DOCKER_IMAGE}} \
+    .

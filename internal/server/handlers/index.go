@@ -226,12 +226,17 @@ func (h *BaseHandler) Index(c echo.Context) error {
 		}
 
 		historyResult := getHistory(history, timeInterval, timeBuckets)
+		status := historyResult.List[len(historyResult.List)-1]
 
 		if outcomeByGroup[target.Group] == "" {
 			outcomeByGroup[target.Group] = HistoryOutcomeUnknown
 		}
 
-		status := historyResult.List[len(historyResult.List)-1]
+		if status.Outcome != HistoryOutcomeHealthy && status.Outcome != HistoryOutcomeUnknown {
+			overallOutcome = status.Outcome
+			outcomeByGroup[target.Group] = status.Outcome
+		}
+
 		if status.Outcome == HistoryOutcomeHealthy {
 			if overallOutcome == HistoryOutcomeUnknown {
 				overallOutcome = status.Outcome
@@ -239,10 +244,6 @@ func (h *BaseHandler) Index(c echo.Context) error {
 			if outcomeByGroup[target.Group] == HistoryOutcomeUnknown {
 				outcomeByGroup[target.Group] = status.Outcome
 			}
-		}
-		if status.Outcome != HistoryOutcomeHealthy && status.Outcome != HistoryOutcomeUnknown {
-			overallOutcome = status.Outcome
-			outcomeByGroup[target.Group] = status.Outcome
 		}
 
 		targetsWithHistory[i] = &Target{

@@ -1,23 +1,9 @@
-# syntax=docker/dockerfile:1
-ARG GO_VERSION=1.21
-FROM golang:${GO_VERSION} as builder
-# Set destination for COPY
-WORKDIR /app
+FROM gcr.io/distroless/static-debian12:latest as production
+ARG TARGETARCH
+ARG TARGETOS
 
-# Download Go modules
-COPY go.mod go.sum ./
-RUN go mod download
+COPY ./bin/zdravko-${TARGETOS}-${TARGETARCH} /bin/zdravko
 
-# Copy source code
-COPY . ./
-
-# Build
-RUN CGO_ENABLED=1 GOOS=linux go build -o /bin/zdravko cmd/zdravko/main.go
-
-###
-# Final production
-FROM gcr.io/distroless/base-debian12:latest as production
-COPY --from=builder /bin/zdravko /bin/zdravko
 COPY LICENSE /LICENSE
 COPY README.md /README.md
 
