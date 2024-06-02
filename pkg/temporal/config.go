@@ -17,12 +17,12 @@ const PersistenceStoreName = "sqlite-default"
 
 const BroadcastAddress = "127.0.0.1"
 
-const FrontendHttpPort = 8233
+const FrontendHttpPort = 7243
 const FrontendPort = 7233
 const HistoryPort = 7234
 const MatchingPort = 7235
-const WorkerPort = 7236
-const InternalFrontendPort = 7237
+const WorkerPort = 7239
+const InternalFrontendPort = 7236
 
 type TokenKeyProvider struct {
 	config *internal.TemporalConfig

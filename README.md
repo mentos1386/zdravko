@@ -47,6 +47,11 @@ just generate-jwt-key
 
 # Start development environment
 just run
+
+# Or build binaries
+just build-bin
+# Or docker image (for current platform)
+just build-docker
 ```
 
 ### License

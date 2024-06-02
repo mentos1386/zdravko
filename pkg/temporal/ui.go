@@ -9,17 +9,15 @@ import (
 
 func NewUiConfig(cfg *internal.TemporalConfig) *config.Config {
 	return &config.Config{
+		BannerText:          "Hello world!",
 		Host:                cfg.ListenAddress,
 		Port:                8223,
-		TemporalGRPCAddress: "localhost:7233",
+		TemporalGRPCAddress: "0.0.0.0:7233",
 		EnableUI:            true,
 		PublicPath:          "/settings/temporal",
 		ForwardHeaders:      []string{"Authorization"},
 		Codec: config.Codec{
 			Endpoint: "",
-		},
-		CORS: config.CORS{
-			CookieInsecure: true,
 		},
 	}
 }

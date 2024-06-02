@@ -16,7 +16,7 @@ import (
 func NewServer(cfg *config.Config, tokenKeyProvider authorization.TokenKeyProvider) (t.Server, error) {
 	logger := log.NewZapLogger(log.BuildZapLogger(log.Config{
 		Stdout:     true,
-		Level:      "warn",
+		Level:      "debug",
 		OutputFile: "",
 	}))
 
