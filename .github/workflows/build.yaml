@@ -45,6 +45,9 @@ jobs:
             type=semver,pattern={{major}}
             type=sha
 
+      - name: Build binaries
+        run: just build-bin
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
