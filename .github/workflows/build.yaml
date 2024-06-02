@@ -48,7 +48,7 @@ jobs:
             type=sha
 
       - name: Build binaries
-        run: just build-bin
+        run: devbox run -- just build-bin
 
       - name: Build and push
         uses: docker/build-push-action@v5
