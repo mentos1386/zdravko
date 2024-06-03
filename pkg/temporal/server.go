@@ -2,23 +2,22 @@ package temporal
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"path/filepath"
 
 	"go.temporal.io/server/common/authorization"
 	"go.temporal.io/server/common/config"
-	"go.temporal.io/server/common/log"
 	"go.temporal.io/server/common/primitives"
 	"go.temporal.io/server/schema/sqlite"
 	t "go.temporal.io/server/temporal"
 )
 
-func NewServer(cfg *config.Config, tokenKeyProvider authorization.TokenKeyProvider) (t.Server, error) {
-	logger := log.NewZapLogger(log.BuildZapLogger(log.Config{
-		Stdout:     true,
-		Level:      "debug",
-		OutputFile: "",
-	}))
+func NewServer(l *slog.Logger, cfg *config.Config, tokenKeyProvider authorization.TokenKeyProvider) (t.Server, error) {
+	logger := slogLogger{
+		log:   l,
+		level: slog.LevelDebug,
+	}
 
 	sqlConfig := cfg.Persistence.DataStores[PersistenceStoreName].SQL
 

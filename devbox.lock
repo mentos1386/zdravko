@@ -191,6 +191,54 @@
         }
       }
     },
+    "temporal-cli@latest": {
+      "last_modified": "2024-05-29T10:04:41Z",
+      "resolved": "github:NixOS/nixpkgs/ac82a513e55582291805d6f09d35b6d8b60637a1#temporal-cli",
+      "source": "devbox-search",
+      "version": "1.18.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/xnv5dw4i4da79zj9albbngb5y576k7zz-temporal-cli-1.18.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/xnv5dw4i4da79zj9albbngb5y576k7zz-temporal-cli-1.18.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/qhswqm1sprbvabsy7jzdfh63aihxgmd4-temporal-cli-1.18.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/qhswqm1sprbvabsy7jzdfh63aihxgmd4-temporal-cli-1.18.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/wkdwmyp26fp41nwyfrcnnhlzyw326czw-temporal-cli-1.18.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/wkdwmyp26fp41nwyfrcnnhlzyw326czw-temporal-cli-1.18.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/mirn2wzr63kbwjsd9rx0510nma8x9kqc-temporal-cli-1.18.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/mirn2wzr63kbwjsd9rx0510nma8x9kqc-temporal-cli-1.18.1"
+        }
+      }
+    },
     "watchexec@latest": {
       "last_modified": "2024-01-27T14:55:31Z",
       "resolved": "github:NixOS/nixpkgs/160b762eda6d139ac10ae081f8f78d640dd523eb#watchexec",

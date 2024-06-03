@@ -1,6 +1,8 @@
 package temporal
 
 import (
+	"log/slog"
+
 	"github.com/mentos1386/zdravko/internal/config"
 	"github.com/temporalio/ui-server/v2/server"
 	t "go.temporal.io/server/temporal"
@@ -12,9 +14,11 @@ type Temporal struct {
 }
 
 func NewTemporal(cfg *config.TemporalConfig) (*Temporal, error) {
+	logger := slog.Default()
+
 	serverConfig := NewServerConfig(cfg)
 	tokenKeyProvider := TokenKeyProvider{config: cfg}
-	server, err := NewServer(serverConfig, &tokenKeyProvider)
+	server, err := NewServer(logger, serverConfig, &tokenKeyProvider)
 	if err != nil {
 		return nil, err
 	}
