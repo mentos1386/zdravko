@@ -17,6 +17,7 @@ ARCH := "amd64 arm64"
 
 export CGO_ENABLED := "0"
 import 'build/Justfile'
+import 'deploy/Justfile'
 
 _default:
   @just --list
@@ -86,6 +87,12 @@ migration-new name:
   echo "Created migration file: $FILENAME"
 
 update-dependencies:
+  # Updating temporal dependencies is a bit tricky
+  #  as finding the right combination of api, server and ui-server
+  #  that work together is not easy.
+  # Any version of ui-server > 2.23.0 < 2.27.2 is broken for us.
+  # Using latest of everything results (at the time of writing) in to
+  #  working server but broken ui-server (404 when it tries to list namespaces).
   go get -u -t \
     go.k6.io/k6@v0.51.0 \
     github.com/temporalio/ui-server/v2@v2.23.0 \
