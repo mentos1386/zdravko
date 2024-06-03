@@ -1,4 +1,4 @@
-FROM gcr.io/distroless/static-debian12:latest as production
+FROM scratch
 ARG TARGETARCH
 ARG TARGETOS
 
