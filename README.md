@@ -33,7 +33,7 @@ Demo is available at https://zdravko.mnts.dev. More screenshots in the [docs fol
 # Development
 
 ### Dependencies
- * [devbox](https://www.jetpack.io/devbox)
+ * [devbox](https://www.jetify.com/devbox)
  * [justfile](https://github.com/casey/just) (optional, `devbox run -- just` can be used instead)
 
 ```sh
