@@ -88,8 +88,10 @@ migration-new name:
 update-dependencies:
   go get -u -t \
     go.k6.io/k6@v0.51.0 \
-    go.temporal.io/server@v1.25.0-113.0.0.20240601002043-57f4709bfaa0 \
-    go.temporal.io/api@v1.34.1-0.20240531204243-10273725c6ea \
+    github.com/temporalio/ui-server/v2@v2.23.0 \
+    go.temporal.io/server@v1.23.0 \
+    go.temporal.io/api@v1.29.2 \
+    go.temporal.io/sdk@v1.26.0 \
     ./...
   go mod tidy
 
