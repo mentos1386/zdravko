@@ -4,7 +4,7 @@ changelog:
   use: github
 
 snapshot:
-  name_template: "{{ .Version }}-UNSTABLE-{{ .Branch }}-{{ .ShortCommit }}"
+  name_template: "{{ .Version }}-UNSTABLE-{{ .ShortCommit }}"
 
 builds:
   - main: ./cmd/zdravko
