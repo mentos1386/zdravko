@@ -12,5 +12,5 @@ deploy-fly-set-jwt-key-secrets:
   EOF
 
 # Deploy locally with docker compose
-deploy-docker: build-docker
+deploy-docker: build
   docker compose --file dpeloy/docker-compose.yaml up

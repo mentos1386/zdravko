@@ -14,6 +14,12 @@ import (
 	"github.com/mentos1386/zdravko/pkg/worker"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 type StartableAndStoppable interface {
 	Name() string
 	Start() error
@@ -42,7 +48,8 @@ func main() {
 	flag.BoolVar(&startTemporal, "temporal", false, "Start the temporal")
 	flag.Parse()
 
-	slog.Info("Starting zdravko...", "server", startServer, "worker", startWorker, "temporal", startTemporal)
+	slog.Info("Starting zdravko", "version", version, "commit", commit, "date", date)
+	slog.Info("Components...", "server", startServer, "worker", startWorker, "temporal", startTemporal)
 
 	if !startServer && !startWorker && !startTemporal {
 		slog.Error("At least one of the following must be set: --server, --worker, --temporal")

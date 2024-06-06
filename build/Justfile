@@ -1,22 +1,26 @@
-# Build the application
-build: build-bin build-docker
+# Only build binary for current platform.
+build-only-bin:
+  goreleaser build --snapshot --clean --single-target --config ./build/release.yaml
 
-# Build multiarch binaries
-build-bin:
-  #!/bin/bash
-  for os in {{OS}}
-  do
-    for arch in {{ARCH}}
-    do
-      echo "Building zdravko for $os $arch..."
-      CGO_ENABLED=0 GOOS=$os GOARCH=$arch go build -o bin/zdravko-$os-$arch cmd/zdravko/main.go
-    done
+# Build binaries, packages, docker images for all platforms.
+build:
+  goreleaser release --snapshot --clean --config ./build/release.yaml
+
+# Unstable release process.
+unstable:
+  #!/bin/env bash
+  set -exuo pipefail
+  goreleaser release --clean --snapshot --config ./build/release.yaml
+
+  IMAGES=$(docker image ls --format "{{'{{ .Repository }}:{{ .Tag }}'}}" | grep -e "{{ DOCKER_IMAGE }}.*")
+
+  for image in ${IMAGES}; do
+    docker push ${image}
   done
 
-# Build docker image
-build-docker: build-bin
-  #!/bin/bash
-  docker buildx build \
-    -f build/Dockerfile \
-    -t {{DOCKER_IMAGE}} \
-    .
+  docker manifest create {{ DOCKER_IMAGE }} ${IMAGES}
+  docker manifest push {{ DOCKER_IMAGE }}
+
+# Stable release process.
+release:
+  goreleaser release --clean --config ./build/release.yaml

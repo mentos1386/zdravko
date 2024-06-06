@@ -1,0 +1,100 @@
+report_sizes: true
+
+changelog:
+  use: github
+
+snapshot:
+  name_template: "{{ .Version }}-UNSTABLE-{{ .Branch }}-{{ .ShortCommit }}"
+
+builds:
+  - main: ./cmd/zdravko
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+    goos:
+      - "darwin"
+      - "freebsd"
+      - "linux"
+      - "windows"
+    goarch:
+      - "amd64"
+      - "arm64"
+
+nfpms:
+  - vendor: Tine Jozelj
+    homepage: https://zdravko.mnts.dev
+    maintainer: Tine Jozelj <me@mnts.dev>
+    license: AGPL-3.0
+    description: |
+      Zdravko is a selfhosted healthcheck service designed to work for small scale,
+      or multi region deployments. It can monitor virtually anything.
+    formats:
+      - apk
+      - deb
+      - rpm
+      - termux.deb
+      - archlinux
+    provides:
+      - zdravko
+
+universal_binaries:
+  - replace: true
+
+archives:
+  - format: tar.gz
+    wrap_in_directory: true
+    format_overrides:
+      - goos: windows
+        format: zip
+
+dockers:
+  - image_templates:
+      - "{{ .Env.DOCKER_REGISTRY }}:sha-{{ .ShortCommit }}-amd64"
+      - "{{ .Env.DOCKER_REGISTRY }}:{{ .Version }}-amd64"
+      - "{{ .Env.DOCKER_REGISTRY }}:latest-amd64"
+    use: buildx
+    goos: linux
+    goarch: amd64
+    dockerfile: build/Dockerfile
+    extra_files:
+      - "README.md"
+      - "LICENSE"
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--platform=linux/amd64"
+  - image_templates:
+      - "{{ .Env.DOCKER_REGISTRY }}:sha-{{ .ShortCommit }}-arm64"
+      - "{{ .Env.DOCKER_REGISTRY }}:{{ .Version }}-arm64"
+      - "{{ .Env.DOCKER_REGISTRY }}:latest-arm64"
+    use: buildx
+    goos: linux
+    goarch: arm64
+    dockerfile: build/Dockerfile
+    extra_files:
+      - "README.md"
+      - "LICENSE"
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--platform=linux/arm64"
+
+docker_manifests:
+  - name_template: "{{ .Env.DOCKER_REGISTRY }}:sha-{{ .ShortCommit }}"
+    image_templates:
+      - "{{ .Env.DOCKER_REGISTRY }}:{{ .Version }}-amd64"
+      - "{{ .Env.DOCKER_REGISTRY }}:{{ .Version }}-arm64"
+  - name_template: "{{ .Env.DOCKER_REGISTRY }}:{{ .Version }}"
+    image_templates:
+      - "{{ .Env.DOCKER_REGISTRY }}:{{ .Version }}-amd64"
+      - "{{ .Env.DOCKER_REGISTRY }}:{{ .Version }}-arm64"
+  - name_template: "{{ .Env.DOCKER_REGISTRY }}:latest"
+    image_templates:
+      - "{{ .Env.DOCKER_REGISTRY }}:{{ .Version }}-amd64"
+      - "{{ .Env.DOCKER_REGISTRY }}:{{ .Version }}-arm64"
