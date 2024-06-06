@@ -8,6 +8,7 @@
     "sqlite-web@latest",
     "go@1.22",
     "tailwindcss@latest",
-    "temporal-cli@latest"
+    "temporal-cli@latest",
+    "goreleaser@latest"
   ]
 }

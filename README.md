@@ -48,10 +48,10 @@ just generate-jwt-key
 # Start development environment
 just run
 
-# Or build binaries
-just build-bin
-# Or docker image (for current platform)
-just build-docker
+# Or build binaries, packages, docker images...
+just build
+# Or build only one binary.
+just build-only-binary
 ```
 
 ### License

@@ -8,6 +8,9 @@ export JWT_PRIVATE_KEY := `cat jwt.private.pem || echo ""`
 export JWT_PUBLIC_KEY := `cat jwt.public.pem || echo ""`
 
 GIT_SHA := `git rev-parse --short HEAD`
+
+export DOCKER_REGISTRY := "ghcr.io/mentos1386/zdravko"
+
 DOCKER_IMAGE := "ghcr.io/mentos1386/zdravko:sha-"+GIT_SHA
 
 STATIC_DIR := "./web/static"
@@ -52,7 +55,7 @@ generate-jwt-key:
   openssl rsa -pubout -in jwt.private.pem -out jwt.public.pem
 
 # Run Docker application.
-run-docker: build-docker
+run-docker: build
   docker run -p 8080:8080 \
   -it --rm \
   -e SESSION_SECRET \

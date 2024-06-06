@@ -1,9 +1,6 @@
 FROM gcr.io/distroless/static-debian12:latest as production
-ARG TARGETARCH
-ARG TARGETOS
 
-COPY ./bin/zdravko-${TARGETOS}-${TARGETARCH} /bin/zdravko
-
+COPY zdravko /bin/zdravko
 COPY LICENSE /LICENSE
 COPY README.md /README.md
 
@@ -21,9 +18,6 @@ ENV SQLITE_DATABASE_PATH=/data/zdravko.db
 ENV TEMPORAL_DATABASE_PATH=/data/temporal.db
 ENV KEYVALUE_DATABASE_PATH=/data/keyvalue.db
 VOLUME /data
-
-ENV DATABASE_PATH=/data/zdravko.db
-ENV TEMPORAL_DATABASE_PATH=/data/temporal.db
 
 ENTRYPOINT ["/bin/zdravko"]
 CMD ["--server", "--temporal", "--worker"]
