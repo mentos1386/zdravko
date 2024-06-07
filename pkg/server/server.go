@@ -14,18 +14,20 @@ import (
 )
 
 type Server struct {
-	echo   *echo.Echo
-	cfg    *config.ServerConfig
-	logger *slog.Logger
+	echo    *echo.Echo
+	cfg     *config.ServerConfig
+	logger  *slog.Logger
+	version string
 
 	worker *Worker
 }
 
-func NewServer(cfg *config.ServerConfig) (*Server, error) {
+func NewServer(version string, cfg *config.ServerConfig) (*Server, error) {
 	return &Server{
-		cfg:    cfg,
-		echo:   echo.New(),
-		logger: slog.Default(),
+		cfg:     cfg,
+		echo:    echo.New(),
+		logger:  slog.Default(),
+		version: version,
 	}, nil
 }
 
@@ -51,7 +53,7 @@ func (s *Server) Start() error {
 
 	s.worker = NewWorker(temporalClient, s.cfg, s.logger, sqliteDb, kvStore)
 
-	templates, err := templates.NewTemplates(s.logger)
+	templates, err := templates.NewTemplates(s.version, s.logger)
 	if err != nil {
 		return errors.Wrap(err, "failed to create templates")
 	}

@@ -23,7 +23,7 @@ type Templates struct {
 	templates map[string]*template.Template
 }
 
-func load(files ...string) *template.Template {
+func load(version string, files ...string) *template.Template {
 	files = append(files, base)
 
 	t := template.New("default").Funcs(
@@ -44,17 +44,20 @@ func load(files ...string) *template.Template {
 			"Now":                  time.Now,
 			"ScriptUnescapeString": script.UnescapeString,
 			"ScriptEscapeString":   script.EscapeString,
+			"Version": func() string {
+				return version
+			},
 		})
 
 	return template.Must(t.ParseFS(templates, files...))
 }
 
-func loadSettings(files ...string) *template.Template {
+func loadSettings(version string, files ...string) *template.Template {
 	files = append(files, "components/settings.tmpl")
-	return load(files...)
+	return load(version, files...)
 }
 
-func NewTemplates(logger *slog.Logger) (*Templates, error) {
+func NewTemplates(version string, logger *slog.Logger) (*Templates, error) {
 	t := Templates{
 		logger:    logger,
 		templates: map[string]*template.Template{},
@@ -69,9 +72,9 @@ func NewTemplates(logger *slog.Logger) (*Templates, error) {
 			pathWithoutPrefix := strings.TrimPrefix(path, "pages/")
 
 			if strings.Contains(path, "settings") {
-				t.templates[pathWithoutPrefix] = loadSettings(path)
+				t.templates[pathWithoutPrefix] = loadSettings(version, path)
 			} else {
-				t.templates[pathWithoutPrefix] = load(path)
+				t.templates[pathWithoutPrefix] = load(version, path)
 			}
 		}
 		return nil

@@ -16,7 +16,7 @@ import (
 func NewServer(l *slog.Logger, cfg *config.Config, tokenKeyProvider authorization.TokenKeyProvider) (t.Server, error) {
 	logger := slogLogger{
 		log:   l,
-		level: slog.LevelDebug,
+		level: slog.LevelInfo,
 	}
 
 	sqlConfig := cfg.Persistence.DataStores[PersistenceStoreName].SQL

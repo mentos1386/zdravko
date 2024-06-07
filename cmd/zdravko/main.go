@@ -73,7 +73,7 @@ func main() {
 	if startServer {
 		slog.Info("Setting up Server")
 		cfg := config.NewServerConfig()
-		server, err := server.NewServer(cfg)
+		server, err := server.NewServer(version, cfg)
 		if err != nil {
 			slog.Error("Unable to create server", "error", err)
 			os.Exit(1)
