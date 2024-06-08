@@ -10,6 +10,8 @@ build:
 unstable:
   #!/bin/env bash
   set -exuo pipefail
+  export DOCKER_REGISTRY={{ DOCKER_REGISTRY }}
+
   goreleaser release --clean --snapshot --config ./build/release.yaml
 
   IMAGES=$(docker image ls --format "{{'{{ .Repository }}:{{ .Tag }}'}}" | grep -e "{{ DOCKER_IMAGE }}.*")

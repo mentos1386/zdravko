@@ -7,16 +7,11 @@ set dotenv-load
 export JWT_PRIVATE_KEY := `cat jwt.private.pem || echo ""`
 export JWT_PUBLIC_KEY := `cat jwt.public.pem || echo ""`
 
+DOCKER_REGISTRY := "ghcr.io/mentos1386/zdravko"
 GIT_SHA := `git rev-parse --short HEAD`
-
-export DOCKER_REGISTRY := "ghcr.io/mentos1386/zdravko"
-
-DOCKER_IMAGE := "ghcr.io/mentos1386/zdravko:sha-"+GIT_SHA
+DOCKER_IMAGE := "{{ DOCKER_REGISTRY }}:sha-{{ GIT_SHA }}"
 
 STATIC_DIR := "./web/static"
-
-OS := "linux darwin"
-ARCH := "amd64 arm64"
 
 export CGO_ENABLED := "0"
 import 'build/Justfile'
